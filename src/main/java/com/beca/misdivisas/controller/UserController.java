@@ -3,34 +3,29 @@ package com.beca.misdivisas.controller;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.beca.misdivisas.interfaces.ILogRepo;
 import com.beca.misdivisas.interfaces.IRolRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRolRepo;
 import com.beca.misdivisas.jpa.Log;
-import com.beca.misdivisas.jpa.Rol;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.jpa.UsuarioRol;
 import com.beca.misdivisas.util.Constantes;
@@ -60,6 +55,9 @@ public class UserController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
+	@Autowired
+	 private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     
 	
 	 @GetMapping("/usuarioHome")
@@ -447,6 +445,7 @@ public class UserController {
 			audit.setOpcionMenu(opcion);
 			audit.setResultado(true);
 			logRepo.save(audit);
+			logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);
 		}
     
     

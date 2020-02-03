@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,12 +26,12 @@ public class LogController {
 	
 	@Autowired
 	private ILogRepo logRepo;
-
-	@Autowired
-	private HttpServletRequest request;
 	
 	@Autowired
 	private ObjectFactory<HttpSession> factory;
+	
+	@Autowired
+	 private static final Logger logger = LoggerFactory.getLogger(LogController.class);
 
 
 	@RequestMapping(value = "/RegistrarLog", method = RequestMethod.POST)
@@ -58,5 +60,6 @@ public class LogController {
 		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);
+		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);
 	}
 }

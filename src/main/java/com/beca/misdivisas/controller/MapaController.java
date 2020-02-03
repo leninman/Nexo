@@ -9,6 +9,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,6 +47,9 @@ public class MapaController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
+	@Autowired
+	 private static final Logger logger = LoggerFactory.getLogger(MapaController.class);
 	
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
@@ -141,5 +146,7 @@ public class MapaController {
 		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);
+		
+		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);		
 	}
 }

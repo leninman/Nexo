@@ -60,11 +60,12 @@ public class UsuarioService implements UserDetailsService {
 				
 		if (username!=null && username.length() > 0) {
 			us = repo.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(username,"A");
-			if (us!=null) {
-				
-					us.setTipoUsuario("Externo");
+			if (us!=null) {				
+					
 					session.removeAttribute("Usuario");
-					session.setAttribute("Usuario", us);					
+					us.setTipoUsuario("Externo");
+					session.setAttribute("Usuario", us);				
+					
 					Date date = new Date();
 					
 					Log audit = new Log();

@@ -15,6 +15,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -67,6 +69,9 @@ public class ReporteController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
+	@Autowired
+	 private static final Logger logger = LoggerFactory.getLogger(ReporteController.class);
 
 	@GetMapping(value = "/reporte")
 	public String reporte(Model modelo) {
@@ -189,8 +194,7 @@ public class ReporteController {
 				modelo.addAttribute("diponibleEuros", "0,00");
 			}
 
-			registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA, Constantes.OPCION_POSICION,
-					true);
+			registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA, Constantes.OPCION_POSICION, true);
 
 			return "reporte";
 
@@ -709,5 +713,6 @@ public class ReporteController {
 		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);
+		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);
 	}
 }
