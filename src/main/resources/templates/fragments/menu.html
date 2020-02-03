@@ -1,0 +1,163 @@
+
+<th:block th:fragment="menuLateral">
+    
+    
+    <!-- Sidebar -->
+		<ul	class="navbar-nav bg-dark sidebar sidebar-dark accordion" id="accordionSidebar">
+
+			<!-- Sidebar - Brand -->
+			<div style="width: 90%; height: 100px">
+			<img th:src="@{/img/exterior.png}" alt="BECA" width="95%" height="100%" style="margin-left: 5%"/>
+			</div>
+
+			<!-- Divider -->
+			<hr class="sidebar-divider my-0">
+
+			<!-- Nav Item - Dashboard -->
+			<li class="nav-item">
+				<a class="nav-link" href="main" id="mainl">
+					<i class="fas fa-fw fas fa-home"></i> 
+					<span>Inicio</span>
+				</a>
+			</li>
+
+			<!-- Divider -->
+			<hr class="sidebar-divider">
+
+			<!-- Heading -->
+			<div class="sidebar-heading">Menu Principal</div>
+
+			<div sec:authorize="hasRole('ADMIN')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
+		          <i class="fas fa-search-dollar"></i>
+		          <span>Consultas</span>
+		        </a>
+		        <div id="collapseUtilities1" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>
+		          <span>Divisas General</span></a>
+		          </div>
+		        </div>
+		      </li>
+
+				<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
+		          <i class="fas fa-clipboard"></i>
+		          <span>Reportes</span>
+		        </a>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="reporte" id="reportel"><i class="fas fa-file"></i>
+		          <span>Posici&oacute;n Consolidada</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-file"></i>
+		          <span>Billetes No Aptos</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-file"></i>
+		          <span>Tracking de Remesas</span></a>
+		          </div>
+		        </div>
+		      </li>
+			</div>
+			
+			<div sec:authorize="hasRole('CONSULTOR')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
+		          <i class="fas fa-search-dollar"></i>
+		          <span>Consultas</span>
+		        </a>
+		        <div id="collapseUtilities1" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>
+		          <span>Divisas General</span></a>
+		          </div>
+		        </div>
+		      </li>
+
+				<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
+		          <i class="fas fa-clipboard"></i>
+		          <span>Reportes</span>
+		        </a>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="reporte" id="reportel"><i class="fas fa-file"></i>
+		          <span>Posici&oacute;n Consolidada</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-file"></i>
+		          <span>Billetes No Aptos</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-file"></i>
+		          <span>Tracking De Remesas</span></a>
+		          </div>
+		        </div>
+		      </li>
+			</div>
+			
+			<div sec:authorize="hasRole('ADMIN')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities3" aria-expanded="true" aria-controls="collapseUtilities3">
+		          <i class="fas fa-user-lock"></i>
+		          <span>Seguridad</span>
+		        </a>
+		        <div id="collapseUtilities3" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="usuarioHome" id="usuarioHomel"><i class="fas fa-fw fa-users"></i>
+		          <span>Usuarios</span></a>
+		          </div>
+		        </div>
+		      </li> 
+			 </div>
+			
+			<div sec:authorize="hasRole('ADMIN_BECA')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		     <!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities3" aria-expanded="true" aria-controls="collapseUtilities3">
+		          <i class="fas fa-user-lock"></i>
+		          <span>Seguridad</span>
+		        </a>
+		        <div id="collapseUtilities3" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="usuarioHome" id="usuarioHomel"><i class="fas fa-fw fa-users"></i>
+		          <span>Usuarios</span></a>
+		          </div>
+		        </div>
+		      </li> 
+			 </div>
+
+			
+			
+
+
+			<!-- Divider -->
+			<hr class="sidebar-divider d-none d-md-block">
+
+			<!-- Sidebar Toggler (Sidebar) -->
+			<div class="text-center d-none d-md-inline">
+				<button class="rounded-circle border-0" id="sidebarToggle"></button>
+			</div>
+
+		</ul>
+		<!-- End of Sidebar -->
+    
+
+</th:block>

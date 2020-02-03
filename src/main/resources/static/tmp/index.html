@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+  xmlns:th="http://www.thymeleaf.org" 
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+  layout:decorate="~{base}">
+<head th:replace=“layout :: site-head”>
+<title>Welcome to Spring MVC Blog</title>
+</head>
+
+<body>
+<h1>INDEX.HTML STATIC TMP</h1>
+<header th:replace=“layout :: site-header” />
+
+<h1>Welcome to Spring MVC</h1>
+Now is: <b th:text=“${execInfo.now.time}”>date and time</b>
+
+<footer th:replace=“layout :: site-footer” />
+
+</body>
+
+</html>

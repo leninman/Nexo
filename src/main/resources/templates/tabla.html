@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>Spring Boot + Datatables</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+<script
+	src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="/js/datatable.js"></script>
+</head>
+
+<body>
+	<h1>Total por Sucursales</h1>
+	<table id="reportable" class="display">
+
+		<!-- Header Table -->
+		<thead>
+			<tr>
+				<th>Zona</th>
+				<th>Nombre</th>
+				<th>Monto</th>
+				<th>Moneda</th>
+			</tr>
+		</thead>
+		<!-- Footer Table -->
+		<tfoot>
+			<tr>
+				<th>Zona</th>
+				<th>Nombre</th>
+				<th>Monto</th>
+				<th>Moneda</th>
+			</tr>
+		</tfoot>
+	</table>
+	<table border="1" class="display">
+		<tr>
+			<td>Zona</td>
+			<td>Nombre</td>
+			<td>Monto</td>
+			<td>Moneda</td>
+		</tr>
+		<tr th:each="suc : ${SucList}">
+			<td th:text="${suc?.zona}">zona</td>
+			<td th:text="${suc?.nombre}">nombre</td>
+			<td th:text="${suc?.monto}">monto</td>
+			<td th:text="${suc?.moneda}">moneda</td>
+		</tr>
+	</table>
+</body>
+</html>

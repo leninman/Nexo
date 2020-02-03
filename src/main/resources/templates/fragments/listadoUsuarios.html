@@ -1,0 +1,116 @@
+<th:block th:fragment=listadoUsuarios>
+
+	<div class="container my-2">
+		<div class="card">
+			<div class="card-body">
+				<div th:switch="${usuarios}" class="container my-5">
+					<p class="my-5">
+						<a href="/signup" class="btn btn-primary"> <i
+							class="fas fa-user-plus ml-2"> Agregar Usuarios</i></a>
+					</p>
+					<div class="col-md-10">
+						<h2 th:case="null">No Existen Usuarios</h2>
+						<div th:case="*">
+							<table class="table table-striped table-responsive-md">
+								<thead>
+									<tr>
+										<th>Nombre</th>
+										<th>E-Mail</th>
+										<th>Ultima Conexion</th>
+										<th>Habilitado</th>
+										<th></th>
+										<th></th>
+									</tr>
+								</thead>
+								
+								<tbody>
+									<tr th:each="usuario : ${usuarios}">
+										<td th:text="${usuario.nombre}"></td>
+										<td th:text="${usuario.email}"></td>
+										<td th:text="${usuario.fechaHoraUltimaConexion}"></td>
+										<td th:text="${usuario.habilitado}"></td>
+										<td><a th:href="@{editar/{id}(id=${usuario.id})}"
+											class="btn btn-primary"><i class="fas fa-user-edit ml-2"></i></a></td>
+										<td><a th:href="@{eliminar/{id}(id=${usuario.id})}"
+											class="btn btn-primary"><i class="fas fa-user-times ml-2"></i></a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</th:block>
+
+
+
+<th:block th:fragment="updateUsuario">
+<div class="container my-5">
+        <h3> Actualizar Usuario</h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="col-md-8">
+                    <form action="#" th:action="@{/update/{id}(id=${usuario.id})}" th:object="${usuario}" method="post">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="nombre" class="col-form-label">Nombre</label> <input type="text" th:field="*{nombre}" class="form-control" id="nombre" placeholder="Nombre"> <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label for="email" class="col-form-label">Email</label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="Email"> <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label for="Clave" class="col-form-label">Clave</label> <input type="text" th:field="*{clave}"  class="form-control"  id="clave" placeholder="clave"> <span th:if="${#fields.hasErrors('clave')}" th:errors="*{clave}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label for="estatus" class="col-form-label">Estatus</label> <input type="text" th:field="*{Estatus}" class="form-control" id="estatus" placeholder="estatus"> <span th:if="${#fields.hasErrors('estatus')}" th:errors="*{estatus}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8" style="text-align: center;">
+                                <input type="submit" class="btn btn-primary" value="Guardar">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+<th:block th:fragment="addUsuario">
+<div class="container my-5">
+        <h3> Agregar Usuario</h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="col-md-10">
+                    <form action="#" th:action="@{/add}" th:object="${usuario}" method="post">
+                        <div class="row">                        
+                        	 <div class="form-group col-md-8">
+                                <label for="id" class="col-form-label">ID</label> <input type="text" th:field="*{id}" class="form-control" id="id" placeholder="ID"> 
+                                <span th:if="${#fields.hasErrors('id')}" th:errors="*{id}" class="text-danger"></span>
+                            </div>                            
+                             <div class="form-group col-md-8">
+                                <label for="nombre" class="col-form-label">Nombre</label> <input type="text" th:field="*{nombre}" class="form-control" id="nombre" placeholder="Nombre"> <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label for="email" class="col-form-label">Email</label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="Email"> <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label for="Clave" class="col-form-label">Clave</label> <input type="text" th:field="*{clave}"  class="form-control"  id="clave" placeholder="clave"> <span th:if="${#fields.hasErrors('clave')}" th:errors="*{clave}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8">
+                                <label for="estatus" class="col-form-label">Estatus</label> <input type="text" th:field="*{Estatus}" class="form-control" id="estatus" placeholder="estatus"> <span th:if="${#fields.hasErrors('estatus')}" th:errors="*{estatus}" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-8" style="text-align: center;">
+                                <input type="submit" class="btn btn-primary" value="Guardar">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
