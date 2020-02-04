@@ -288,7 +288,7 @@ public class ReporteController {
 						rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_CANCELADA);
 
 						saldo = saldo.subtract(remesa.getRemesaDetalles().get(0).getMonto());
-						rs.setSaldo(String.format("%.2f", saldo));
+						rs.setSaldo(Util.formatMonto(saldo.toString()));
 						reportes.add(rs);
 					}
 
@@ -298,10 +298,10 @@ public class ReporteController {
 						rs = new ReporteSucursal();
 						rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
 						rs.setReferencia(remesa.getCartaPorte() + "-BNA");
-						rs.setDebito(Util.formatMonto(tmp.negate().toString()));
+						rs.setDebito(Util.formatMonto(tmp.toString()));
 						rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_BNA);
 						saldo = saldo.subtract(tmp);
-						rs.setSaldo(String.format("%.2f", saldo));
+						rs.setSaldo(Util.formatMonto(saldo.toString()));
 						reportes.add(rs);
 					}
 				}

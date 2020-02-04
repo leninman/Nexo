@@ -27,33 +27,42 @@ function tabla(fechaInicio, fechaFin, moneda) {
 		            sortDescending: ": ordenar descendente"
 		        }
 		    },
-			"sAjaxSource": "remesa/"+fechaInicio+"/"+fechaFin+"/"+moneda,
-			"sAjaxDataProp": "",
-			"order": [[ 0, "desc" ]],
-			"aoColumns": [
-			      { "mData": "fecha"},
-				  { "mData": "referencia" },
-				  { "mData": "concepto" },
-				  { "mData": "debito" },
-				  { "mData": "credito" },
-				  { "mData": "saldo" }
+			sAjaxSource: "remesa/"+fechaInicio+"/"+fechaFin+"/"+moneda,
+			sAjaxDataProp: "",
+			order: [[ 0, "desc" ]],
+			columns: [
+			      { data: "fecha"},
+				  { data: "referencia" },
+				  { data: "concepto" },
+				  { data: "debito" },
+				  { data: "credito" },
+				  { data: "saldo" }
 				  
 			],
 			bFilter: false,		    
 		    dom: 'Bfrtip',
-		    buttons: [
-		    	'excel',
-                'csv',
-                'pdf'
-            ],
+		    buttons: [{
+		        extend: 'excelHtml5',
+		        customize: function( xlsx ) {
+		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		          }
+		      },
+		      {extend: 'csvHtml5'}, 
+		      {extend: 'pdf'}
+		      
+		      ],
 	        initComplete: function () {
 	            var btns = $('.dt-button');
 	            btns.addClass('btn btn-info btn-sm');
 	            btns.removeClass('dt-button');
 	        },
-            columnDefs: [{ className: "text-right", "targets": [3,4,5]
-                }],
-            pageLength:15
+            columnDefs: [
+            	{ className: "text-right", "targets": [1,3,4,5]},
+            	{ type: "string", "targets": [3,4,5]}
+            ],
+            pageLength:15,
+            
 	 })
 	 
 	 $(".buttons-excel").on('click', function(event){
@@ -123,11 +132,17 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 			],
 			bFilter: false,		    
 		    dom: 'Bfrtip',
-		    buttons: [
-		    	'excel',
-                'csv',
-                'pdf'
-            ],
+		    buttons: [{
+		        extend: 'excelHtml5',
+		        customize: function( xlsx ) {
+		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		          }
+		      },
+		      {extend: 'csvHtml5'}, 
+		      {extend: 'pdf'}
+		      
+		      ],
 	        initComplete: function () {
 	            var btns = $('.dt-button');
 	            btns.addClass('btn btn-info btn-sm');
@@ -251,11 +266,16 @@ function tablaRemesa(fechaInicio, fechaFin, cartaPorte) {
 			],
 			bFilter: false,		    
 		    dom: 'Bfrtip',
-		    buttons: [
-		    	'excel',
-                'csv',
-                'pdf'
-            ],
+		    buttons: [{
+		        extend: 'excelHtml5',
+		        customize: function( xlsx ) {
+		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		          }
+		      },
+		      {extend: 'csvHtml5'}, 
+		      {extend: 'pdf'}
+		      ],
 	        initComplete: function () {
 	            var btns = $('.dt-button');
 	            btns.addClass('btn btn-info btn-sm');
