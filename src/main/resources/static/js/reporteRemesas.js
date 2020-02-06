@@ -81,7 +81,7 @@ function validar_no_aptos(){
 	if(muestra==1){
 		$("#modalbody").html(mensaje);
 		$('#exampleModalCenter').modal('show');
-		$('#reportable').DataTable().destroy();
+		$('#tablaNoAptos').DataTable().destroy();
 		$("#father").hide();
 	}else{
 		var fechaInicio =  $( "#fechaInicio" ).val();	
@@ -126,7 +126,7 @@ function validar_consolidada(){
 	if(muestra==1){
 		$("#modalbody").html(mensaje);
 		$("#exampleModalCenter").modal('show');
-		$("#reportable").DataTable().destroy();
+		$("#tablaRemesas").DataTable().destroy();
 		$("#father").hide();
 	}else{
 		var fechaInicio =  $( "#fechaInicio" ).val();	

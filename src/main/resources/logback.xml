@@ -7,7 +7,7 @@
    </appender>
    
    <appender name = "FILE" class = "ch.qos.logback.core.FileAppender">
-      <File>/tmp/misDivisas.log</File>
+      <File>/app/logs/misDivisas.log</File>
       <encoder>
          <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p] %m%n</pattern>
       </encoder>

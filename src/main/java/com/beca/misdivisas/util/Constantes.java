@@ -23,8 +23,8 @@ public interface Constantes {
 	public static final int REINTEGRO_CUANTIA = 11;
 	public static final int DIFERENCIA_SOBRANTE = 14;
 	public static final int RECEPCION_EFECTIVO = 17;
-	public static final int BILLETE_NO_APTO = 18;
-	public static final int REMESA_FALTANTE = 19;
+	//public static final int BILLETE_NO_APTO = 18;
+	//public static final int REMESA_FALTANTE = 19;
 
 	public static final String  SIMBOLO_DOLAR = "$";
 	public static final String  SIMBOLO_EURO = "€";

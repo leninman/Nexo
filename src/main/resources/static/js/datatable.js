@@ -1,20 +1,19 @@
 
  
 function tabla(fechaInicio, fechaFin, moneda) {
-	$('#reportable').DataTable().destroy();
+	$('#tablaRemesas').DataTable().destroy();
 	var accion = "Descargar Posicion Consolidada";
 	var detalle = "Descarga el reporte:  fecha inicio(";
 	var opcion = "Descarga";
-	detalle = detalle + ': fecha inicio('+fechaInicio+'); fecha fin('+fechaFin+'); moneda('+moneda+')';
+	detalle = detalle + ': fecha inicio('+fechaInicio+'); fecha fin('+fechaFin+'); moneda('+moneda+')';	
 	
-	
-	 var table = $('#reportable').DataTable({
+	 var table = $('#tablaRemesas').DataTable({
 	        processing: true,
 	        language: {			 
 	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',					        
 		        lengthMenu:    	"Mostrar _MENU_ elementos",
 		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
-		        zeroRecords:    "Sin registros",
+		        zeroRecords:    "No hay movimientos en el rango de fechas y moneda seleccionada",
 		        emptyTable:     "No hay movimientos en el rango de fechas y moneda seleccionada",
 		        paginate: {
 		            first:      "Primero",
@@ -93,19 +92,19 @@ function registrar(accion, detalle, opcion){
 }
 
 function tablaNoAptos(fechaInicio, fechaFin, moneda) {
-	$('#reportable').DataTable().destroy();
+	$('#tablaNoAptos').DataTable().destroy();
 	var accion = "Descargar Posicion BNA";
 	var detalle = "Descarga el reporte BNA:  fecha inicio(";
 	var opcion = "Descarga";
 	detalle = detalle +fechaInicio+'); fecha fin('+fechaFin+'); moneda('+moneda+')';
-	 var table = $('#reportable').DataTable({
+	 var table = $('#tablaNoAptos').DataTable({
 	        processing: true,
 	        language: {			 
 	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',		        
 		        lengthMenu:    	"Mostrar _MENU_ elementos",
 		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
-		        zeroRecords:    "Sin registros",
-		        emptyTable:     "No hay datos para visualizar",
+		        zeroRecords:    "Usted no tiene registro de Billetes No Aptos",
+		        emptyTable:     "Usted no tiene registro de Billetes No Aptos",
 		        paginate: {
 		            first:      "Primero",
 		            previous:   "Previo",
@@ -166,19 +165,19 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 
 
 function tablaIrregularidades(cartaporte) {
-	$('#tablaNoAptos').DataTable().destroy();
+	$('#tablaIrregularidades').DataTable().destroy();
 	var accion = "Descargar Posicion BNA";
 	var detalle = "Descarga el Detalle BNA:  Carta Porte(";
 	var opcion = "Descarga";
 	detalle = detalle +cartaporte+')';
-	 var table = $('#tablaNoAptos').DataTable({
+	 var table = $('#tablaIrregularidades').DataTable({
 	        processing: true,
 	        language: {			 
 	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',	        
 		        lengthMenu:    	"Mostrar _MENU_ elementos",
 		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
-		        zeroRecords:    "Sin registros",
-		        emptyTable:     "No hay datos para visualizar",
+		        zeroRecords:    "Usted no tiene registro de Billetes No Aptos",
+		        emptyTable:     "Usted no tiene registro de Billetes No Aptos",
 		        paginate: {
 		            first:      "Primero",
 		            previous:   "Previo",
@@ -240,8 +239,8 @@ function tablaRemesa(fechaInicio, fechaFin, cartaPorte) {
 	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',		        
 		        lengthMenu:    	"Mostrar _MENU_ elementos",
 		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
-		        zeroRecords:    "Sin registros",
-		        emptyTable:     "Número de Carta Porte No Encontrado",
+		        zeroRecords:    "Disculpe... Número de Carta Porte no encontrado",
+		        emptyTable:     "Disculpe... Número de Carta Porte no encontrado",
 		        paginate: {
 		            first:      "Primero",
 		            previous:   "Previo",
