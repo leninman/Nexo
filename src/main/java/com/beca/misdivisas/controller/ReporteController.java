@@ -236,7 +236,6 @@ public class ReporteController {
 								if (s.length > 2) {
 									for (int j = 2; j < s.length; j++) {
 										desc += " " + s[j];
-										System.out.println(s[j]);
 									}
 									rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + desc);
 								} else {
@@ -257,7 +256,6 @@ public class ReporteController {
 							if (s.length > 2) {
 								for (int j = 2; j < s.length; j++) {
 									desc += " " + s[j];
-									System.out.println(s[j]);
 								}
 								rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + desc);
 							} else {
@@ -292,7 +290,7 @@ public class ReporteController {
 						rs = new ReporteSucursal();
 						rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
 						rs.setReferencia(remesa.getCartaPorte() + "-BNA");
-						rs.setDebito(Util.formatMonto(tmp.toString()));
+						rs.setDebito(Util.formatMonto(tmp.negate().toString()));
 						rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_BNA);
 						saldo = saldo.subtract(tmp);
 						rs.setSaldo(Util.formatMonto(saldo.toString()));
@@ -712,7 +710,70 @@ public class ReporteController {
 	
 	
 	@GetMapping(value = "/remesasPendientes")
-	public String remesasPendientes() {
+	public String remesasPendientes(Model modelo) {
+		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		Empresa empresa = empresaRepo.findById(id);
+		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 		return "remesasPendientes";
 	}
+	
+	@RequestMapping(path = "/remesaEntregaPendiente", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public List<ReporteRemesa> getRemesasPendientes() {
+		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+		
+		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		List<Remesa> remesas = null;
+
+		List<ReporteRemesa> rem = new ArrayList<ReporteRemesa>();
+
+		ReporteRemesa reprem = null;
+
+		try {
+			remesas = remesaRepo.findRemesasPendientesByIdEmpresa(id);
+			if (remesas != null && !remesas.isEmpty()) {
+				for (Remesa remesa : remesas) {
+
+					for (RemesaDetalle rd : remesa.getRemesaDetalles()) {
+						reprem = new ReporteRemesa();
+						if (remesa.getRemesaDetalles().get(0).getIdMoneda() == Constantes.USD)
+							reprem.setMoneda(Constantes.USD_STRING);
+						else if (remesa.getRemesaDetalles().get(0).getIdMoneda() == Constantes.EUR)
+							reprem.setMoneda(Constantes.EUR_STRING);
+
+						reprem.setFecha(formato.format(rd.getFecha()));
+						reprem.setReferencia(remesa.getCartaPorte());
+						
+
+						if (remesa.getDescripcion() != null && !remesa.getDescripcion().isEmpty()) {
+							String desc = "";
+							String[] s = remesa.getDescripcion().split(" ");
+							if (s.length > 2) {
+								for (int j = 2; j < s.length; j++) {
+									desc += " " + s[j];
+								}
+								reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa() + " - " + desc);
+							} else {
+								reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa() + " - "
+										+ remesa.getSucursal().getSucursal());
+							}
+						}else {
+							reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa());
+						}
+						reprem.setMonto(Util.formatMonto(rd.getMonto().toString()));
+						reprem.setCentro(remesa.getAgencia().getAgencia());
+						rem.add(reprem);
+					}
+				}
+			}
+
+		} catch (NumberFormatException e) {
+			logger.error(e.getLocalizedMessage());
+		}
+		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa("+id+"))";
+		registrarLog(Constantes.REMESAS_PENDIENTES, Detalle, Constantes.REMESAS_PENDIENTES, true);
+		return rem;
+	}
+	
+	
 }

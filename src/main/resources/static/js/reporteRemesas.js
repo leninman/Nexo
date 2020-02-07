@@ -45,7 +45,7 @@ function validar_remesa(){
 		var fechaInicio =  $( "#fechaInicio" ).val();	
 		var fechaFin =  $( "#fechaFin" ).val();
 		var cartaporte = $( "#cartaporte" ).val();
-		tablaRemesa(fechaInicio, fechaFin, cartaporte);
+		trackingRemesa(fechaInicio, fechaFin, cartaporte);
 		$("#father").show();
 	}
 }

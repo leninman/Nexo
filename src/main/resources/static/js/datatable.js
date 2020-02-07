@@ -28,7 +28,7 @@ function tabla(fechaInicio, fechaFin, moneda) {
 		    },
 			sAjaxSource: "remesa/"+fechaInicio+"/"+fechaFin+"/"+moneda,
 			sAjaxDataProp: "",
-			order: [[ 0, "desc" ]],
+			order: [[ 0, "asc" ]],
 			columns: [
 			      { data: "fecha"},
 				  { data: "referencia" },
@@ -58,7 +58,8 @@ function tabla(fechaInicio, fechaFin, moneda) {
 	        },
             columnDefs: [
             	{ className: "text-right", "targets": [1,3,4,5]},
-            	{ type: "string", "targets": [3,4,5]}
+            	{ type: "string", "targets": [3,4,5]},
+            	{ type:"date-eu", targets :[0]}
             ],
             pageLength:15,
             
@@ -227,7 +228,7 @@ function tablaIrregularidades(cartaporte) {
 		});
 }
 
-function tablaRemesa(fechaInicio, fechaFin, cartaPorte) {
+function trackingRemesa(fechaInicio, fechaFin, cartaPorte) {
 	$('#trackingRemesa').DataTable().destroy();
 	var accion = "Descargar Tracking de Remesas";
 	var detalle = "Descarga el Tracking:  fecha inicio(";
@@ -294,3 +295,72 @@ function tablaRemesa(fechaInicio, fechaFin, cartaPorte) {
 		 registrar(accion, detalle, opcion);
 		});
 }
+
+
+function remesasPendientes() {
+	//$('#tablaRemesasPendientes').DataTable().destroy();
+	var accion = "Descargar Remesas Pendientes";
+	var detalle = "Descarga las Remesas Pendientes";
+	var opcion = "Descarga";
+	 var table = $('#tablaRemesasPendientes').DataTable({
+	        processing: true,
+	        language: {			 
+	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',		        
+		        lengthMenu:    	"Mostrar _MENU_ elementos",
+		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
+		        zeroRecords:    "No tienes Remesas Pendiente por Entregar",
+		        emptyTable:     "No tienes Remesas Pendiente por Entregar",
+		        paginate: {
+		            first:      "Primero",
+		            previous:   "Previo",
+		            next:       "Siguiente",
+		            last:       "Ultimo"
+		        },
+		        aria: {
+		            sortAscending:  ": ordenar ascendente",
+		            sortDescending: ": ordenar descendente"
+		        }
+		    },
+			"sAjaxSource": "./remesaEntregaPendiente",
+			"sAjaxDataProp": "",
+			"order": [[ 0, "d" ]],
+			"aoColumns": [
+			      { "mData": "fecha"},
+				  { "mData": "referencia" },
+				  { "mData": "estado" },
+				  { "mData": "moneda" },
+				  { "mData": "monto" }
+			],
+			bFilter: false,		    
+		    dom: 'Bfrtip',
+		    buttons: [{
+		        extend: 'excelHtml5',
+		        customize: function( xlsx ) {
+		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		          }
+		      },
+		      {extend: 'csvHtml5'}, 
+		      {extend: 'pdf'}
+		      ],
+	        initComplete: function () {
+	            var btns = $('.dt-button');
+	            btns.addClass('btn btn-info btn-sm');
+	            btns.removeClass('dt-button');
+
+	        },
+            columnDefs: [{ className: "text-right", "targets": [3]}]
+	 })
+	 
+	 $(".buttons-excel").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+	 $(".buttons-csv").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+	 $(".buttons-pdf").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+}
+
+
