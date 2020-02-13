@@ -20,10 +20,6 @@ function tabla(fechaInicio, fechaFin, moneda) {
 		            previous:   "Previo",
 		            next:       "Siguiente",
 		            last:       "Ultimo"
-		        },
-		        aria: {
-		            sortAscending:  ": ordenar ascendente",
-		            sortDescending: ": ordenar descendente"
 		        }
 		    },
 			sAjaxSource: "remesa/"+fechaInicio+"/"+fechaFin+"/"+moneda,
@@ -40,11 +36,13 @@ function tabla(fechaInicio, fechaFin, moneda) {
 			],
 			bFilter: false,		    
 		    dom: 'Bfrtip',
+		    bSort : false,
 		    buttons: [{
 		        extend: 'excelHtml5',
 		        customize: function( xlsx ) {
 		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
 		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		            $('row:eq(0) c', sheet).attr( 's', '2' );
 		          }
 		      },
 		      {extend: 'csvHtml5'}, 
@@ -328,6 +326,7 @@ function remesasPendientes() {
 			      { "mData": "fecha"},
 				  { "mData": "referencia" },
 				  { "mData": "estado" },
+				  { "mData": "centro" },
 				  { "mData": "moneda" },
 				  { "mData": "monto" }
 			],
@@ -349,7 +348,9 @@ function remesasPendientes() {
 	            btns.removeClass('dt-button');
 
 	        },
-            columnDefs: [{ className: "text-right", "targets": [3]}]
+            columnDefs: [{ className: "text-right", "targets": [3,5]},
+            			{ className: "text-center", "targets": [0,4]}]
+	        
 	 })
 	 
 	 $(".buttons-excel").on('click', function(event){

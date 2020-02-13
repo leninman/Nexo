@@ -29,7 +29,7 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 	public List<Remesa> trackingRemesaByCartaporteAndIdEmpresa(int idEmpresa, String cartaPorte);
 
 	@Query("SELECT r FROM Remesa r, Sucursal s, RemesaDetalle rd"
-			+ " WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and r.idOperacion not in (9,12) and rd.idEstatusRemesa in (2,4) and s.idEmpresa  = ?1 and rd.idMoneda = ?2  and rd.fecha between ?3 and ?4 order by rd.fecha asc")
+			+ " WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa and d.fecha between ?3 and ?4) and r.idOperacion not in (9,12) and rd.idEstatusRemesa in (2,4) and s.idEmpresa  = ?1 and rd.idMoneda = ?2   order by rd.fecha asc")
 	public List<Remesa> findRemesaByEmpresaId(int idEmpresa, int moneda, Date fechaInicio, Date fechaFin);
 
 	@Query("SELECT r FROM Remesa r, Sucursal s, Empresa e, RemesaDetalle rd, Pieza p"
@@ -48,7 +48,7 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 			+ " WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idSucursal  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa = ?3 and r.idOperacion = ?4")
 	public BigDecimal getTotalBySucursal(int idSucursal, int moneda, int status, int operacion);
 
-	@Query("SELECT r FROM Remesa r, Sucursal s, RemesaDetalle rd WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idEmpresa=?1 and r.cartaPorte = ?2 and rd.fecha between ?3 and ?4 order by rd.fecha asc, rd.idEstatusRemesa asc")
+	@Query("SELECT r FROM Remesa r, Sucursal s, RemesaDetalle rd WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa  and d.fecha between ?3 and ?4) and s.idEmpresa=?1 and r.cartaPorte = ?2 order by rd.fecha asc, rd.idEstatusRemesa asc")
 	public List<Remesa> findRemesaByCartaporteAndIdEmpresaByDate(int idEmpresa, String cartaPorte, Date fechaInicio,
 			Date fechaFin);
 

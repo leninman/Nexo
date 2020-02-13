@@ -7,11 +7,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -19,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +53,11 @@ import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
 @Controller
+@PropertySource("/application.properties")
 public class ReporteController {
+	@Resource
+	public Environment env;
+	
 	@Autowired
 	private IRemesaRepo remesaRepo;
 
@@ -69,9 +78,9 @@ public class ReporteController {
 
 	@Autowired
 	private HttpServletRequest request;
-	
+
 	@Autowired
-	 private static final Logger logger = LoggerFactory.getLogger(ReporteController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReporteController.class);
 
 	@GetMapping(value = "/reporte")
 	public String reporte(Model modelo) {
@@ -140,20 +149,15 @@ public class ReporteController {
 				}
 
 				saldoTOT = saldoD.subtract(retiroD).subtract(saldoNAD);
-				modelo.addAttribute("totalDolares", Util.formatMonto(String.valueOf(saldoTOT)));
-				modelo.addAttribute("pendienteDolares", Util.formatMonto(montoPendienteDolar.toString()));
-				modelo.addAttribute("pendienteEntregaDolares", Util.formatMonto(montoPendienteEntregaDolar.toString()));
-
 				tmp = saldoTOT.subtract(montoPendienteEntregaDolar);
-				modelo.addAttribute("disponibleDolares", Util.formatMonto(String.valueOf(tmp)));
-				tmp = new BigDecimal(0);
 
-			} else {
-				modelo.addAttribute("totalDolares", "0,00");
-				modelo.addAttribute("pendienteDolares", "0,00");
-				modelo.addAttribute("pendienteEntregaDolares", "0,00");
-				modelo.addAttribute("disponibleDolares", "0,00");
 			}
+			modelo.addAttribute("totalDolares", Util.formatMonto(String.valueOf(saldoTOT)));
+			modelo.addAttribute("pendienteDolares", Util.formatMonto(montoPendienteDolar.toString()));
+			modelo.addAttribute("pendienteEntregaDolares", Util.formatMonto(montoPendienteEntregaDolar.toString()));
+			modelo.addAttribute("disponibleDolares", Util.formatMonto(String.valueOf(tmp)));
+			tmp = new BigDecimal(0);
+			saldoTOT = new BigDecimal(0);
 
 			if (remesasEuro.size() > 0) {
 				saldoTOT = new BigDecimal(0);
@@ -176,21 +180,16 @@ public class ReporteController {
 				}
 
 				saldoTOT = saldoE.subtract(retiroE).subtract(saldoNAE);
-				modelo.addAttribute("totalEuros", Util.formatMonto(String.valueOf(saldoTOT)));
-				modelo.addAttribute("pendienteEuros", Util.formatMonto(montoPendienteEuro.toString()));
-				modelo.addAttribute("pendienteEntregaEuros", Util.formatMonto(montoPendienteEntregaEuro.toString()));
-
 				tmp = saldoTOT.subtract(montoPendienteEntregaEuro);
-				modelo.addAttribute("disponibleEuros", Util.formatMonto(String.valueOf(tmp)));
-
-			} else {
-				modelo.addAttribute("totalEuros", "0,00");
-				modelo.addAttribute("pendienteEuros", "0,00");
-				modelo.addAttribute("pendienteEntregaEuros", "0,00");
-				modelo.addAttribute("diponibleEuros", "0,00");
 			}
 
-			registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA, Constantes.OPCION_POSICION, true);
+			modelo.addAttribute("totalEuros", Util.formatMonto(String.valueOf(saldoTOT)));
+			modelo.addAttribute("pendienteEuros", Util.formatMonto(montoPendienteEuro.toString()));
+			modelo.addAttribute("pendienteEntregaEuros", Util.formatMonto(montoPendienteEntregaEuro.toString()));
+			modelo.addAttribute("disponibleEuros", Util.formatMonto(String.valueOf(tmp)));
+
+			registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA, Constantes.OPCION_POSICION,
+					true);
 
 			return "reporte";
 
@@ -224,8 +223,11 @@ public class ReporteController {
 				rs = new ReporteSucursal();
 
 				if (remesa.getIdOperacion() != Constantes.RETIRO_BNA) {
+					if (remesa.getRemesaDetalles().size() > 0) {
+						rs.setFecha(formato1.format(
+								remesa.getRemesaDetalles().get(remesa.getRemesaDetalles().size() - 1).getFecha()));
+					}
 
-					rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
 					rs.setReferencia(remesa.getCartaPorte());
 					String desc = "";
 					if (remesa.getOperacion().getIdTipoOperacion() == Constantes.CREDITO) {
@@ -249,7 +251,8 @@ public class ReporteController {
 						saldo = saldo.add(remesa.getRemesaDetalles().get(0).getMonto());
 					} else {
 
-						rs.setDebito(Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().negate().toString()));
+						rs.setDebito(
+								Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().negate().toString()));
 						desc = "";
 						if (remesa.getDescripcion() != null && !remesa.getDescripcion().isEmpty()) {
 							String[] s = remesa.getDescripcion().split(" ");
@@ -506,30 +509,36 @@ public class ReporteController {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		List<Remesa> remesas = null;
 
+		Date d1, d2;
+
 		List<ReporteRemesa> rem = new ArrayList<ReporteRemesa>();
 
 		ReporteRemesa reprem = null;
 
 		try {
-			remesas = remesaRepo.findRemesaByCartaporteAndIdEmpresaByDate(id, cartaPorte,
-					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"));
+			d1 = formato2.parse(fechaI + " 00:00:00");
+			d2 = formato2.parse(fechaF + " 23:59:59");
+			remesas = remesaRepo.findRemesaByCartaporteAndIdEmpresaByDate(id, cartaPorte, d1, d2);
+
 			if (remesas != null && !remesas.isEmpty()) {
 				for (Remesa remesa : remesas) {
-
 					for (RemesaDetalle rd : remesa.getRemesaDetalles()) {
-						reprem = new ReporteRemesa();
-						if (remesa.getRemesaDetalles().get(0).getIdMoneda() == Constantes.USD)
-							reprem.setMoneda(Constantes.USD_STRING);
-						else if (remesa.getRemesaDetalles().get(0).getIdMoneda() == Constantes.EUR)
-							reprem.setMoneda(Constantes.EUR_STRING);
+						
+						if (rd.getFecha().after(d1) && rd.getFecha().before(d2)) {
+							reprem = new ReporteRemesa();
+							if (remesa.getRemesaDetalles().get(0).getIdMoneda() == Constantes.USD)
+								reprem.setMoneda(Constantes.USD_STRING);
+							else if (remesa.getRemesaDetalles().get(0).getIdMoneda() == Constantes.EUR)
+								reprem.setMoneda(Constantes.EUR_STRING);
 
-						reprem.setFecha(formato.format(rd.getFecha()));
-						reprem.setReferencia(remesa.getCartaPorte());
-						reprem.setEstado(
-								estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa());
-						reprem.setMonto(Util.formatMonto(rd.getMonto().toString()));
-						reprem.setCentro(remesa.getAgencia().getAgencia());
-						rem.add(reprem);
+							reprem.setFecha(formato.format(rd.getFecha()));
+							reprem.setReferencia(remesa.getCartaPorte());
+							reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa())
+									.getEstatusRemesa());
+							reprem.setMonto(Util.formatMonto(rd.getMonto().toString()));
+							reprem.setCentro(remesa.getAgencia().getAgencia());
+							rem.add(reprem);
+						}
 					}
 				}
 			}
@@ -608,13 +617,11 @@ public class ReporteController {
 				meses[reporte.getMes() - 1] = nombreMes[reporte.getMes() - 1] + '\'' + reporte.getAno() % 100;
 				;
 				montos[reporte.getMes() - 1] = reporte.getSuma();
-
 			}
 
 			for (int i = 0; i < meses.length; i++) {
 				if (meses[i] == null) {
 					meses[i] = nombreMes[i];
-
 				}
 			}
 
@@ -705,23 +712,27 @@ public class ReporteController {
 		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);
-		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);
+		logger.info("Ip origen: " + ip + " Accion:" + accion + " Detalle:" + detalle + " Opcion:" + opcion);
 	}
-	
-	
+
 	@GetMapping(value = "/remesasPendientes")
 	public String remesasPendientes(Model modelo) {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+
+		List<Date> fechas = obtenerFeriados();	
+		
+		modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));		
+		
 		return "remesasPendientes";
 	}
-	
+
 	@RequestMapping(path = "/remesaEntregaPendiente", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
 	public List<ReporteRemesa> getRemesasPendientes() {
 		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-		
+
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		List<Remesa> remesas = null;
 
@@ -742,8 +753,17 @@ public class ReporteController {
 							reprem.setMoneda(Constantes.EUR_STRING);
 
 						reprem.setFecha(formato.format(rd.getFecha()));
+
+						Calendar cal = new GregorianCalendar();
+						Calendar cal2 = new GregorianCalendar();
+
+						cal.setTime(rd.getFecha());
+						cal2.setTime(new Date());
+
+						int dias = Util.getDiasHabiles(cal, cal2);
+
+						reprem.setCentro(String.valueOf(dias));
 						reprem.setReferencia(remesa.getCartaPorte());
-						
 
 						if (remesa.getDescripcion() != null && !remesa.getDescripcion().isEmpty()) {
 							String desc = "";
@@ -752,16 +772,17 @@ public class ReporteController {
 								for (int j = 2; j < s.length; j++) {
 									desc += " " + s[j];
 								}
-								reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa() + " - " + desc);
+								reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa())
+										.getEstatusRemesa() + " - " + desc);
 							} else {
-								reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa() + " - "
-										+ remesa.getSucursal().getSucursal());
+								reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa())
+										.getEstatusRemesa() + " - " + remesa.getSucursal().getSucursal());
 							}
-						}else {
-							reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa()).getEstatusRemesa());
+						} else {
+							reprem.setEstado(estatusRemesaRepo.findEstatusRemesaById(rd.getIdEstatusRemesa())
+									.getEstatusRemesa());
 						}
 						reprem.setMonto(Util.formatMonto(rd.getMonto().toString()));
-						reprem.setCentro(remesa.getAgencia().getAgencia());
 						rem.add(reprem);
 					}
 				}
@@ -770,10 +791,29 @@ public class ReporteController {
 		} catch (NumberFormatException e) {
 			logger.error(e.getLocalizedMessage());
 		}
-		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa("+id+"))";
+		
+		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa(" + id + "))";
 		registrarLog(Constantes.REMESAS_PENDIENTES, Detalle, Constantes.REMESAS_PENDIENTES, true);
 		return rem;
 	}
 	
+	public List<Date> obtenerFeriados(){
+		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
+		String bancarios = env.getProperty("bancarios");
+		
+		if(bancarios!=null && !bancarios.isEmpty()) {
+			String [] bancariosSplit = bancarios.split(",");
+			List<Date> fechas = new ArrayList<Date>();
 	
+			for(int i =  0; i< bancariosSplit.length; i++) {
+				try {				
+					fechas.add(formato.parse(bancariosSplit[i]));				
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			return fechas;			
+		}
+		return null;
+	}
 }
