@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +20,6 @@ import java.util.List;
 
 @Service
 public class Util {
-	@Autowired
-	private Environment env;
 
 	public static String formatMonto(String montoIn) {
 		Locale[] locales = { new Locale("de", "DE") };
@@ -64,7 +62,7 @@ public class Util {
 	}
 
 	public static int getDiasHabiles(Calendar fechaInicial, Calendar fechaFinal) {
-		int diffDays = -1;
+		int diffDays = 0;
 		while (fechaInicial.before(fechaFinal)) {
 			if (fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
 					&& fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
@@ -120,5 +118,25 @@ public class Util {
 			}
 		}
 		return true;
+	}
+	
+	public List<Date> obtenerFeriados(String prop){
+		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
+		String bancarios = prop;
+		
+		if(bancarios!=null && !bancarios.isEmpty()) {
+			String [] bancariosSplit = bancarios.split(",");
+			List<Date> fechas = new ArrayList<Date>();
+	
+			for(int i =  0; i< bancariosSplit.length; i++) {
+				try {				
+					fechas.add(formato.parse(bancariosSplit[i]));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			return fechas;
+		}
+		return null;
 	}
 }

@@ -13,8 +13,6 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -22,8 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,11 +50,11 @@ import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
 @Controller
-@PropertySource("/application.properties")
 public class ReporteController {
-	@Resource
-	public Environment env;
 	
+   @Value("${bancarios}")
+    private String bancarios;
+	   
 	@Autowired
 	private IRemesaRepo remesaRepo;
 
@@ -87,8 +84,6 @@ public class ReporteController {
 
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-
-			DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
@@ -122,11 +117,10 @@ public class ReporteController {
 			if (montoPendienteEntregaEuro == null) {
 				montoPendienteEntregaEuro = BigDecimal.valueOf(0.00);
 			}
-
-			if (!remesasDolar.isEmpty())
-				modelo.addAttribute("fechaCorte",
-						formato.format(remesasDolar.get(0).getRemesaDetalles().get(0).getFecha()));
-
+			Util u = new Util();
+			List<Date> fechas = u.obtenerFeriados(this.bancarios);
+			modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
+			
 			if (remesasDolar.size() > 0) {
 
 				for (int i = 0; i < remesasDolar.size(); i++) {
@@ -720,9 +714,8 @@ public class ReporteController {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
-
-		List<Date> fechas = obtenerFeriados();	
-		
+		Util u = new Util();
+		List<Date> fechas = u.obtenerFeriados(this.bancarios);
 		modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));		
 		
 		return "remesasPendientes";
@@ -795,25 +788,5 @@ public class ReporteController {
 		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa(" + id + "))";
 		registrarLog(Constantes.REMESAS_PENDIENTES, Detalle, Constantes.REMESAS_PENDIENTES, true);
 		return rem;
-	}
-	
-	public List<Date> obtenerFeriados(){
-		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
-		String bancarios = env.getProperty("bancarios");
-		
-		if(bancarios!=null && !bancarios.isEmpty()) {
-			String [] bancariosSplit = bancarios.split(",");
-			List<Date> fechas = new ArrayList<Date>();
-	
-			for(int i =  0; i< bancariosSplit.length; i++) {
-				try {				
-					fechas.add(formato.parse(bancariosSplit[i]));				
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			}
-			return fechas;			
-		}
-		return null;
 	}
 }
