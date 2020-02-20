@@ -498,7 +498,7 @@ public class ReporteController {
 	@ResponseBody
 	public List<ReporteRemesa> getRemesaPorCataporte(@PathVariable String fechaI, @PathVariable String fechaF,
 			@PathVariable String cartaPorte) {
-		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		List<Remesa> remesas = null;
