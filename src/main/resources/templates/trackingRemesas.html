@@ -66,13 +66,11 @@
 	
 </head>
 
-<body id="page-top" style="font-size: 13px !important" onload="cargarFecha()">
+<body id="page-top" onload="cargarFecha()">
 	<!-- Page Wrapper -->
 	<div id="wrapper">
 
 		<!-- Sidebar -->
-
-		<th:block th:replace="fragments/menu :: menuLateral" />
 
 		<!-- End of Sidebar -->
 
@@ -84,11 +82,12 @@
 
 				<!-- Topbar -->
 				<th:block th:replace="fragments/header :: header" />
+				<th:block th:replace="fragments/menu :: menuSuperior" />
 				<!-- End of Topbar -->
 
 
 				<!-- Begin Page Content -->
-          <div class="card shadow mb-4">
+          <div class="card shadow mb-4" style="font-size: 13px !important">
             <div class="card-header py-3" style="float: right;">
              				<!-- <div style="float: right;"> -->             				
 					<table style="width: 100%" border="0">

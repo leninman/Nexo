@@ -107,7 +107,7 @@ public class HomeController {
     }
     
     @GetMapping("/reporteG")
-    public String test() {
+    public String reporte() {
         return "reporteGrafico";
     }
    

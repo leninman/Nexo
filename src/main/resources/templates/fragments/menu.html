@@ -1,19 +1,19 @@
 
-<th:block th:fragment="menuLateral">
+<th:block th:fragment="menuSuperior">
     
-    
-    <!-- Sidebar -->
+<!--     
+    Sidebar
 		<ul	class="navbar-nav bg-dark sidebar sidebar-dark accordion" id="accordionSidebar">
 
-			<!-- Sidebar - Brand -->
+			Sidebar - Brand
 			<div style="width: 90%; height: 100px">
 			<img th:src="@{/img/exterior.png}" alt="BECA" width="95%" height="100%" style="margin-left: 5%"/>
 			</div>
 
-			<!-- Divider -->
+			Divider
 			<hr class="sidebar-divider my-0">
 
-			<!-- Nav Item - Dashboard -->
+			Nav Item - Dashboard
 			<li class="nav-item">
 				<a class="nav-link" href="main" id="mainl">
 					<i class="fas fa-fw fas fa-home"></i> 
@@ -21,62 +21,14 @@
 				</a>
 			</li>
 
-			<!-- Divider -->
+			Divider
 			<hr class="sidebar-divider">
 
-			<!-- Heading -->
+			Heading
 			<div class="sidebar-heading">Menu Principal</div>
-
-			<div sec:authorize="hasRole('ADMIN')">
-			<!-- Nav Item - Utilities Collapse Menu -->
-		      <li class="nav-item">
-		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
-		          <i class="fas fa-search-dollar"></i>
-		          <span>Consultas</span>
-		        </a>
-		        <div id="collapseUtilities1" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>
-		          <span>Divisas General</span></a>
-		          </div>
-		        </div>
-		      </li>
-
-				<!-- Nav Item - Utilities Collapse Menu -->
-		      <li class="nav-item">
-		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
-		          <i class="fas fa-clipboard"></i>
-		          <span>Reportes</span>
-		        </a>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="reporte" id="reportel"><i class="fas fa-file"></i>
-		          <span>Posici&oacute;n Consolidada</span></a>
-		          </div>
-		        </div>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-file"></i>
-		          <span>Billetes No Aptos</span></a>
-		          </div>
-		        </div>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-file"></i>
-		          <span>Tracking de Remesas</span></a>
-		          </div>
-		        </div>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="remesasPendientes" id="remesasPendientesl"><i class="fas fa-file"></i>
-		          <span>Pendientes por Entrega</span></a>
-		          </div>
-		        </div>
-		      </li>
-			</div>
 			
-			<div sec:authorize="hasRole('CONSULTOR')">
-			<!-- Nav Item - Utilities Collapse Menu -->
+			<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
+			Nav Item - Utilities Collapse Menu
 		      <li class="nav-item">
 		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
 		          <i class="fas fa-search-dollar"></i>
@@ -90,7 +42,7 @@
 		        </div>
 		      </li>
 
-				<!-- Nav Item - Utilities Collapse Menu -->
+				Nav Item - Utilities Collapse Menu
 		      <li class="nav-item">
 		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
 		          <i class="fas fa-clipboard"></i>
@@ -114,28 +66,19 @@
 		          <span>Tracking De Remesas</span></a>
 		          </div>
 		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="remesasPendientes" id="remesasPendientesl"><i class="fas fa-file"></i>
+		          <span>Pendientes por Entrega</span></a>
+		          </div>
+		        </div>
 		      </li>
 			</div>
+
 			
-			<div sec:authorize="hasRole('ADMIN')">
-			<!-- Nav Item - Utilities Collapse Menu -->
-		      <li class="nav-item">
-		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities3" aria-expanded="true" aria-controls="collapseUtilities3">
-		          <i class="fas fa-user-lock"></i>
-		          <span>Seguridad</span>
-		        </a>
-		        <div id="collapseUtilities3" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="usuarioHome" id="usuarioHomel"><i class="fas fa-fw fa-users"></i>
-		          <span>Usuarios</span></a>
-		          </div>
-		        </div>
-		      </li> 
-			 </div>
-			
-			<div sec:authorize="hasRole('ADMIN_BECA')">
-			<!-- Nav Item - Utilities Collapse Menu -->
-		     <!-- Nav Item - Utilities Collapse Menu -->
+			<div sec:authorize="hasAnyRole('ADMIN_BECA', 'ADMIN')">
+			Nav Item - Utilities Collapse Menu
+		     Nav Item - Utilities Collapse Menu
 		      <li class="nav-item">
 		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities3" aria-expanded="true" aria-controls="collapseUtilities3">
 		          <i class="fas fa-user-lock"></i>
@@ -150,20 +93,69 @@
 		      </li> 
 			 </div>
 
-			
-			
 
-
-			<!-- Divider -->
+			Divider
 			<hr class="sidebar-divider d-none d-md-block">
 
-			<!-- Sidebar Toggler (Sidebar) -->
+			Sidebar Toggler (Sidebar)
 			<div class="text-center d-none d-md-inline">
 				<button class="rounded-circle border-0" id="sidebarToggle"></button>
 			</div>
 
 		</ul>
-		<!-- End of Sidebar -->
-    
+		End of Sidebar
+  -->
+	<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">     
+		<nav class="navbar navbar-expand-sm navbar-dark bg-dark"  style="height: 100%; width: 100%; font-size: 16px !important">
+			<!-- Sidebar Toggle (Topbar) -->
+
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+    			<span class="navbar-toggler-icon"></span>
+  			</button>
+		  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		    <ul class="navbar-nav mr-auto">
+			  <li class="nav-item">
+				<a class="nav-link" href="main" id="mainl">
+					<i class="fas fa-fw fas fa-home"></i> 
+					<span>Inicio</span>
+				</a>
+			  </li>	  
+		  	  <li class="nav-item dropdown">
+		        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		          <i class="fas fa-search-dollar"></i>
+		          <span>Consultas</span>
+		        </a>
+		        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+		        	<a class="dropdown-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>
+				    <span>Divisas General</span></a>		         
+		        </div>
+		      </li>
+		  	 <li class="nav-item dropdown">
+		       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		         <i class="fas fa-clipboard"></i>
+		         <span>Reportes</span>
+		       </a>
+		       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+		          <a class="dropdown-item" href="reporte" id="reportel"><i class="fas fa-chart-line"></i><span>  Posici&oacute;n Consolidada</span></a>
+		          <a class="dropdown-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-ban"></i><span>  Billetes No Aptos</span></a>
+		          <a class="dropdown-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-route"></i><span>  Tracking De Remesas</span></a>
+		          <a class="dropdown-item" href="remesasPendientes" id="remesasPendientesl"><i class="fas fa-people-carry"></i><span>  Pendientes por Entrega</span></a>		         
+		        </div>
+		     </li>
+			 <div sec:authorize="hasAnyRole('ADMIN_BECA', 'ADMIN')">
+				<li class="nav-item dropdown">
+			       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			         <i class="fas fa-user-lock"></i>
+			         <span>Seguridad</span>
+			       </a>
+			       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			          <a class="dropdown-item" href="usuarioHome" id="usuarioHomel"><i class="fas fa-fw fa-users"></i><span>  Usuarios</span></a>		         
+			        </div>
+			     </li>
+			 </div>
+		    </ul>
+		  </div>
+		</nav>
+	</div>
 
 </th:block>
