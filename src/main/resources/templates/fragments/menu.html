@@ -27,7 +27,7 @@
 			<!-- Heading -->
 			<div class="sidebar-heading">Menu Principal</div>
 
-			<div sec:authorize="hasRole('ADMIN')">
+			<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
 			<!-- Nav Item - Utilities Collapse Menu -->
 		      <li class="nav-item">
 		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
@@ -74,49 +74,7 @@
 		        </div>
 		      </li>
 			</div>
-			
-			<div sec:authorize="hasRole('CONSULTOR')">
-			<!-- Nav Item - Utilities Collapse Menu -->
-		      <li class="nav-item">
-		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
-		          <i class="fas fa-search-dollar"></i>
-		          <span>Consultas</span>
-		        </a>
-		        <div id="collapseUtilities1" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>
-		          <span>Divisas General</span></a>
-		          </div>
-		        </div>
-		      </li>
 
-				<!-- Nav Item - Utilities Collapse Menu -->
-		      <li class="nav-item">
-		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
-		          <i class="fas fa-clipboard"></i>
-		          <span>Reportes</span>
-		        </a>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="reporte" id="reportel"><i class="fas fa-file"></i>
-		          <span>Posici&oacute;n Consolidada</span></a>
-		          </div>
-		        </div>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-file"></i>
-		          <span>Billetes No Aptos</span></a>
-		          </div>
-		        </div>
-		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-		          <div class="bg-white py-2 collapse-inner rounded">
-		            <a class="collapse-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-file"></i>
-		          <span>Tracking De Remesas</span></a>
-		          </div>
-		        </div>
-		      </li>
-			</div>
-			
 			<div sec:authorize="hasRole('ADMIN')">
 			<!-- Nav Item - Utilities Collapse Menu -->
 		      <li class="nav-item">

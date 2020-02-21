@@ -58,7 +58,7 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 	public List<ReporteSucursalMapa> getTotalMensualBySucursal(int idSucursal, int moneda, int status, int idOperacion,
 			Date fechaInicio);
 
-	@Query("SELECT r FROM Remesa r, Sucursal s, RemesaDetalle rd WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and r.idOperacion in (2,8) and rd.idEstatusRemesa =3 and s.idEmpresa=?1 order by rd.fecha asc")
+	@Query("SELECT r FROM Remesa r, Sucursal s, RemesaDetalle rd WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and r.idOperacion in (2,7) and rd.idEstatusRemesa =3 and s.idEmpresa=?1 order by rd.fecha asc")
 	public List<Remesa> findRemesasPendientesByIdEmpresa(int idEmpresa);
 
 	//@Query("SELECT MAX(fechan) FROM (SELECT MAX(rd.fecha) as fechan FROM Remesa r, Sucursal s, RemesaDetalle rd  WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.fecha=(SELECT MAX(d.fecha) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idEmpresa  = ?1 ) f ")
