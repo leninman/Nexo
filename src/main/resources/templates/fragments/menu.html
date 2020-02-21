@@ -26,6 +26,7 @@
 
 			Heading
 			<div class="sidebar-heading">Menu Principal</div>
+<<<<<<< HEAD
 			
 			<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
 			Nav Item - Utilities Collapse Menu
@@ -41,7 +42,58 @@
 		          </div>
 		        </div>
 		      </li>
+=======
 
+			<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities1">
+		          <i class="fas fa-search-dollar"></i>
+		          <span>Consultas</span>
+		        </a>
+		        <div id="collapseUtilities1" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>
+		          <span>Divisas General</span></a>
+		          </div>
+		        </div>
+		      </li>
+
+				<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
+		          <i class="fas fa-clipboard"></i>
+		          <span>Reportes</span>
+		        </a>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="reporte" id="reportel"><i class="fas fa-file"></i>
+		          <span>Posici&oacute;n Consolidada</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-file"></i>
+		          <span>Billetes No Aptos</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-file"></i>
+		          <span>Tracking de Remesas</span></a>
+		          </div>
+		        </div>
+		        <div id="collapseUtilities2" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="remesasPendientes" id="remesasPendientesl"><i class="fas fa-file"></i>
+		          <span>Pendientes por Entrega</span></a>
+		          </div>
+		        </div>
+		      </li>
+			</div>
+>>>>>>> branch 'master' of https://scrum.bancoexterior.com/plugins/git/misdivisas/Codigo_FTMisDivisas.git
+
+<<<<<<< HEAD
 				Nav Item - Utilities Collapse Menu
 		      <li class="nav-item">
 		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities2" aria-expanded="true" aria-controls="collapseUtilities2">
@@ -79,6 +131,27 @@
 			<div sec:authorize="hasAnyRole('ADMIN_BECA', 'ADMIN')">
 			Nav Item - Utilities Collapse Menu
 		     Nav Item - Utilities Collapse Menu
+=======
+			<div sec:authorize="hasRole('ADMIN')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		      <li class="nav-item">
+		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities3" aria-expanded="true" aria-controls="collapseUtilities3">
+		          <i class="fas fa-user-lock"></i>
+		          <span>Seguridad</span>
+		        </a>
+		        <div id="collapseUtilities3" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+		          <div class="bg-white py-2 collapse-inner rounded">
+		            <a class="collapse-item" href="usuarioHome" id="usuarioHomel"><i class="fas fa-fw fa-users"></i>
+		          <span>Usuarios</span></a>
+		          </div>
+		        </div>
+		      </li> 
+			 </div>
+			
+			<div sec:authorize="hasRole('ADMIN_BECA')">
+			<!-- Nav Item - Utilities Collapse Menu -->
+		     <!-- Nav Item - Utilities Collapse Menu -->
+>>>>>>> branch 'master' of https://scrum.bancoexterior.com/plugins/git/misdivisas/Codigo_FTMisDivisas.git
 		      <li class="nav-item">
 		        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities3" aria-expanded="true" aria-controls="collapseUtilities3">
 		          <i class="fas fa-user-lock"></i>
