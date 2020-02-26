@@ -350,9 +350,14 @@ public class ReporteController {
 			Empresa empresa = empresaRepo.findById(id);
 			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
-			if (!remesasDolar.isEmpty())
-				modelo.addAttribute("fechaCorte",
-						formato.format(remesasDolar.get(0).getRemesaDetalles().get(0).getFecha()));
+			/*
+			 * if (!remesasDolar.isEmpty()) modelo.addAttribute("fechaCorte",
+			 * formato.format(remesasDolar.get(0).getRemesaDetalles().get(0).getFecha()));
+			 */
+			
+			Util u = new Util();
+			List<Date> fechas = u.obtenerFeriados(this.bancarios);
+			modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
 
 			if (remesasDolar.size() > 0) {
 				noAptoD = noAptoD.subtract(retiroD);
@@ -753,7 +758,10 @@ public class ReporteController {
 						cal.setTime(rd.getFecha());
 						cal2.setTime(new Date());
 
-						int dias = Util.getDiasHabiles(cal, cal2);
+						Util u = new Util();
+						List<Date> fechas = u.obtenerFeriados(this.bancarios);
+						
+						int dias = Util.getDiasHabiles(cal, cal2, fechas);
 
 						reprem.setCentro(String.valueOf(dias));
 						reprem.setReferencia(remesa.getCartaPorte());
