@@ -8,12 +8,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -440,6 +438,7 @@ public class ReporteController {
 
 		String detalle = "Consulta: fecha inicio(" + fechaI + "); fecha fin(" + fechaF + "); moneda(" + moneda + ")";
 		registrarLog(Constantes.POSICION_BNA, detalle, Constantes.OPCION_BNA, true);
+		Collections.sort(reportes);
 		return reportes;
 	}
 
@@ -838,6 +837,9 @@ public class ReporteController {
 			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda,
 					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_ENTREGADA, Constantes.DIFERENCIA_FALTANTE));
 			
+
+			Collections.sort(remesas);
+
 			for (int i = 0; i < remesas.size(); i++) {
 				remesa = remesas.get(i);
 

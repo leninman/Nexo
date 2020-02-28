@@ -24,7 +24,6 @@ function tabla(fechaInicio, fechaFin, moneda) {
 		    },
 			sAjaxSource: "remesa/"+fechaInicio+"/"+fechaFin+"/"+moneda,
 			sAjaxDataProp: "",
-			order: [[ 0, "asc" ]],
 			columns: [
 			      { data: "fecha"},
 				  { data: "referencia" },
@@ -117,15 +116,13 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 		    },
 			"sAjaxSource": "./remesaNoApta/"+fechaInicio+"/"+fechaFin+"/"+moneda,
 			"sAjaxDataProp": "",
-			"order": [[ 0, "asc" ]],
 			"aoColumns": [
 			      { "mData": "fecha"},
 				  { "mData": "referencia" },
 				  { "mData": "concepto" },
 				  { "mData": "saldo" },
                   { "mData": function (data, type, row, meta) {
-                             	return '<a href="#" data-toggle="modal" data-target="#detalleRemesa" onclick= "verDetalle(\''+ data.referencia + '\');">ver</a>';
-                              }
+                             	return '<a href="#" data-toggle="modal" data-target="#detalleRemesa" onclick= "verDetalle(\''+ data.referencia + '\');">ver</a>';}
                   }				  
 			],
 			bFilter: false,		    
@@ -147,8 +144,8 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 	            btns.addClass('btn btn-info btn-sm');
 	            btns.removeClass('dt-button');
 	        },
-            columnDefs: [{ className: "text-right", "targets": [3]
-            }]
+            columnDefs: [{ className: "text-right", "targets": [3]},
+            			 { type:"date-eu", targets :[0]}]
 	 })
 	 
 	 $(".buttons-excel").on('click', function(event){
@@ -191,7 +188,6 @@ function tablaIrregularidades(cartaporte) {
 		    },
 			"sAjaxSource": "./irregularidades/"+cartaporte,
 			"sAjaxDataProp": "",
-			"order": [[ 0, "asc" ]],
 			"aoColumns": [
 			      { "mData": "fecha"},
 				  { "mData": "referencia" },
@@ -352,7 +348,8 @@ function remesasPendientes() {
 
 	        },
             columnDefs: [{ className: "text-right", "targets": [3,5]},
-            			{ className: "text-center", "targets": [0,4]}]
+            			{ className: "text-center", "targets": [0,4]},
+            			{ type:"date-eu", targets :[0]}]
 	        
 	 })
 	 
@@ -391,6 +388,7 @@ function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
 		    },
 			sAjaxSource: "reporteSucursal/"+fechaInicio+"/"+fechaFin+"/"+sucursal+"/"+moneda,
 			sAjaxDataProp: "",
+			order: [[ 0, "d" ]],
 			order: [[ 0, "asc" ]],
 			columns: [
 			      { data: "fecha"},
