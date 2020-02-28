@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -796,5 +799,106 @@ public class ReporteController {
 		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa(" + id + "))";
 		registrarLog(Constantes.REMESAS_PENDIENTES, Detalle, Constantes.REMESAS_PENDIENTES, true);
 		return rem;
+	}
+	
+	
+	@GetMapping(value = "/reporteSucursal")
+	public String reporteSucursal(Model modelo) {
+		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		
+		Empresa empresa = empresaRepo.findById(id);
+		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+		Util u = new Util();
+		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+		modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
+		
+		List<Sucursal> sucs = sucursalRepo.findSucursalByEmpId(id);
+		modelo.addAttribute("sucursales", sucs);
+		
+		return "reporteSucursal";
+	}
+	
+	@RequestMapping(path = "/reporteSucursal/{fechaI}/{fechaF}/{sucursal}/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public List<ReporteSucursal> getReporteSucursal(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable int sucursal, @PathVariable int moneda) {
+		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+
+		List<ReporteSucursal> reportes = new ArrayList<ReporteSucursal>();
+		ReporteSucursal rs = null;
+		Remesa remesa = null;
+		BigDecimal saldo = new BigDecimal(0);
+		try {
+			List<Remesa> remesas = remesaRepo.findBySucursalGivenDates(sucursal, moneda,
+					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_PROCESADA, Constantes.RECEPCION_EFECTIVO);
+			
+			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda,
+					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_PROCESADA, Constantes.DIFERENCIA_SOBRANTE));
+			
+			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda,
+					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_ENTREGADA, Constantes.DIFERENCIA_FALTANTE));
+			
+			for (int i = 0; i < remesas.size(); i++) {
+				remesa = remesas.get(i);
+
+				rs = new ReporteSucursal();
+				if(moneda == Constantes.USD) {
+					rs.setDebito(Constantes.USD_STRING);
+				}else {
+					rs.setDebito(Constantes.EUR_STRING);
+				}
+				
+
+					if (remesa.getRemesaDetalles().size() > 0) {
+						rs.setFecha(formato1.format(
+								remesa.getRemesaDetalles().get(remesa.getRemesaDetalles().size() - 1).getFecha()));
+					}
+
+					rs.setReferencia(remesa.getCartaPorte());
+					String desc = "";
+					if (remesa.getOperacion().getIdTipoOperacion() == Constantes.CREDITO) {
+						if (remesa.getIdOperacion() != Constantes.TRASPASO_CLIENTES
+								|| remesa.getIdOperacion() != Constantes.TRASPASO) {
+							if (remesa.getDescripcion() != null && !remesa.getDescripcion().isEmpty()) {
+								String[] s = remesa.getDescripcion().split(" ");
+								if (s.length > 2) {
+									for (int j = 2; j < s.length; j++) {
+										desc += " " + s[j];
+									}
+									rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + desc);
+								} else {
+									rs.setConcepto(remesa.getOperacion().getOperacion() + " - "
+											+ remesa.getSucursal().getSucursal());
+								}
+							}
+						}
+
+						rs.setCredito(Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().toString()));
+						saldo = saldo.add(remesa.getRemesaDetalles().get(0).getMonto());
+						rs.setSaldo(Util.formatMonto(saldo.toString()));
+						reportes.add(rs);
+					}
+
+					if (remesa.getOperacion().getIdTipoOperacion() == Constantes.CREDITO
+							&& remesa.getRemesaDetalles().get(0).getIdEstatusRemesa() == Constantes.ESTATUS_CANCELADA) {
+						rs = new ReporteSucursal();
+						rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
+						rs.setReferencia(remesa.getCartaPorte() + "- Cancelada");
+						rs.setDebito(
+								Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().negate().toString()));
+						rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_CANCELADA);
+
+						saldo = saldo.subtract(remesa.getRemesaDetalles().get(0).getMonto());
+						rs.setSaldo(Util.formatMonto(saldo.toString()));
+						reportes.add(rs);
+					}				
+			}
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		String detalle = "Consulta: fecha inicio(" + fechaI + "); fecha fin(" + fechaF + ");sucursal("+sucursal+"); moneda(" + moneda + ")";
+		registrarLog(Constantes.REPORTE_SUCURSAL, detalle, Constantes.REPORTE_SUCURSAL, true);
+		return reportes;
 	}
 }
