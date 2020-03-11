@@ -39,9 +39,14 @@
 										</div>
 										
 										<div sec:authorize="hasRole('ADMIN')">
-											<td><a th:if="${!usuario.admin}" th:href="@{usuarioEditar/{id}(id=${usuario.idUsuario})}"
-											title="Editar" class="btn btn-secondary"><i class="fas fa-user-edit ml-2"></i></a></td>
-											
+											<td>
+												<form method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
+													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
+										            <button type="submit" name="submit"  class="btn btn-secondary">
+										            	<i class="fas fa-user-edit ml-2" ></i>
+										            </button>										           										            
+										        </form>
+											</td>											
 											<td>
 											<div th:if="${!usuario.admin}">
 												<button type="button" title="Eliminar" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
@@ -59,11 +64,18 @@
 																</button>
 															</div>
 															<div class="modal-body"></div>
-															<div style="text-align: center;">
-																<button class="btn btn-secondary" type="button"
-																	data-dismiss="modal" style="height:40px;width:100px" >No</button>																	
-																<a class="btn btn-primary" th:href="@{usuarioEliminar/{id}(id=${usuario.idUsuario})}" style="height:40px;width:100px">Si</a>
-															</div>
+																<form method="POST" th:action="@{usuarioEliminar}" th:attr="id='form'+${usuario.idUsuario}">
+																	<div style="text-align: center;">
+																		<button class="btn btn-secondary" type="button" data-dismiss="modal" style="height:40px;width:100px">
+																			No
+																		</button>
+																		<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
+											            				<button type="submit" name="submit"  class="btn btn-primary" style="height:40px;width:100px">
+											            					Si
+											            				</button>
+										            				</div>										           										            
+										        				</form>
+															
 															<br/>
 														</div>
 													</div>
@@ -74,8 +86,14 @@
 										</div>
 										
 										<div sec:authorize="hasRole('ADMIN_BECA')">
-										<td><a th:if="${usuario.admin}" th:href="@{usuarioEditar/{id}(id=${usuario.idUsuario})}"
-											title="Editar" class="btn btn-secondary"><i class="fas fa-user-edit ml-2"></i></a></td>
+											<td>
+												<form method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
+													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
+										            <button type="submit" name="submit"  class="btn btn-secondary">
+										            	<i class="fas fa-user-edit ml-2" ></i>
+										            </button>										           										            
+										        </form>										
+											</td>
 											
 											<td>
 											<div th:if="${usuario.admin}">
@@ -94,11 +112,17 @@
 																</button>
 															</div>
 															<div class="modal-body"></div>
-															<div  style="text-align: center;">
-																<button class="btn btn-secondary" type="button"
-																	data-dismiss="modal" style="height:40px;width:100px">No</button>
-																<a class="btn btn-primary" style="height:40px;width:100px" th:href="@{usuarioEliminar/{id}(id=${usuario.idUsuario})}">Si</a>
-															</div>														
+																<form method="POST" th:action="@{usuarioEliminar}" th:attr="id='form'+${usuario.idUsuario}">
+																	<div style="text-align: center;">
+																		<button class="btn btn-secondary" type="button" data-dismiss="modal" style="height:40px;width:100px">
+																			No
+																		</button>
+																		<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
+											            				<button type="submit" name="submit"  class="btn btn-primary" style="height:40px;width:100px">
+											            					Si
+											            				</button>
+										            				</div>										           										            
+										        				</form>														
 															<br/>
 														</div>
 													</div>
@@ -135,9 +159,9 @@
         <div class="card">
             <div class="card-body">
                 <div class="col-md-10">
-                    <form action="#" th:action="@{/usuarioUpdate/{id}(id=${usuario.idUsuario})}" th:object="${usuario}" method="post">
+                    <form action="#" th:action="@{/usuarioUpdate}" th:object="${usuario}" method="post">
                         <div class="row">
-                        
+                        	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
                             <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario">
                        	
                         	<div class="form-group col-md-8">
@@ -161,7 +185,7 @@
                             </div>
                             <div class="form-group col-md-8" Style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" value="Guardar">
-                            	<a class="btn btn-secondary" href="../usuarioHome">Cancelar</a>
+                            	<a class="btn btn-secondary" href="./usuarioHome">Cancelar</a>
                             </div>
 
                         </div>
@@ -179,9 +203,9 @@
         <div class="card">
             <div class="card-body">
                 <div class="col-md-10">
-                    <form action="#" th:action="@{/usuarioChange/{id}(id=${usuario.idUsuario})}" th:object="${usuario}" method="post">
+                    <form action="#" th:action="@{/usuarioChange}" th:object="${usuario}" method="post">
                         <div class="row">
-                        
+                        	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
                             <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario" value="a">
                             <input type="hidden" th:field="*{email}" class="form-control" id="email" value="a@a">
                             <input type="hidden" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" value="a">
@@ -200,7 +224,7 @@
                             
                             <div class="form-group col-md-8" style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" value="Guardar">
-                            	<a class="btn btn-secondary" href="main">Cancelar</a>
+                            	<a class="btn btn-secondary" href="./main">Cancelar</a>
                             </div>
 
                         </div>

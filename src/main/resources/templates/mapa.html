@@ -23,6 +23,16 @@
 
 	<link rel="stylesheet" th:href="@{/css/ol_v5.2.0.css}"/>
 	<link rel="stylesheet" th:href="@{/css/ol-popup.css}"/>
+	<style>
+	button {
+	    background-color: Transparent;
+	    background-repeat:no-repeat;
+	    border: none;
+	    cursor:pointer;
+	    overflow: hidden;
+	    outline:none;
+	}
+	</style>
 </head>
 
 <body id="page-top">
@@ -135,10 +145,6 @@ window.onpaint =  $.getJSON("./sucursales", function (data) {
 });
 
 
-//var obj = jQuery.parseJSON(data);
-//alert(obj[0].sucursal);
-
-//$( document ).ready(function() {    
 function pintar(locations){
 	// Array of Icon features
 	var iconFeatures=[];
@@ -214,9 +220,11 @@ function pintar(locations){
 	    if (feature) {
 	        var coord = feature.getGeometry().getCoordinates();
 	        var props = feature.getProperties();
-	        var info = '<a style="color:black; font-weight:600; font-size:11px" href="' + props.url + '">' + 
-		'<img width="50" src="' +  props.image + '"  />' + 
-		'<div style="width:220px; margin-top:3px">' + props.desc + '</div></a>';
+	        var info = '<form method="POST" action="reporte/" id="form1">' +
+	        '<input type="hidden" id="sucursalId" name="sucursalId" value="'+props.url+'" />' +
+	        '<button type="submit" name="submit" style="font-weight:600; font-size:11px; text-align: left;style="background-color: Transparent !important; background-repeat:no-repeat !important; border: none !important; cursor:pointer; overflow: hidden; border-width: 0px !important;">' + 
+	        '<img width="50" src="' +  props.image + '"  />' + 
+	        '<div style="width:220px; margin-top:3px">' + props.desc + '</div></button></form>'		;
 
 	        // Offset the popup so it points at the middle of the marker not the tip
 	        popup.setOffset([0, -22]);
@@ -237,7 +245,8 @@ function pintar(locations){
 	    }
 	});
 }
-//});
+
+
 </script>
 </body>
 

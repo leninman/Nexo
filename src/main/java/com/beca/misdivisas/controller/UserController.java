@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.beca.misdivisas.interfaces.ILogRepo;
 import com.beca.misdivisas.interfaces.IRolRepo;
@@ -33,7 +34,6 @@ import com.beca.misdivisas.util.Constantes;
 
 
 @Controller
-//@RequestMapping("/usuario")
 public class UserController {
 
 	 @Autowired
@@ -167,9 +167,8 @@ public class UserController {
 	        return "redirect:usuarioListar?success";
 	    }
 
-	 @GetMapping("usuarioEditar/{id}")
-	    public String showUpdateForm(@PathVariable("id") int id, Model model) {
-	    	
+	 @PostMapping("usuarioEditar")
+	    public String showUpdateForm(@RequestParam("usuarioId") int id, Model model) {
 	    	int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 	    	Usuario usuarioRep = usuarioRepository.findById(id);
 	    	
@@ -184,8 +183,8 @@ public class UserController {
 	        }
 	    }
 
-	 @PostMapping("usuarioUpdate/{id}")
-	    public String updateUsuario(@PathVariable("id") int id, @Valid Usuario usuarioRep, BindingResult result,
+	 @PostMapping("usuarioUpdate")
+	    public String updateUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result,
 	        Model model) {
 	    	
 	    	
@@ -244,8 +243,8 @@ public class UserController {
 	        return "redirect:/usuarioListar?success";
 	    }
 
-	 @PostMapping("usuarioChange/{id}")
-	    public String cambioContrasenaUsuario(@PathVariable("id") int id, @Valid Usuario usuarioRep, BindingResult result,
+	 @PostMapping("usuarioChange")
+	    public String cambioContrasenaUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result,
 	            Model model) {
 	    	 
 	    	Usuario usuario = (Usuario) usuarioRepository.findById(id);
@@ -305,9 +304,9 @@ public class UserController {
 
 	        return "redirect:/resultadoCambio?success";
 	    }
-	 
-	 @GetMapping("usuarioEliminar/{id}")
-	    public String deleteUsuario(@PathVariable("id") int id, Model model) {
+
+	    @PostMapping("usuarioEliminar")
+	    public String deleteUsuario(@RequestParam("usuarioId") int id, Model model) {
 	    	
 	    	
 	        Usuario usuario = usuarioRepository.findById(id);
@@ -322,13 +321,7 @@ public class UserController {
 	    	else {
 	        
 		        List<UsuarioRol> roles = usuarioRolRepository.findByIdUsuario(usuario.getIdUsuario());
-		       
-		        /*for (Iterator iterator = roles.iterator(); iterator.hasNext();) {
-					UsuarioRol usuarioRol = (UsuarioRol) iterator.next();
-					usuarioRolRepository.delete(usuarioRol);
-				}*/
-		        
-		        //usuarioRepository.delete(usuario);
+
 		        usuario.setEstado("I");
 		        usuarioRepository.save(usuario);
 		        //model.addAttribute("usuarios", usuarioRepository.findAll());

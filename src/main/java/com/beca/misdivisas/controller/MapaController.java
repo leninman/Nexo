@@ -95,7 +95,7 @@ public class MapaController {
 				locacion.setSucursal(sucursales.get(i).getSucursal() + "<br>" + descripcion);
 				locacion.setLatitud(Double.parseDouble(sucursales.get(i).getLatitud()));
 				locacion.setLongitud(Double.parseDouble(sucursales.get(i).getLongitud()));
-				locacion.setAccion("reporte/" + sucursales.get(i).getIdSucursal());
+				locacion.setAccion(sucursales.get(i).getIdSucursal().toString());
 				locacion.setLogo("img/" + empresa.getCaracterRif() + empresa.getRif() + ".jpg");
 				locacion.setPosicion(i);
 				locaciones.add(locacion);

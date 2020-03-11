@@ -25,8 +25,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
@@ -548,8 +550,8 @@ public class ReporteController {
 		return rem;
 	}
 
-	@GetMapping(value = "/reporte/{idSucursal}")
-	public String getAcumuladoSucursal(@PathVariable int idSucursal, Model modelo) {
+	@PostMapping(value = "/reporte")
+	public String getAcumuladoSucursal(@RequestParam("sucursalId") int idSucursal, Model modelo) {
 		modelo.addAttribute("idSucursal", idSucursal);
 		factory.getObject().removeAttribute("idSucursal");
 		factory.getObject().setAttribute("idSucursal", idSucursal);
