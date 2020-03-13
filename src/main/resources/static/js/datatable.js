@@ -395,9 +395,7 @@ function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
 				  { data: "referencia" },
 				  { data: "concepto" },
 				  { data: "debito" },
-				  { data: "credito" },
-				  { data: "saldo" }
-				  
+				  { data: "credito" }				  
 			],
 			bFilter: false,		    
 		    dom: 'Bfrtip',
@@ -420,9 +418,9 @@ function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
 	            btns.removeClass('dt-button');
 	        },
             columnDefs: [
-            	{ className: "text-right", "targets": [1,4,5]},
+            	{ className: "text-right", "targets": [1,4]},
             	{ className: "text-center", "targets": [0,3]},
-            	{ type: "string", "targets": [3,4,5]},
+            	{ type: "string", "targets": [3,4]},
             	{ type:"date-eu", targets :[0]}
             ],
             pageLength:15,
