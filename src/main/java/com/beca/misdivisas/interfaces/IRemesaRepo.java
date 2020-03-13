@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.beca.misdivisas.jpa.Remesa;
+import com.beca.misdivisas.jpa.RemesaDetalle;
 import com.beca.misdivisas.model.ReporteSucursalMapa;
 
 public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
@@ -64,5 +65,8 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 	//@Query("SELECT MAX(fechan) FROM (SELECT MAX(rd.fecha) as fechan FROM Remesa r, Sucursal s, RemesaDetalle rd  WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.fecha=(SELECT MAX(d.fecha) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idEmpresa  = ?1 ) f ")
 	@Query("SELECT MAX(rd.fecha) as fechan FROM Remesa r, Sucursal s, RemesaDetalle rd  WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.fecha=(SELECT MAX(d.fecha) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idEmpresa  = ?1")
 	public List<Remesa> getFechaDeCorte(int idEmpresa);
+	
+	@Query("select rd FROM Remesa r, RemesaDetalle rd, Sucursal s where r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and r.idOperacion not in (9,12) and rd.idEstatusRemesa in (2,4) and s.idEmpresa  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa and d.fecha between ?3 and ?4) order by rd.fecha asc")
+	public List<RemesaDetalle> findRemeDetalle(int idEmpresa, int moneda, Date fechaInicio, Date fechaFin);
 
 }
