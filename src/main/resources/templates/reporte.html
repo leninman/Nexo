@@ -138,25 +138,24 @@
             </div>
             
             <div>
-	            <table style="width: 100%">
+	            <table style="width: 100%; font-size: 13px !important">
 					<tbody>
 						<tr>
-							<td style="text-align: left;">Fecha Inicio:</td>
-							<td style="text-align: left;"><input type="text" id="fechaInicio" class="form-control-sm form-control-warning" style="font-size: 13px; width: 45%" readonly="readonly" /></td>						
+							<td style="text-align: center;">Fecha Inicio:</td>
+							<td style="text-align: left;"><input type="text" id="fechaInicio" class="form-control-sm form-control-warning" style="width: 45%" readonly="readonly" /></td>						
 							<td style="text-align: center;" >Fecha Fin:</td>
-							<td style="text-align: left;" ><input type="text" id="fechaFin" class="form-control-sm form-control-warning" style="font-size: 13px; width: 45%" readonly="readonly" /></td>
-							<td style="text-align: left;">Moneda:</td>
+							<td style="text-align: left;" ><input type="text" id="fechaFin" class="form-control-sm form-control-warning" style="width: 45%" readonly="readonly" /></td>
+							<td style="text-align: center;">Moneda:</td>
 							<td style="text-align: left;">
-							<select id="moneda" class="form-control-sm" style="font-size: 13px">
-								<option selected value="1">USD</option>
-								<option value="2">EUR</option>
-							</select>
+								<select id="moneda" class="form-control-sm">
+									<option selected value="1">USD</option>
+									<option value="2">EUR</option>
+								</select>
 							</td>
 							<td colspan="3">
-							<button class="btn btn-dark" type="button" id="ver" style="font-size: 13px" onclick="validar_consolidada();">Ver Movimientos</button>													
-						
+								<button class="btn btn-dark" type="button" id="ver" onclick="validar_consolidada();">Ver Movimientos</button>
+							</td>				
 						</tr>
-						<tr>						</tr>
 					</tbody>
 				</table>
             </div>

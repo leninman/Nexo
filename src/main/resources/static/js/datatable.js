@@ -24,7 +24,6 @@ function tabla(fechaInicio, fechaFin, moneda) {
 		    },
 			sAjaxSource: "remesa/"+fechaInicio+"/"+fechaFin+"/"+moneda,
 			sAjaxDataProp: "",
-			order: [[ 0, "asc" ]],
 			columns: [
 			      { data: "fecha"},
 				  { data: "referencia" },
@@ -117,15 +116,13 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 		    },
 			"sAjaxSource": "./remesaNoApta/"+fechaInicio+"/"+fechaFin+"/"+moneda,
 			"sAjaxDataProp": "",
-			"order": [[ 0, "asc" ]],
 			"aoColumns": [
 			      { "mData": "fecha"},
 				  { "mData": "referencia" },
 				  { "mData": "concepto" },
 				  { "mData": "saldo" },
                   { "mData": function (data, type, row, meta) {
-                             	return '<a href="#" data-toggle="modal" data-target="#detalleRemesa" onclick= "verDetalle(\''+ data.referencia + '\');">ver</a>';
-                              }
+                             	return '<a href="#" data-toggle="modal" data-target="#detalleRemesa" onclick= "verDetalle(\''+ data.referencia + '\');">ver</a>';}
                   }				  
 			],
 			bFilter: false,		    
@@ -135,6 +132,7 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 		        customize: function( xlsx ) {
 		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
 		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		            $('row:eq(0) c', sheet).attr( 's', '2' );
 		          }
 		      },
 		      {extend: 'csvHtml5'}, 
@@ -146,8 +144,8 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 	            btns.addClass('btn btn-info btn-sm');
 	            btns.removeClass('dt-button');
 	        },
-            columnDefs: [{ className: "text-right", "targets": [3]
-            }]
+            columnDefs: [{ className: "text-right", "targets": [3]},
+            			 { type:"date-eu", targets :[0]}]
 	 })
 	 
 	 $(".buttons-excel").on('click', function(event){
@@ -190,7 +188,6 @@ function tablaIrregularidades(cartaporte) {
 		    },
 			"sAjaxSource": "./irregularidades/"+cartaporte,
 			"sAjaxDataProp": "",
-			"order": [[ 0, "asc" ]],
 			"aoColumns": [
 			      { "mData": "fecha"},
 				  { "mData": "referencia" },
@@ -269,6 +266,7 @@ function trackingRemesa(fechaInicio, fechaFin, cartaPorte) {
 		        customize: function( xlsx ) {
 		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
 		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		            $('row:eq(0) c', sheet).attr( 's', '2' );
 		          }
 		      },
 		      {extend: 'csvHtml5'}, 
@@ -337,6 +335,7 @@ function remesasPendientes() {
 		        customize: function( xlsx ) {
 		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
 		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		            $('row:eq(0) c', sheet).attr( 's', '2' );
 		          }
 		      },
 		      {extend: 'csvHtml5'}, 
@@ -349,7 +348,8 @@ function remesasPendientes() {
 
 	        },
             columnDefs: [{ className: "text-right", "targets": [3,5]},
-            			{ className: "text-center", "targets": [0,4]}]
+            			{ className: "text-center", "targets": [0,4]},
+            			{ type:"date-eu", targets :[0]}]
 	        
 	 })
 	 
@@ -364,4 +364,78 @@ function remesasPendientes() {
 		});
 }
 
-
+function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
+	$('#tablaReporteSucursal').DataTable().destroy();
+	var accion = "Descargar Reporte por Sucursal";
+	var detalle = "Descarga el reporte:  fecha inicio(";
+	var opcion = "Descarga";
+	detalle = detalle + ': fecha inicio('+fechaInicio+'); fecha fin('+fechaFin+'); sucursal('+sucursal+'); moneda('+moneda+')';	
+	
+	 var table = $('#tablaReporteSucursal').DataTable({
+	        processing: true,
+	        language: {			 
+	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',					        
+		        lengthMenu:    	"Mostrar _MENU_ elementos",
+		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
+		        zeroRecords:    "No hay movimientos en el rango de fechas, sucursal y moneda seleccionada",
+		        emptyTable:     "No hay movimientos en el rango de fechas, sucursal y moneda seleccionada",
+		        paginate: {
+		            first:      "Primero",
+		            previous:   "Previo",
+		            next:       "Siguiente",
+		            last:       "Ultimo"
+		        }
+		    },
+			sAjaxSource: "reporteSucursal/"+fechaInicio+"/"+fechaFin+"/"+sucursal+"/"+moneda,
+			sAjaxDataProp: "",
+			order: [[ 0, "d" ]],
+			order: [[ 0, "asc" ]],
+			columns: [
+			      { data: "fecha"},
+				  { data: "referencia" },
+				  { data: "concepto" },
+				  { data: "debito" },
+				  { data: "credito" },
+				  { data: "saldo" }
+				  
+			],
+			bFilter: false,		    
+		    dom: 'Bfrtip',
+		    bSort : false,
+		    buttons: [{
+		        extend: 'excelHtml5',
+		        customize: function( xlsx ) {
+		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		            $('row:eq(0) c', sheet).attr( 's', '2' );
+		          }
+		      },
+		      {extend: 'csvHtml5'}, 
+		      {extend: 'pdf'}
+		      
+		      ],
+	        initComplete: function () {
+	            var btns = $('.dt-button');
+	            btns.addClass('btn btn-info btn-sm');
+	            btns.removeClass('dt-button');
+	        },
+            columnDefs: [
+            	{ className: "text-right", "targets": [1,4,5]},
+            	{ className: "text-center", "targets": [0,3]},
+            	{ type: "string", "targets": [3,4,5]},
+            	{ type:"date-eu", targets :[0]}
+            ],
+            pageLength:15,
+            
+	 })
+	 
+	 $(".buttons-excel").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+	 $(".buttons-csv").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+	 $(".buttons-pdf").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+}

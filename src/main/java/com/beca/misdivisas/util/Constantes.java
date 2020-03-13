@@ -42,6 +42,7 @@ public interface Constantes {
 	public static final String REPORTE_GRAFICO = "Reporte Grafico";
 	public static final String ADMINISTRAR_USUARIO = "Administracion Usuario";
 	public static final String REMESAS_PENDIENTES = "Remesas Pendientes por Entrega";
+	public static final String REPORTE_SUCURSAL= "Reporte por sucursal";
 	
 	public static final String OPERACION_CONSULTA = "Consulta";
 	public static final String OPERACION_EDICION = "Edicion";

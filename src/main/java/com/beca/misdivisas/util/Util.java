@@ -61,11 +61,10 @@ public class Util {
 		return diffDays;
 	}
 
-	public static int getDiasHabiles(Calendar fechaInicial, Calendar fechaFinal) {
+	public static int getDiasHabiles(Calendar fechaInicial, Calendar fechaFinal, List<Date> listaFechasNoLaborables) {
 		int diffDays = 0;
 		while (fechaInicial.before(fechaFinal)) {
-			if (fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
-					&& fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
+			if (esLaborable(fechaInicial, listaFechasNoLaborables)) {
 				diffDays++;
 			}
 			fechaInicial.add(Calendar.DATE, 1);
@@ -96,13 +95,19 @@ public class Util {
 		return formato.format(cal.getTime());
 	}
 
-	public static boolean esLaborable(Calendar fechaInicial, List<Date> listaFechasNoLaborables) {
+	public static boolean esLaborable(Calendar fecha, List<Date> listaFechasNoLaborables) {
+
+		fecha.set(Calendar.HOUR_OF_DAY, 0);
+		fecha.set(Calendar.MINUTE, 0);
+		fecha.set(Calendar.SECOND, 0);
+		fecha.set(Calendar.MILLISECOND, 0);
 
 		if (listaFechasNoLaborables != null) {
-			Date fechaNoLaborablecalendar = fechaInicial.getTime();
-			if (fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
+			Date fechaC = fecha.getTime();
+			
+			if (fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
 				for (int i = 0; i < listaFechasNoLaborables.size(); i++) {
-					if (fechaNoLaborablecalendar.equals(listaFechasNoLaborables.get(i))) {
+					if (fechaC.equals(listaFechasNoLaborables.get(i))) {
 						return false;
 					}
 				}				
@@ -110,8 +115,8 @@ public class Util {
 				return false;
 			}
 		} else {
-			if (fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
-					&& fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
+			if (fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
+					&& fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
 				return true;
 			} else {
 				return false;
