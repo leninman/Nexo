@@ -14,6 +14,7 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -89,9 +90,7 @@ public class ReporteController {
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
-			List<Remesa> remesasEuro = remesaRepo.getLasRemesaByMoneda(id, Constantes.EUR);
-
+			DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 			BigDecimal montoPendienteDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
 					Constantes.ESTATUS_PENDIENTE);
 			BigDecimal montoPendienteEuro = remesaRepo.getLastRemesaByStatus(id, Constantes.EUR,
@@ -103,12 +102,11 @@ public class ReporteController {
 			Empresa empresa = empresaRepo.findById(id);
 			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
-			BigDecimal saldoD = new BigDecimal(0), saldoE = new BigDecimal(0), retiroD = new BigDecimal(0),
-					retiroE = new BigDecimal(0);
 			BigDecimal saldoTOT = new BigDecimal(0);
-			BigDecimal saldoNAD = new BigDecimal(0);
-			BigDecimal saldoNAE = new BigDecimal(0);
 			BigDecimal tmp = new BigDecimal(0);
+
+			
+			saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.USD, formato2.format(new Date()));
 
 			if (montoPendienteDolar == null)
 				montoPendienteDolar = BigDecimal.valueOf(0.00);
@@ -124,61 +122,16 @@ public class ReporteController {
 			List<Date> fechas = u.obtenerFeriados(this.bancarios);
 			modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
 			
-			if (remesasDolar.size() > 0) {
+			tmp = saldoTOT.subtract(montoPendienteEntregaDolar);
 
-				for (int i = 0; i < remesasDolar.size(); i++) {
-					if (!remesasDolar.get(i).getRemesaDetalles().isEmpty() && remesasDolar.get(i).getRemesaDetalles()
-							.get(0).getIdEstatusRemesa() != Constantes.ESTATUS_CANCELADA) {
-
-						if (remesasDolar.get(i).getOperacion().getIdTipoOperacion() == Constantes.CREDITO) {
-							if (remesasDolar.get(i).getIdOperacion() != Constantes.RETIRO_BNA) {
-
-								saldoD = saldoD.add(remesasDolar.get(i).getRemesaDetalles().get(0).getMonto());
-								if (remesasDolar.get(i).getPiezas() != null)
-									saldoNAD = saldoNAD.add(getMontoFromPiezas(remesasDolar.get(i).getPiezas()));
-							}
-
-						} else {
-							if (remesasDolar.get(i).getIdOperacion() != Constantes.RETIRO_BNA)
-								retiroD = retiroD.add(remesasDolar.get(i).getRemesaDetalles().get(0).getMonto());
-						}
-					}
-				}
-
-				saldoTOT = saldoD.subtract(retiroD).subtract(saldoNAD);
-				tmp = saldoTOT.subtract(montoPendienteEntregaDolar);
-
-			}
 			modelo.addAttribute("totalDolares", Util.formatMonto(String.valueOf(saldoTOT)));
 			modelo.addAttribute("pendienteDolares", Util.formatMonto(montoPendienteDolar.toString()));
 			modelo.addAttribute("pendienteEntregaDolares", Util.formatMonto(montoPendienteEntregaDolar.toString()));
 			modelo.addAttribute("disponibleDolares", Util.formatMonto(String.valueOf(tmp)));
 			tmp = new BigDecimal(0);
-			saldoTOT = new BigDecimal(0);
+			saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.EUR, formato2.format(new Date()));
 
-			if (remesasEuro.size() > 0) {
-				saldoTOT = new BigDecimal(0);
-				for (int i = 0; i < remesasEuro.size(); i++) {
-
-					if (!remesasEuro.get(i).getRemesaDetalles().isEmpty() && remesasEuro.get(i).getRemesaDetalles()
-							.get(0).getIdEstatusRemesa() != Constantes.ESTATUS_CANCELADA) {
-						if (remesasEuro.get(i).getOperacion().getIdTipoOperacion() == Constantes.CREDITO
-								&& remesasEuro.get(i).getIdOperacion() != Constantes.RETIRO_BNA) {
-
-							saldoE = saldoE.add(remesasEuro.get(i).getRemesaDetalles().get(0).getMonto());
-							if (remesasEuro.get(i).getPiezas() != null)
-								saldoNAE = saldoNAE.add(getMontoFromPiezas(remesasEuro.get(i).getPiezas()));
-
-						} else {
-							if (remesasEuro.get(i).getIdOperacion() != Constantes.RETIRO_BNA)
-								retiroE = retiroE.add(remesasEuro.get(i).getRemesaDetalles().get(0).getMonto());
-						}
-					}
-				}
-
-				saldoTOT = saldoE.subtract(retiroE).subtract(saldoNAE);
-				tmp = saldoTOT.subtract(montoPendienteEntregaEuro);
-			}
+			tmp = saldoTOT.subtract(montoPendienteEntregaEuro);
 
 			modelo.addAttribute("totalEuros", Util.formatMonto(String.valueOf(saldoTOT)));
 			modelo.addAttribute("pendienteEuros", Util.formatMonto(montoPendienteEuro.toString()));
@@ -209,10 +162,12 @@ public class ReporteController {
 		ReporteSucursal rs = null;
 		RemesaDetalle remesaDetalle = null;
 		BigDecimal saldo = new BigDecimal(0);
+		
 		try {
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			//List<Remesa> remesas = remesaRepo.findRemesaByEmpresaId(id, Integer.parseInt(moneda), formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"));
 			
+			saldo = remesaRepo.getTotalByEmpresaAndDate(id, Integer.parseInt(moneda), fechaI + " 00:00:00");
+
 			List<RemesaDetalle> remesaDetalles = remesaRepo.findRemeDetalle(id, Integer.parseInt(moneda), formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"));
 
 			for (int i = 0; i < remesaDetalles.size(); i++) {
@@ -314,7 +269,7 @@ public class ReporteController {
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 
-			DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+			//DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
 			List<Remesa> remesasEuro = remesaRepo.getLasRemesaByMoneda(id, Constantes.EUR);
@@ -409,7 +364,7 @@ public class ReporteController {
 				if (remesa.getIdOperacion() != Constantes.DIFERENCIA_FALTANTE) {
 					rs = new ReporteSucursal();
 					List<Pieza> piezas = remesa.getPiezas();
-					for (Iterator iterator = piezas.iterator(); iterator.hasNext();) {
+					for (Iterator<Pieza> iterator = piezas.iterator(); iterator.hasNext();) {
 						Pieza pieza = (Pieza) iterator.next();
 						if (pieza.getCantidadNoApta() > 0) {
 							rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
@@ -645,7 +600,7 @@ public class ReporteController {
 		BigDecimal monto = new BigDecimal(0);
 		BigDecimal parcial = new BigDecimal(0);
 		if (piezas != null) {
-			for (Iterator iterator = piezas.iterator(); iterator.hasNext();) {
+			for (Iterator<Pieza> iterator = piezas.iterator(); iterator.hasNext();) {
 				Pieza pieza = (Pieza) iterator.next();
 				if (pieza.getCantidadNoApta() > 0) {
 					parcial = BigDecimal.valueOf(pieza.getCantidadNoApta() * pieza.getDenominacion().getDenominacion());
@@ -829,7 +784,7 @@ public class ReporteController {
 		List<ReporteSucursal> reportes = new ArrayList<ReporteSucursal>();
 		ReporteSucursal rs = null;
 		Remesa remesa = null;
-		BigDecimal saldo = new BigDecimal(0);
+
 		try {
 			List<Remesa> remesas = remesaRepo.findBySucursalGivenDates(sucursal, moneda,
 					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_PROCESADA, Constantes.RECEPCION_EFECTIVO);
@@ -852,8 +807,6 @@ public class ReporteController {
 				}else {
 					rs.setDebito(Constantes.EUR_STRING);
 				}
-				
-
 					if (remesa.getRemesaDetalles().size() > 0) {
 						rs.setFecha(formato1.format(
 								remesa.getRemesaDetalles().get(remesa.getRemesaDetalles().size() - 1).getFecha()));
@@ -879,8 +832,6 @@ public class ReporteController {
 						}
 
 						rs.setCredito(Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().toString()));
-						saldo = saldo.add(remesa.getRemesaDetalles().get(0).getMonto());
-						rs.setSaldo(Util.formatMonto(saldo.toString()));
 						reportes.add(rs);
 					}
 
@@ -892,9 +843,6 @@ public class ReporteController {
 						rs.setDebito(
 								Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().negate().toString()));
 						rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_CANCELADA);
-
-						saldo = saldo.subtract(remesa.getRemesaDetalles().get(0).getMonto());
-						rs.setSaldo(Util.formatMonto(saldo.toString()));
 						reportes.add(rs);
 					}				
 			}
@@ -906,4 +854,14 @@ public class ReporteController {
 		registrarLog(Constantes.REPORTE_SUCURSAL, detalle, Constantes.REPORTE_SUCURSAL, true);
 		return reportes;
 	}
+	
+	@RequestMapping(path = "/totalPorSucursal/{sucursal}/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public String getTotalPorSucursal(@PathVariable int sucursal,  @PathVariable int moneda) {
+		BigDecimal saldo = new BigDecimal(0);
+		saldo = getMontoTotalBySucursal(sucursal, moneda);		
+		return saldo.toString();
+		
+	}
+
 }

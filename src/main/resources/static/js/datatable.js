@@ -395,7 +395,7 @@ function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
 				  { data: "referencia" },
 				  { data: "concepto" },
 				  { data: "debito" },
-				  { data: "credito" }				  
+				  { data: "credito" }
 			],
 			bFilter: false,		    
 		    dom: 'Bfrtip',
@@ -426,6 +426,7 @@ function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
             pageLength:15,
             
 	 })
+	 $("#saldoTotal").html(getTotalBySucursal(sucursal,moneda));
 	 
 	 $(".buttons-excel").on('click', function(event){
 		 registrar(accion, detalle, opcion);
@@ -436,4 +437,20 @@ function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
 	 $(".buttons-pdf").on('click', function(event){
 		 registrar(accion, detalle, opcion);
 		});
+}
+
+function getTotalBySucursal(sucursal, moneda) {
+	var strReturn="";
+	  jQuery.ajax({
+	    url:"totalPorSucursal/"+sucursal+"/"+moneda,
+	    success: function(html) {
+	      strReturn = Number(parseFloat(html).toFixed(2)).toLocaleString('de', {minimumFractionDigits: 2}); 
+	    },
+	    async:false, 
+	    error: function() {
+	    	alert("error");
+	    }
+	  });
+
+	  return strReturn;
 }

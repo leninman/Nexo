@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.beca.misdivisas.jpa.Remesa;
 import com.beca.misdivisas.jpa.RemesaDetalle;
@@ -44,7 +45,10 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 	@Query("SELECT SUM(rd.monto) FROM Remesa r, Sucursal s, RemesaDetalle rd"
 			+ " WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and r.idOperacion not in (9,12) and s.idEmpresa  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa = ?3")
 	public BigDecimal getLastRemesaByStatus(int idEmpresa, int moneda, int status);
-
+	
+	@Query(nativeQuery = true, value = "SELECT \"ALMACEN\".SaldoTotal(:empresa,:moneda,:fecha)")
+	public BigDecimal getTotalByEmpresaAndDate(@Param("empresa") int empresa, @Param("moneda") int moneda, @Param("fecha") String fecha );
+	
 	@Query("SELECT SUM(rd.monto) FROM Remesa r, Sucursal s, RemesaDetalle rd"
 			+ " WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idSucursal  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa = ?3 and r.idOperacion = ?4")
 	public BigDecimal getTotalBySucursal(int idSucursal, int moneda, int status, int operacion);

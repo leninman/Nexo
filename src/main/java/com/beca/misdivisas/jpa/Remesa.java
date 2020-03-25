@@ -1,13 +1,8 @@
 package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import javax.persistence.*;
-
-import com.beca.misdivisas.model.ReporteSucursal;
 
 import java.util.Date;
 import java.util.List;

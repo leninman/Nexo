@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -320,11 +319,8 @@ public class UserController {
 	    	
 	    	else {
 	        
-		        List<UsuarioRol> roles = usuarioRolRepository.findByIdUsuario(usuario.getIdUsuario());
-
 		        usuario.setEstado("I");
 		        usuarioRepository.save(usuario);
-		        //model.addAttribute("usuarios", usuarioRepository.findAll());
 				String detalle= "Eliminar Usuario : NombreUsuario("+usuario.getNombreUsuario()+");  idUsuario("+usuario.getIdUsuario()+");";
 
 				registrarLog(Constantes.ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_BORRAR, true);
@@ -378,14 +374,7 @@ public class UserController {
 	                	 contEspecial++;
 	                 
 	        }
-        //@dm!n1$tr&d0r
-        //#C0nsu%t*r.
-//        System.out.println("Cantidad de letras mayusculas:"+contLetraMay);
-//        System.out.println("Cantidad de letras minusculas:"+contLetraMin);
-//        System.out.println("Cantidad de numeros:"+contNumero);
-//        System.out.println("Cantidad de especiales:"+contEspecial);
-//        System.out.println("Longitud:"+contrasena.length());
-//        
+      
         if(contLetraMay > 0 && contLetraMin > 0 && contNumero > 0 && contEspecial > 0 && contrasena.length() == (contLetraMay + contLetraMin + contNumero + contEspecial))
         	return true;
         else
