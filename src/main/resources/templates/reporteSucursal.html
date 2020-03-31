@@ -16,7 +16,7 @@
 <link rel="shortcut icon" type="image/x-icon"
 	th:href="@{/img/favicon.ico}" />
 <link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon">
-<title>Reporte Detallado por Sucursal</title>
+<title>Reporte de Ingresos por Sucursal</title>
 
 <!-- Custom fonts for this template -->
 <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
@@ -113,8 +113,7 @@
 											de Procesamiento y Almacenamiento de Efectivo en Divisas</h4></td>
 								</tr>
 								<tr>
-									<td style="text-align: center;" colspan="6"><h5>Reporte
-											Detallado por Sucursal</h5></td>
+									<td style="text-align: center;" colspan="6"><h5>Reporte de Ingresos por Sucursal</h5></td>
 								</tr>
 								<tr>
 									<td style="text-align: right;" width="23%"><b>Cliente:&nbsp;&nbsp;</b></td>
@@ -162,6 +161,12 @@
 											onclick="validar_Rep_Sucursal();">Ver Movimientos</button>
 									</td>
 								</tr>
+								<tr>
+									<td colspan="9"></td>
+								</tr>
+								<tr>								
+									<td colspan="9" align="center"><div class="btn btn-light" id="totalbtn" hidden="true"><b>Total Ingresado:</b> <b id="saldoTotal"></b></div></td>									
+								</tr>
 							</tbody>
 						</table>
 					</div>
@@ -181,13 +186,13 @@
 										<th>Monto</th>
 									</tr>
 								</thead>
-								<tfoot>
+<!-- 								<tfoot>
 									<tr id="tfooter">
 										<td colspan="3" style="border: 0 1 0 0 !important"></td>
 										<td><b>Saldo Total por Sucursal:</b></td>
 										<td id="saldoTotal"></td>
 									</tr>
-								</tfoot>
+								</tfoot> -->
 							</table>
 						</div>
 					</div>

@@ -1,6 +1,5 @@
 
-<th:block th:fragment="menuSuperior">
-	<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">     
+<th:block th:fragment="menuSuperior">	    
 		<nav class="navbar navbar-expand-sm navbar-dark bg-dark"  style="height: 100%; width: 100%; font-size: 16px !important">
 			<!-- Sidebar Toggle (Topbar) -->
 
@@ -14,7 +13,8 @@
 					<i class="fas fa-fw fas fa-home"></i> 
 					<span>Inicio</span>
 				</a>
-			  </li>	  
+			  </li>
+			  <div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">   
 		  	  <li class="nav-item dropdown">
 		        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		          <i class="fas fa-search-dollar"></i>
@@ -38,7 +38,8 @@
 				  <a class="dropdown-item" href="reporteSucursal" id="reporteSucursall"><i class="fas fa-store-alt"></i>&nbsp;<span>  Ingresos por Sucursal</span></a>		         		        
 		        </div>
 		     </li>
-			 <div sec:authorize="hasAnyRole('ADMIN_BECA', 'ADMIN')">
+		     </div>
+			 <div sec:authorize="hasAnyRole('ADMIN_BECA','ADMIN')">
 				<li class="nav-item dropdown">
 			       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 			         <i class="fas fa-user-lock"></i>
@@ -52,6 +53,4 @@
 		    </ul>
 		  </div>
 		</nav>
-	</div>
-
 </th:block>

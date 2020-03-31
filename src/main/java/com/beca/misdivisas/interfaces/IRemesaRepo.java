@@ -46,7 +46,7 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 			+ " WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and r.idOperacion not in (9,12) and s.idEmpresa  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa = ?3")
 	public BigDecimal getLastRemesaByStatus(int idEmpresa, int moneda, int status);
 	
-	@Query(nativeQuery = true, value = "SELECT \"ALMACEN\".SaldoTotal(:empresa,:moneda,:fecha)")
+	@Query(nativeQuery = true, value = "SELECT \"ALMACEN\".f_Saldo_total(:empresa,:moneda,:fecha)")
 	public BigDecimal getTotalByEmpresaAndDate(@Param("empresa") int empresa, @Param("moneda") int moneda, @Param("fecha") String fecha );
 	
 	@Query("SELECT SUM(rd.monto) FROM Remesa r, Sucursal s, RemesaDetalle rd"
@@ -70,7 +70,7 @@ public interface IRemesaRepo extends JpaRepository<Remesa, Integer> {
 	@Query("SELECT MAX(rd.fecha) as fechan FROM Remesa r, Sucursal s, RemesaDetalle rd  WHERE r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and rd.fecha=(SELECT MAX(d.fecha) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa) and s.idEmpresa  = ?1")
 	public List<Remesa> getFechaDeCorte(int idEmpresa);
 	
-	@Query("select rd FROM Remesa r, RemesaDetalle rd, Sucursal s where r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and r.idOperacion not in (9,12) and rd.idEstatusRemesa in (2,4) and s.idEmpresa  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa and d.fecha between ?3 and ?4) order by rd.fecha asc")
+	@Query("select rd FROM Remesa r, RemesaDetalle rd, Sucursal s where r.idSucursal = s.idSucursal and rd.idRemesa = r.idRemesa and r.idOperacion not in (9,12) and rd.idEstatusRemesa in (2,4) and s.idEmpresa  = ?1 and rd.idMoneda = ?2 and rd.idEstatusRemesa=(SELECT MAX(d.idEstatusRemesa) FROM RemesaDetalle d WHERE d.idRemesa=rd.idRemesa and d.fecha between ?3 and ?4) order by rd.fecha,rd.idRemesa asc")
 	public List<RemesaDetalle> findRemeDetalle(int idEmpresa, int moneda, Date fechaInicio, Date fechaFin);
 	
 	

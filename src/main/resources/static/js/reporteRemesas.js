@@ -181,7 +181,7 @@ function validar_Rep_Sucursal(){
 		var sucursal = $("#dropSucursales").val();		
 
 		tablaReporteSucursal(fechaInicio, fechaFin,sucursal,  moneda);
-		
+		$("#totalbtn").attr("hidden",false);
 		$("#father").show();
 	}
 }
