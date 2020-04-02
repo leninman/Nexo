@@ -49,6 +49,27 @@ public class HomeController {
     public String login(HttpServletRequest request) {
     	return "login";
     }
+
+    @GetMapping(value ="/EnvioEfectivo")
+    public String envioRemesa(Model modelo) {
+    	int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();    	
+    	modelo.addAttribute("idEmpresa", id);
+    	return "EnvioEfectivo";
+    }
+    
+    @GetMapping(value ="/TraspasoEfectivo")
+    public String traspasoEfectivo(Model modelo) {
+    	int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();    	
+    	modelo.addAttribute("idEmpresa", id);
+    	return "TraspasoEfectivo";
+    }
+    
+    @GetMapping(value ="/RetiroEfectivo")
+    public String retiroEfectivo(Model modelo) {
+    	int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();    	
+    	modelo.addAttribute("idEmpresa", id);
+    	return "RetiroEfectivo";
+    }
     
 	@PostMapping(value="/login")
 	public String main() {
