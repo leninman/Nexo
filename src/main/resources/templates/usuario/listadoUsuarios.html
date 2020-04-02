@@ -40,7 +40,7 @@
 										
 										<div sec:authorize="hasRole('ADMIN')">
 											<td>
-												<form method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
+												<form th:if="${!usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
 													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
 										            <button type="submit" name="submit"  class="btn btn-secondary">
 										            	<i class="fas fa-user-edit ml-2" ></i>
@@ -87,7 +87,7 @@
 										
 										<div sec:authorize="hasRole('ADMIN_BECA')">
 											<td>
-												<form method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
+												<form th:if="${usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
 													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
 										            <button type="submit" name="submit"  class="btn btn-secondary">
 										            	<i class="fas fa-user-edit ml-2" ></i>
