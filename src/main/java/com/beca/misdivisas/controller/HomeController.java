@@ -1,6 +1,5 @@
 package com.beca.misdivisas.controller;
 
-
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -23,64 +22,89 @@ import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Login;
 
-
 @Controller
 public class HomeController {
-   
+
 	@Autowired
 	private IEmpresaRepo empresaRepository;
-	
+
 	@Autowired
 	private ObjectFactory<HttpSession> factory;
-	
+
 	@Autowired
 	private ILogRepo logRepo;
 
 	@Autowired
 	private HttpServletRequest request;
-	
-    @RequestMapping(value="/")
-    public String home(){
-    	 return "login";
-    }
-    
-    
-    @GetMapping("/login")
-    public String login(HttpServletRequest request) {
-    	return "login";
-    }
 
-    @GetMapping(value ="/EnvioEfectivo")
-    public String envioRemesa(Model modelo) {
-    	int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();    	
-    	modelo.addAttribute("idEmpresa", id);
-    	return "EnvioEfectivo";
-    }
-    
-    @GetMapping(value ="/TraspasoEfectivo")
-    public String traspasoEfectivo(Model modelo) {
-    	int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();    	
-    	modelo.addAttribute("idEmpresa", id);
-    	return "TraspasoEfectivo";
-    }
-    
-    @GetMapping(value ="/RetiroEfectivo")
-    public String retiroEfectivo(Model modelo) {
-    	int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();    	
-    	modelo.addAttribute("idEmpresa", id);
-    	return "RetiroEfectivo";
-    }
-    
-	@PostMapping(value="/login")
+	@RequestMapping(value = "/")
+	public String home() {
+		return "login";
+	}
+
+	@GetMapping("/login")
+	public String login(HttpServletRequest request) {
+		return "login";
+	}
+
+	@GetMapping(value = "/EnvioEfectivo")
+	public String envioRemesa(Model modelo) {
+		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
+				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
+
+			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+			modelo.addAttribute("idEmpresa", id);
+			return "EnvioEfectivo";
+		} else {
+			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+			modelo.addAttribute("usuario", usuario);
+			return "changePassword";
+		}
+
+	}
+
+	@GetMapping(value = "/TraspasoEfectivo")
+	public String traspasoEfectivo(Model modelo) {
+		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
+				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
+
+			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+			modelo.addAttribute("idEmpresa", id);
+			return "TraspasoEfectivo";
+
+		} else {
+			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+			modelo.addAttribute("usuario", usuario);
+			return "changePassword";
+		}
+	}
+
+	@GetMapping(value = "/RetiroEfectivo")
+	public String retiroEfectivo(Model modelo) {
+		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
+				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
+
+			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+			modelo.addAttribute("idEmpresa", id);
+			return "RetiroEfectivo";
+
+		} else {
+			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+			modelo.addAttribute("usuario", usuario);
+			return "changePassword";
+		}
+	}
+
+	@PostMapping(value = "/login")
 	public String main() {
 		return "main";
 	}
-	
-	@PostMapping(value="/mainBECA")
+
+	@PostMapping(value = "/mainBECA")
 	public String mainBECA(Login login) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-		Usuario usuario =  new Usuario();
+
+		Usuario usuario = new Usuario();
 		usuario.setNombreUsuario(auth.getName());
 		usuario.setEmpresa(empresaRepository.findById(login.getEmpresa().getIdEmpresa().intValue()));
 		usuario.setIdEmpresa(login.getEmpresa().getIdEmpresa());
@@ -88,74 +112,69 @@ public class HomeController {
 		usuario.setContrasena1("local");
 		factory.getObject().removeAttribute("Usuario");
 		factory.getObject().setAttribute("Usuario", usuario);
-		
+
 		registrarLog("Acceso al sistema", "Ingreso", "Login", true);
 
 		return "main";
 	}
-	
-	@GetMapping(value="/main")
+
+	@GetMapping(value = "/main")
 	public String main_href(Login login, Model model) {
-		
-		if(factory.getObject().getAttribute("Usuario") != null) {
-			if (((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1()!=null && !(((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals("")))
+
+		if (factory.getObject().getAttribute("Usuario") != null) {
+			if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
+					&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals("")))
 				return "main";
 			else {
 				Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-		    	model.addAttribute("usuario", usuario);
-		        return "changePassword";
+				model.addAttribute("usuario", usuario);
+				return "changePassword";
 			}
 		}
-			
+
 		else {
 			login.setEmpresas(empresaRepository.findAll());
-		    model.addAttribute("login", login);
-		    
-		    
+			model.addAttribute("login", login);
+
 			return "loginBECA";
 		}
 	}
-	
-	@GetMapping(value="/grafico")
+
+	@GetMapping(value = "/grafico")
 	public String grafico(Model model) {
-		
+
 		return "grafico";
 	}
-	
-    @GetMapping("/index")
-    public String index() {
-        return "index";
-    }
-    
-    @GetMapping("/reporteG")
-    public String reporte() {
-        return "reporteGrafico";
-    }
-   
-/*
-    @GetMapping("/access-denied")
-    public String accessDenied() {
-        return "/error/access-denied";
-    }
-    
-    @RequestMapping(value="/403")
-    public String Error403(){
-        return "403";
-    }
-*/
-	public  void registrarLog(String accion, String detalle,  String opcion, boolean resultado) {
+
+	@GetMapping("/index")
+	public String index() {
+		return "index";
+	}
+
+	@GetMapping("/reporteG")
+	public String reporte() {
+		return "reporteGrafico";
+	}
+
+	/*
+	 * @GetMapping("/access-denied") public String accessDenied() { return
+	 * "/error/access-denied"; }
+	 * 
+	 * @RequestMapping(value="/403") public String Error403(){ return "403"; }
+	 */
+	public void registrarLog(String accion, String detalle, String opcion, boolean resultado) {
 		Date date = new Date();
 		Log audit = new Log();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		String ip = request.getRemoteAddr();
 		HttpSession session = factory.getObject();
 		Usuario us = (Usuario) session.getAttribute("Usuario");
-		if(us!=null) {
+		if (us != null) {
 			audit.setIdEmpresa(us.getIdEmpresa());
 			audit.setIdUsuario(us.getIdUsuario());
 			audit.setNombreUsuario(us.getNombreUsuario());
-		}else {
+		} else {
 			audit.setNombreUsuario(auth.getName());
 		}
 		audit.setFecha(new Timestamp(date.getTime()));
@@ -166,5 +185,5 @@ public class HomeController {
 		audit.setResultado(true);
 		logRepo.save(audit);
 	}
-	
+
 }
