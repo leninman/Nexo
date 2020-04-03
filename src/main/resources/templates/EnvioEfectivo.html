@@ -20,6 +20,7 @@
 	
 	<!-- Custom styles for this template-->
 	<link href="css/sb-admin-2.min.css" th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+	<script src="vendor/jquery/jquery.min.js"></script>
 </head>
 
 <body id="page-top">
@@ -49,13 +50,13 @@
 					<!-- Page Heading -->
 				<br/>
 					<center>
-						<div th:switch="${idEmpresa}" align="center" style="border-radius: 10px; width: 850px; overflow: hidden;">						
-							<iframe th:case="'1'" width="850px" height= "1700px" src= "https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUQkswVUQxNE9CWFlYMVlRVFNZNUdRUU9NVSQlQCN0PWcu&embed=true" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
-							<iframe th:case="'2'" width="850px" height= "1700px" src= "https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lURVg0TjNKMjJGUTlIUUgyOFJVQVQ5NUdQMiQlQCN0PWcu&embed=true" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
-							<iframe th:case="'3'" width="850px" height= "1700px" src= "https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUQ1lNUU9WMk1XUjVGWVRTNUpTVVdVSUIxSiQlQCN0PWcu&embed=true" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+						<div th:switch="${idEmpresa}" align="center" style="border-radius: 10px; width: 850px; overflow: hidden;">
+							<input type="hidden" name="idEmpresa" id="idEmpresa" th:value="${idEmpresa}" />						
+							<iframe th:case="'1'" width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+							<iframe th:case="'2'" width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+							<iframe th:case="'3'" width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
 						</div>
-					</center>
-						 
+					</center>						 
 
 				</div>
 				<!-- /.container-fluid -->
@@ -112,8 +113,28 @@
 
 	<!-- Custom scripts for all pages-->
 	<script src="js/sb-admin-2.min.js"   th:src="@{/js/sb-admin-2.min.js}" ></script>
-
-
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+			var id = $('#idEmpresa').val();
+			var url = '';
+			switch(id) {
+			  case "1":
+				url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUQkswVUQxNE9CWFlYMVlRVFNZNUdRUU9NVSQlQCN0PWcu&embed=true';
+			    break;
+			  case "2":
+				url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lURVg0TjNKMjJGUTlIUUgyOFJVQVQ5NUdQMiQlQCN0PWcu&embed=true';
+			    break;
+			  case "3":
+				url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUQ1lNUU9WMk1XUjVGWVRTNUpTVVdVSUIxSiQlQCN0PWcu&embed=true';
+				break;
+			  default:
+				break;
+			}
+			$('iframe').attr('src', url);
+		});
+	
+	</script>
 </body>
 
 </html>

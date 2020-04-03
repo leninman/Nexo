@@ -33,18 +33,26 @@ loop
 	FETCH cursor_remesas INTO estatus, monto, operacion, tipo_operacion, remesa;
 	EXIT WHEN NOT FOUND;
 	IF (estatus != 5) then
-		if(tipo_operacion = 1) then		
-			total = total + monto;
-			select "ALMACEN".monto_bna(remesa) into bna;
-			totalNA = totalNA + bna;			
+		if(tipo_operacion = 1) then
+			if monto is not null then 
+				total = total + monto;
+			end if;	
+			select "ALMACEN".f_monto_bna(remesa) into bna;
+			
+			if bna is not null then
+				totalNA = totalNA + bna;
+			end if;
 		else
 			if(operacion != 7) then
-				 total_retiro = total_retiro + monto;				 
+				if monto is not null then
+				 	total_retiro = total_retiro + monto;
+				 end if;
 			end if;
 		end if;
 	end if;
 end loop;
-	total = total-(totalNA+total_retiro);
+	total = total-(totalNA + total_retiro);
+	
 return total;
 END
 $function$;

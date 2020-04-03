@@ -54,6 +54,7 @@ public class HomeController {
 
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			modelo.addAttribute("idEmpresa", id);
+			registrarLog("EnvioEfectivo", "Solicitud Envio de Efectivo", "Solicitud", true);
 			return "EnvioEfectivo";
 		} else {
 			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
@@ -70,6 +71,7 @@ public class HomeController {
 
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			modelo.addAttribute("idEmpresa", id);
+			registrarLog("TraspasoEfectivo", "Solicitud Traspaso de Efectivo", "Solicitud", true);
 			return "TraspasoEfectivo";
 
 		} else {
@@ -86,6 +88,7 @@ public class HomeController {
 
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			modelo.addAttribute("idEmpresa", id);
+			registrarLog("RetiroEfectivo", "Solicitud Retiro de Efectivo", "Solicitud ", true);
 			return "RetiroEfectivo";
 
 		} else {
