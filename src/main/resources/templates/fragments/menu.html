@@ -14,7 +14,7 @@
 					<span>Inicio</span>
 				</a>
 			  </li>
-			  <li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMIN')">
+			  <li class="nav-item dropdown" sec:authorize="hasAnyRole('CONSULTOR','ADMIN')">
 		       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		         <i class="fas fa-file-alt"></i>
 		         <span>Solicitudes</span>
@@ -22,7 +22,7 @@
 		       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 		          <a class="dropdown-item" href="EnvioEfectivo" id="envioEfectivol"><i class="fas fa-truck"></i>&nbsp;<span> Env&iacute;o de Efectivo</span></a>
 		          <a class="dropdown-item" href="RetiroEfectivo" id="retiroEfectivol"><i class="fas fa-money-bill-wave"></i>&nbsp;<span>  Retiro de Efectivo</span></a>
-		          <a class="dropdown-item" href="TraspasoEfectivo" id="traspasoEfectivol"><i class="fas fa-money-check"></i>&nbsp;<span>  Traspaso de Efectivo</span></a>
+		          <a class="dropdown-item" href="TraspasoEfectivo" id="traspasoEfectivol"><i class="fas fa-money-check"></i>&nbsp;<span>  Traspaso</span></a>
 		        </div>
 		      </li>			    
 		  	  <li class="nav-item dropdown" sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
