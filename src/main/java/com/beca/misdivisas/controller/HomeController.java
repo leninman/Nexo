@@ -47,56 +47,6 @@ public class HomeController {
 		return "login";
 	}
 
-	@GetMapping(value = "/EnvioEfectivo")
-	public String envioRemesa(Model modelo) {
-		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			modelo.addAttribute("idEmpresa", id);
-			registrarLog("EnvioEfectivo", "Solicitud Envio de Efectivo", "Solicitud", true);
-			return "EnvioEfectivo";
-		} else {
-			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-			modelo.addAttribute("usuario", usuario);
-			return "changePassword";
-		}
-
-	}
-
-	@GetMapping(value = "/TraspasoEfectivo")
-	public String traspasoEfectivo(Model modelo) {
-		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			modelo.addAttribute("idEmpresa", id);
-			registrarLog("TraspasoEfectivo", "Solicitud Traspaso de Efectivo", "Solicitud", true);
-			return "TraspasoEfectivo";
-
-		} else {
-			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-			modelo.addAttribute("usuario", usuario);
-			return "changePassword";
-		}
-	}
-
-	@GetMapping(value = "/RetiroEfectivo")
-	public String retiroEfectivo(Model modelo) {
-		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			modelo.addAttribute("idEmpresa", id);
-			registrarLog("RetiroEfectivo", "Solicitud Retiro de Efectivo", "Solicitud ", true);
-			return "RetiroEfectivo";
-
-		} else {
-			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-			modelo.addAttribute("usuario", usuario);
-			return "changePassword";
-		}
-	}
 
 	@PostMapping(value = "/login")
 	public String main() {
@@ -152,11 +102,6 @@ public class HomeController {
 	@GetMapping("/index")
 	public String index() {
 		return "index";
-	}
-
-	@GetMapping("/reporteG")
-	public String reporte() {
-		return "reporteGrafico";
 	}
 
 	/*

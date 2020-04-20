@@ -16,7 +16,7 @@
 	
 	<!-- Custom fonts for this template-->
 	<link href="vendor/fontawesome-free/css/all.min.css" th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet" type="text/css">
-	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"	rel="stylesheet">
+	<link href="css/fonts-family-nunito.css" rel="stylesheet">
 	
 	<!-- Custom styles for this template-->
 	<link href="css/sb-admin-2.min.css" th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
@@ -52,9 +52,7 @@
 					<center>
 						<div th:switch="${idEmpresa}" align="center" style="border-radius: 10px; width: 850px; overflow: hidden;">
 							<input type="hidden" name="idEmpresa" id="idEmpresa" th:value="${idEmpresa}" />						
-							<iframe th:case="'1'" width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
-							<iframe th:case="'2'" width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
-							<iframe th:case="'3'" width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+							<iframe width="850px" height= "1700px" src= "" style= "border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
 						</div>
 					</center>
 						 
@@ -120,21 +118,29 @@
 			var id = $('#idEmpresa').val();
 			var url = '';
 			switch(id) {
-			  case "1":
-				url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUMkMyUzVOUTE5SE1JUDFHOEdaM1M2WlA2TiQlQCN0PWcu&embed=true';
-			    break;
-			  case "2":
-				url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUQzk1T0FJN1YxTVFENjMyQjFWQjBQU1BXSCQlQCN0PWcu&embed=true';
-			    break;
-			  case "3":
-				url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUNTdLOERXQVFQNUpOWjY0N0dDTVVKNDFZViQlQCN0PWcu&embed=true';
-				break;
+			  case "202001"://farmatodo
+					url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUMkMyUzVOUTE5SE1JUDFHOEdaM1M2WlA2TiQlQCN0PWcu&embed=true';
+					break;
+			  case "301420608"://gama
+					url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUQzk1T0FJN1YxTVFENjMyQjFWQjBQU1BXSCQlQCN0PWcu&embed=true';
+					break;
+			  case "306725024"://plazas
+					url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUNTdLOERXQVFQNUpOWjY0N0dDTVVKNDFZViQlQCN0PWcu&embed=true';
+					break;
+			  case "316125017"://El paso
+					url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUNTY5M0FZRVNJMEJETzMxNkpEUFRHMEVWRSQlQCN0PWcu&embed=true';
+					break;
+			  case "000453390"://alimex
+					url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUN0cyRThWUDhXUzYyQkRaNTBMN0ZVSTlCRyQlQCN0PWcu&embed=true';
+					break;
+			  case "300244776"://tunal
+					url = 'https://forms.office.com/Pages/ResponsePage.aspx?id=X0LDO4vW6kaIkVvM7HEVyr386aAckxRLjj3pv9RL05lUNVkzUEw2UVg0RkRFN1dSWUJYV0pLV1pCWCQlQCN0PWcu&embed=true';
+					break;
 			  default:
 				break;
 			}
 			$('iframe').attr('src', url);
-		});
-	
+		});	
 	</script>
 
 </body>

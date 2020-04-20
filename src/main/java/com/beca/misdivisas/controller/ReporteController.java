@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -79,10 +80,18 @@ public class ReporteController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
+	@Autowired
+	private HttpServletResponse response;
 
 	@Autowired
 	private static final Logger logger = LoggerFactory.getLogger(ReporteController.class);
 
+	@GetMapping("/reporteG")
+	public String reporte() {
+		return "reporteGrafico";
+	}
+	
 	@GetMapping(value = "/reporte")
 	public String reporte(Model modelo) {
 
@@ -682,7 +691,7 @@ public class ReporteController {
 		Util u = new Util();
 		List<Date> fechas = u.obtenerFeriados(this.bancarios);
 		modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));		
-		
+		response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=strict");
 		return "remesasPendientes";
 	}
 

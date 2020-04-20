@@ -1,5 +1,6 @@
 package com.beca.misdivisas.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -13,8 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,6 +58,12 @@ public class MapaController {
 	
 	@Autowired
 	 private static final Logger logger = LoggerFactory.getLogger(MapaController.class);
+	
+	@Autowired
+	ResourceLoader resourceLoader;
+	
+   @Value("${images.path}")
+    private String images;
 	
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
@@ -96,7 +110,7 @@ public class MapaController {
 				locacion.setLatitud(Double.parseDouble(sucursales.get(i).getLatitud()));
 				locacion.setLongitud(Double.parseDouble(sucursales.get(i).getLongitud()));
 				locacion.setAccion(sucursales.get(i).getIdSucursal().toString());
-				locacion.setLogo("img/" + empresa.getCaracterRif() + empresa.getRif() + ".jpg");
+				locacion.setLogo("images");////app/divisasapp/webapps/NexoDivisas/WEB-INF/classes/static/img/
 				locacion.setPosicion(i);
 				locaciones.add(locacion);
 			}
@@ -148,5 +162,18 @@ public class MapaController {
 		logRepo.save(audit);
 		
 		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);		
+	}
+	
+	@GetMapping(value = "/images")
+	public ResponseEntity<byte[]> fromClasspathAsResEntity() throws IOException {
+		int id = ((Usuario)factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		Empresa empresa = empresaRepo.findById(id);
+		
+		
+		Resource imageFile = resourceLoader.getResource("file:///"+ images + empresa.getCaracterRif() + empresa.getRif() + ".jpg");
+
+		byte[] imageBytes = StreamUtils.copyToByteArray(imageFile.getInputStream());
+
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
 	}
 }

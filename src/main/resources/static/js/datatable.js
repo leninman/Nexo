@@ -42,7 +42,8 @@ function tabla(fechaInicio, fechaFin, moneda) {
 		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
 		            $('row c[r^="A"]', sheet).attr( 's', '0' );
 		            $('row:eq(0) c', sheet).attr( 's', '2' );
-		          }
+		            $('row c[r^="D"]', sheet).attr( 's', '62' );
+		          },
 		      },
 		      {extend: 'csvHtml5'}, 
 		      {extend: 'pdf'}
