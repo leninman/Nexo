@@ -17,6 +17,7 @@ public interface Constantes {
 	public static final int DIFERENCIA_FALTANTE = 3;
 	public static final int TRASPASO = 4;
 	public static final int COBRO_CUANTIA = 5;
+	public static final int DEBITO_POR_REINTEGRO_BNA = 6;
 	public static final int RETIRO_BNA = 7;
 	public static final int TRASPASO_CLIENTES = 8;
 	public static final int RETIRO_TAQUILLA = 10;

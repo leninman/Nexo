@@ -40,7 +40,7 @@ import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
 @Controller
-public class MapaController {
+public class MapController {
 	@Autowired
 	private ObjectFactory<HttpSession> factory;
 	
@@ -57,13 +57,13 @@ public class MapaController {
 	private HttpServletRequest request;
 	
 	@Autowired
-	 private static final Logger logger = LoggerFactory.getLogger(MapaController.class);
+	 private static final Logger logger = LoggerFactory.getLogger(MapController.class);
 	
 	@Autowired
 	ResourceLoader resourceLoader;
 	
    @Value("${images.path}")
-    private String images;
+    private String pathImages;
 	
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
@@ -170,7 +170,7 @@ public class MapaController {
 		Empresa empresa = empresaRepo.findById(id);
 		
 		
-		Resource imageFile = resourceLoader.getResource("file:///"+ images + empresa.getCaracterRif() + empresa.getRif() + ".jpg");
+		Resource imageFile = resourceLoader.getResource("file:///"+ pathImages + empresa.getCaracterRif() + empresa.getRif() + ".jpg");
 
 		byte[] imageBytes = StreamUtils.copyToByteArray(imageFile.getInputStream());
 
