@@ -99,7 +99,7 @@ public class ReportController {
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+			DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy 23:59:59");
 			BigDecimal montoPendienteDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
 					Constantes.ESTATUS_PENDIENTE);
 			BigDecimal montoPendienteEuro = remesaRepo.getLastRemesaByStatus(id, Constantes.EUR,
