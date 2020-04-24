@@ -210,7 +210,8 @@ function tablaIrregularidades(cartaporte) {
 	            var btns = $('.dt-button');
 	            btns.addClass('btn btn-info btn-sm');
 	            btns.removeClass('dt-button');
-	        }
+	        },
+	        columnDefs: [{ type:"date-eu", targets :[0]}]
 	 })
 	 
 	 $(".buttons-excel").on('click', function(event){
@@ -279,7 +280,8 @@ function trackingRemesa(fechaInicio, fechaFin, cartaPorte) {
 	            btns.removeClass('dt-button');
 
 	        },
-            columnDefs: [{ className: "text-right", "targets": [3]}]
+            columnDefs: [	{ className: "text-right", "targets": [3]},
+            				{ type:"date-eu", targets :[0]}]
 	 })
 	 
 	 $(".buttons-excel").on('click', function(event){
