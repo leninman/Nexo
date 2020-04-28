@@ -23,10 +23,23 @@ public class Rol implements Serializable {
 	
 	@Column(name="rol")
 	private String rol;
+	
+	@Column(name="\"id_empresa\"")
+	private Integer idEmpresa;
 
 	//bi-directional many-to-one association to UsuarioRol
 	@OneToMany(mappedBy="rol")
 	private List<UsuarioRol> usuarioRols;
+	
+	//bi-directional many-to-one association to MenuRol
+	@OneToMany(mappedBy="rol")
+	private List<MenuRol> menuRols;
+	
+	//bi-directional many-to-one association to Empresa
+	@ManyToOne
+	@JoinColumns({@JoinColumn(name = "\"id_empresa\"", insertable = false, updatable = false)
+	})
+	private Empresa empresa;
 
 	public Rol() {
 	}
@@ -46,7 +59,23 @@ public class Rol implements Serializable {
 	public void setRol(String rol) {
 		this.rol = rol;
 	}
+	
+	public Integer getIdEmpresa() {
+		return this.idEmpresa;
+	}
 
+	public void setIdEmpresa(Integer idEmpresa) {
+		this.idEmpresa = idEmpresa;
+	}
+	
+	public Empresa getEmpresa() {
+		return this.empresa;
+	}
+
+	public void setEmpresa(Empresa empresa) {
+		this.empresa = empresa;
+	}
+	
 	public List<UsuarioRol> getUsuarioRols() {
 		return this.usuarioRols;
 	}
@@ -67,6 +96,28 @@ public class Rol implements Serializable {
 		usuarioRol.setRol(null);
 
 		return usuarioRol;
+	}
+	
+	public List<MenuRol> getMenuRols() {
+		return this.menuRols;
+	}
+
+	public void setMenuRols(List<MenuRol> menuRols) {
+		this.menuRols = menuRols;
+	}
+
+	public MenuRol addMenuRol(MenuRol menuRol) {
+		getMenuRols().add(menuRol);
+		menuRol.setRol(this);
+
+		return menuRol;
+	}
+
+	public MenuRol removeMenuRol(MenuRol menuRol) {
+		getMenuRols().remove(menuRol);
+		menuRol.setRol(null);
+
+		return menuRol;
 	}
 
 }
