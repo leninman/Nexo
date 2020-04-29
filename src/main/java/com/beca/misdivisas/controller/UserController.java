@@ -28,6 +28,8 @@ import com.beca.misdivisas.interfaces.IUsuarioRolRepo;
 import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.jpa.UsuarioRol;
+import com.beca.misdivisas.model.Menu;
+import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 
 
@@ -56,12 +58,16 @@ public class UserController {
 	private HttpServletRequest request;
 	
 	@Autowired
+	private MenuService menuService;
+	
+	@Autowired
 	 private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     
 	
 	 @GetMapping("/usuarioHome")
 	    public String userIndex(Model model) {
-	    	
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
 	    	if (((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1()!=null && !(((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 	    		int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 	    		List<Usuario> usuarios = usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A");
@@ -80,7 +86,9 @@ public class UserController {
 	 
 	 @GetMapping("/changePassword")
 	    public String changePassword(Model model) {
-	    	
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
+			
 	    	Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 	    	model.addAttribute("usuario", usuario);
 	        return "changePassword";
@@ -88,6 +96,9 @@ public class UserController {
 
 	 @GetMapping("/usuarioMainAgregar")
 	    public String showSignUpForm(Model model) {
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
+			
 	    	Usuario usuario = new Usuario();
 	    	usuario.setHabilitado(false);
 	    	model.addAttribute("usuario", usuario);
@@ -97,6 +108,8 @@ public class UserController {
     
 	 @GetMapping("usuarioListar")
 	    public String showUpdateForm(Model model) {
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
 
 	        int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 	    	model.addAttribute("usuarios", usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A"));
@@ -168,6 +181,9 @@ public class UserController {
 
 	 @PostMapping("usuarioEditar")
 	    public String showUpdateForm(@RequestParam("usuarioId") int id, Model model) {
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
+		 
 	    	int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 	    	Usuario usuarioRep = usuarioRepository.findById(id);
 	    	
@@ -186,7 +202,9 @@ public class UserController {
 	    public String updateUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result,
 	        Model model) {
 	    	
-	    	
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
+			
 	    	if(usuarioRep.getContrasena().length() < 8 || usuarioRep.getContrasena().length() > 20)
 	        	result.rejectValue("contrasena", "", "debe contener entre 8 y 20 caracteres");
 	    	else if(!esValidaContrasena(usuarioRep.getContrasena()))
@@ -245,7 +263,9 @@ public class UserController {
 	 @PostMapping("usuarioChange")
 	    public String cambioContrasenaUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result,
 	            Model model) {
-	    	 
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			model.addAttribute("menus",menus);
+			
 	    	Usuario usuario = (Usuario) usuarioRepository.findById(id);
 	    	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 	    	if(!encoder.matches(usuarioRep.getContrasena(), usuario.getContrasena()))

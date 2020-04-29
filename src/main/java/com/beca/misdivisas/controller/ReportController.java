@@ -47,10 +47,12 @@ import com.beca.misdivisas.jpa.RemesaDetalle;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.DatosReporteMapa;
+import com.beca.misdivisas.model.Menu;
 import com.beca.misdivisas.model.ReporteIrregularidades;
 import com.beca.misdivisas.model.ReporteRemesa;
 import com.beca.misdivisas.model.ReporteSucursal;
 import com.beca.misdivisas.model.ReporteSucursalMapa;
+import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
@@ -83,6 +85,9 @@ public class ReportController {
 
 	@Autowired
 	private HttpServletResponse response;
+	
+	@Autowired
+	private MenuService menuService;
 
 	@Autowired
 	private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
@@ -111,6 +116,9 @@ public class ReportController {
 			Empresa empresa = empresaRepo.findById(id);
 			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
+			List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+			modelo.addAttribute("menus",menus);
+			
 			BigDecimal saldoTOT = new BigDecimal(0);
 			BigDecimal tmp = new BigDecimal(0);
 
@@ -282,10 +290,12 @@ public class ReportController {
 
 	@GetMapping(value = "/reporteNoAptos")
 	public String reporteNoAptos(Model modelo) {
-
+		List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		modelo.addAttribute("menus",menus);
+		
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-
+			
 			// DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
@@ -463,6 +473,8 @@ public class ReportController {
 
 	@GetMapping(value = "/trackingRemesas")
 	public String trackingRemesas(Model modelo) {
+		List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		modelo.addAttribute("menus",menus);
 
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
@@ -541,6 +553,9 @@ public class ReportController {
 		factory.getObject().removeAttribute("idSucursal");
 		factory.getObject().setAttribute("idSucursal", idSucursal);
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		
+		List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		modelo.addAttribute("menus",menus);
 
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -698,6 +713,8 @@ public class ReportController {
 
 	@GetMapping(value = "/remesasPendientes")
 	public String remesasPendientes(Model modelo) {
+		List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		modelo.addAttribute("menus",menus);
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -783,7 +800,10 @@ public class ReportController {
 	@GetMapping(value = "/reporteSucursal")
 	public String reporteSucursal(Model modelo) {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-
+		
+		List<Menu> menus = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		modelo.addAttribute("menus",menus);
+		
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 		Util u = new Util();

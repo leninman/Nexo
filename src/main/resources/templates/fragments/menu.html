@@ -8,55 +8,19 @@
   			</button>
 		  <div class="collapse navbar-collapse" id="navbarSupportedContent">
 		    <ul class="navbar-nav mr-auto">
-			  <li class="nav-item">
-				<a class="nav-link" href="main" id="mainl">
-					<i class="fas fa-fw fas fa-home"></i> 
-					<span>Inicio</span>
-				</a>
-			  </li>
-			  <li class="nav-item dropdown" sec:authorize="hasAnyRole('CONSULTOR','ADMIN')">
-		       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		         <i class="fas fa-file-alt"></i>
-		         <span>Solicitudes</span>
+			  <li th:each="menu : ${menus}" th:class="${#lists.size(menu.subMenu)>0} ? 'nav-item dropdown' : 'nav-item'" >
+		       <a th:class="nav-link" th:href="${menu.accion}!=NULL ? ${menu.accion} : '#'" th:id="${menu.accion} !=NULL ? ${menu.accion} + 'l' : 'navbarDropdown'" 
+		       th:role="${menu.accion}!=NULL ? '' : 'button'" th:data-toggle="${menu.accion}!=NULL ? '' : 'dropdown'" th:aria-haspopup="${menu.accion}!=NULL ? 'false' : 'true'">
+		         <i th:class="${menu.icono}"></i>
+		         <span th:text="${menu.nombreOpcion}"></span>
 		       </a>
-		       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-		          <a class="dropdown-item" href="EnvioEfectivo" id="envioEfectivol"><i class="fas fa-truck"></i>&nbsp;<span> Env&iacute;o de Efectivo</span></a>
-		          <a class="dropdown-item" href="RetiroEfectivo" id="retiroEfectivol"><i class="fas fa-money-bill-wave"></i>&nbsp;<span>  Retiro de Efectivo</span></a>
-		          <a class="dropdown-item" href="TraspasoEfectivo" id="traspasoEfectivol"><i class="fas fa-money-check"></i>&nbsp;<span>  Traspaso</span></a>
+		       <div class="dropdown-menu" aria-labelledby="navbarDropdown" th:if="${#lists.size(menu.subMenu)>0}">
+		          <a  th:each="submenu : ${menu.subMenu}" class="dropdown-item" th:href="${submenu.accion}" th:id="${submenu.accion}+'l'">
+		          	<i th:class="${submenu.icono}"></i>&nbsp;
+		          	<span th:text="${submenu.nombreOpcion}"></span>
+		          </a>
 		        </div>
 		      </li>			    
-		  	  <li class="nav-item dropdown" sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
-		        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		          <i class="fas fa-search-dollar"></i>
-		          <span>Consultas</span>
-		        </a>
-		        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-		        	<a class="dropdown-item" href="mapa" id="mapal"><i class="fas fa-map-marked-alt"></i>&nbsp;
-				    <span>Divisas General</span></a>		         
-		        </div>
-		      </li>
-		  	 <li class="nav-item dropdown" sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
-		       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		         <i class="fas fa-clipboard"></i>
-		         <span>Reportes</span>
-		       </a>
-		       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-		          <a class="dropdown-item" href="reporte" id="reportel"><i class="fas fa-chart-line"></i>&nbsp;<span>  Posici&oacute;n Consolidada</span></a>
-		          <a class="dropdown-item" href="reporteNoAptos" id="reporteNoAptosl"><i class="fas fa-ban"></i>&nbsp;<span>  Billetes No Aptos</span></a>
-		          <a class="dropdown-item" href="trackingRemesas" id="reporteRemesasl"><i class="fas fa-route"></i>&nbsp;<span>  Tracking De Remesas</span></a>
-		          <a class="dropdown-item" href="remesasPendientes" id="remesasPendientesl"><i class="fas fa-hand-holding-usd"></i>&nbsp;<span>  Pendientes por Entrega</span></a>		         
-				  <a class="dropdown-item" href="reporteSucursal" id="reporteSucursall"><i class="fas fa-store-alt"></i>&nbsp;<span>  Ingresos por Sucursal</span></a>		         		        
-		        </div>
-		     </li>
-			<li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMIN_BECA','ADMIN')">
-		       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		         <i class="fas fa-user-lock"></i>
-		         <span>Seguridad</span>
-		       </a>
-		       <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-		          <a class="dropdown-item" href="usuarioHome" id="usuarioHomel"><i class="fas fa-fw fa-users"></i>&nbsp;<span>Usuarios</span></a>		         
-		        </div>
-		     </li>
 		    </ul>
 		  </div>
 		</nav>
