@@ -2,6 +2,7 @@ package com.beca.misdivisas.controller;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,9 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
 import com.beca.misdivisas.interfaces.ILogRepo;
+import com.beca.misdivisas.interfaces.IMenuRepo;
 import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Login;
+import com.beca.misdivisas.model.Menu;
+import com.beca.misdivisas.services.MenuService;
+import com.beca.misdivisas.util.Constantes;
 
 @Controller
 public class HomeController {
@@ -36,6 +41,9 @@ public class HomeController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
+	@Autowired
+	private MenuService menuService;
 
 	@RequestMapping(value = "/")
 	public String home() {
@@ -54,10 +62,11 @@ public class HomeController {
 	}
 
 	@PostMapping(value = "/mainBECA")
-	public String mainBECA(Login login) {
+	public String mainBECA(Login login, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
+		
 		Usuario usuario = new Usuario();
+
 		usuario.setNombreUsuario(auth.getName());
 		usuario.setEmpresa(empresaRepository.findById(login.getEmpresa().getIdEmpresa().intValue()));
 		usuario.setIdEmpresa(login.getEmpresa().getIdEmpresa());
@@ -66,6 +75,8 @@ public class HomeController {
 		factory.getObject().removeAttribute("Usuario");
 		factory.getObject().setAttribute("Usuario", usuario);
 
+		model.addAttribute("menus",getMenu());
+		
 		registrarLog("Acceso al sistema", "Ingreso", "Login", true);
 
 		return "main";
@@ -76,9 +87,11 @@ public class HomeController {
 
 		if (factory.getObject().getAttribute("Usuario") != null) {
 			if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-					&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals("")))
+					&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
+				
+				model.addAttribute("menus",getMenu());
 				return "main";
-			else {
+			}else {
 				Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 				model.addAttribute("usuario", usuario);
 				return "changePassword";
@@ -132,6 +145,19 @@ public class HomeController {
 		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);
+	}
+	
+	public List<Menu> getMenu() {
+		List<Menu> menu = null;
+		
+		if(request.isUserInRole(Constantes.ADMIN_BECA)) { 			
+			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+			
+		}else {
+			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		}
+		
+		return menu;
 	}
 
 }

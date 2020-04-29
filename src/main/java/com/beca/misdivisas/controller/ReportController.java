@@ -47,10 +47,12 @@ import com.beca.misdivisas.jpa.RemesaDetalle;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.DatosReporteMapa;
+import com.beca.misdivisas.model.Menu;
 import com.beca.misdivisas.model.ReporteIrregularidades;
 import com.beca.misdivisas.model.ReporteRemesa;
 import com.beca.misdivisas.model.ReporteSucursal;
 import com.beca.misdivisas.model.ReporteSucursalMapa;
+import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
@@ -83,6 +85,9 @@ public class ReportController {
 
 	@Autowired
 	private HttpServletResponse response;
+	
+	@Autowired
+	private MenuService menuService;
 
 	@Autowired
 	private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
@@ -111,6 +116,8 @@ public class ReportController {
 			Empresa empresa = empresaRepo.findById(id);
 			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
+			modelo.addAttribute("menus",getMenu());
+			
 			BigDecimal saldoTOT = new BigDecimal(0);
 			BigDecimal tmp = new BigDecimal(0);
 
@@ -282,10 +289,11 @@ public class ReportController {
 
 	@GetMapping(value = "/reporteNoAptos")
 	public String reporteNoAptos(Model modelo) {
-
+		modelo.addAttribute("menus",getMenu());
+		
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-
+			
 			// DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
@@ -366,8 +374,7 @@ public class ReportController {
 
 	@RequestMapping(path = "/remesaNoApta/{fechaI}/{fechaF}/{moneda}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<ReporteSucursal> getAllRemesasNoAptas(@PathVariable String fechaI, @PathVariable String fechaF,
-			@PathVariable String moneda) {
+	public List<ReporteSucursal> getAllRemesasNoAptas(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable String moneda) {
 		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
 		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
@@ -463,6 +470,7 @@ public class ReportController {
 
 	@GetMapping(value = "/trackingRemesas")
 	public String trackingRemesas(Model modelo) {
+		modelo.addAttribute("menus",getMenu());
 
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
@@ -483,8 +491,7 @@ public class ReportController {
 
 	@RequestMapping(path = "/remesabycartaporte/{fechaI}/{fechaF}/{cartaPorte}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<ReporteRemesa> getRemesaPorCataporte(@PathVariable String fechaI, @PathVariable String fechaF,
-			@PathVariable String cartaPorte) {
+	public List<ReporteRemesa> getRemesaPorCataporte(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable String cartaPorte) {
 		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
@@ -541,6 +548,8 @@ public class ReportController {
 		factory.getObject().removeAttribute("idSucursal");
 		factory.getObject().setAttribute("idSucursal", idSucursal);
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		
+		modelo.addAttribute("menus",getMenu());
 
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -698,6 +707,7 @@ public class ReportController {
 
 	@GetMapping(value = "/remesasPendientes")
 	public String remesasPendientes(Model modelo) {
+		modelo.addAttribute("menus",getMenu());
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -783,7 +793,9 @@ public class ReportController {
 	@GetMapping(value = "/reporteSucursal")
 	public String reporteSucursal(Model modelo) {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-
+		
+		modelo.addAttribute("menus",getMenu());
+		
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 		Util u = new Util();
@@ -798,8 +810,7 @@ public class ReportController {
 
 	@RequestMapping(path = "/reporteSucursal/{fechaI}/{fechaF}/{sucursal}/{moneda}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public List<ReporteSucursal> getReporteSucursal(@PathVariable String fechaI, @PathVariable String fechaF,
-			@PathVariable int sucursal, @PathVariable int moneda) {
+	public List<ReporteSucursal> getReporteSucursal(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable int sucursal, @PathVariable int moneda) {
 		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
 		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
@@ -886,6 +897,19 @@ public class ReportController {
 		saldo = getMontoTotalBySucursal(sucursal, moneda);
 		return saldo.toString();
 
+	}
+	
+	public List<Menu> getMenu() {
+		List<Menu> menu = null;
+
+		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+
+		} else {
+			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		}
+
+		return menu;
 	}
 
 }

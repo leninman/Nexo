@@ -59,6 +59,7 @@ public interface Constantes {
 	public static final String OPCION_MAPA = "Vista del Mapa";
 	public static final String OPCION_GRAFICO = "Vista del Grafico";
 	
+	public static final String ADMIN_BECA = "ADMIN_BECA";
 	
 	
 	

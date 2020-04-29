@@ -36,6 +36,8 @@ import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Locacion;
+import com.beca.misdivisas.model.Menu;
+import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
@@ -57,6 +59,9 @@ public class MapController {
 	private HttpServletRequest request;
 	
 	@Autowired
+	private MenuService menuService;
+	
+	@Autowired
 	 private static final Logger logger = LoggerFactory.getLogger(MapController.class);
 	
 	@Autowired
@@ -67,6 +72,7 @@ public class MapController {
 	
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
+		model.addAttribute("menus",getMenu());
 		
 		if (((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1()!=null && !(((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 			
@@ -175,5 +181,18 @@ public class MapController {
 		byte[] imageBytes = StreamUtils.copyToByteArray(imageFile.getInputStream());
 
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
+	}
+	
+	public List<Menu> getMenu() {
+		List<Menu> menu = null;
+
+		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+
+		} else {
+			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
+		}
+
+		return menu;
 	}
 }

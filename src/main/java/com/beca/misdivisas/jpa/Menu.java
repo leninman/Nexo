@@ -109,5 +109,4 @@ public class Menu implements Serializable {
 
 		return menuRol;
 	}
-
 }
