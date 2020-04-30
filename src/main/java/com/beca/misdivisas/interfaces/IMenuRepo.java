@@ -22,5 +22,4 @@ public interface IMenuRepo extends JpaRepository<Menu, Integer> {
 	@Query("select distinct (m) from Menu m, MenuRol mr, Rol r, UsuarioRol ur, Usuario u where m.idMenu = mr.idMenu and mr.idRol = r.idRol and r.idRol = ur.idRol and ur.idUsuario = u.idUsuario and u.idUsuario = ?1 and r.idEmpresa = ?2 and m.nivel = ?3 order by m.idMenu asc")
 	List<Menu> findByIdUsuarioAndIdEmpresa(int idUsuario, int idEmpresa, int nivel);
 
-
 }

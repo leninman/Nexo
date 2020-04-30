@@ -41,7 +41,7 @@ public class HomeController {
 
 	@Autowired
 	private HttpServletRequest request;
-	
+		
 	@Autowired
 	private MenuService menuService;
 
@@ -90,6 +90,7 @@ public class HomeController {
 					&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 				
 				model.addAttribute("menus",getMenu());
+
 				return "main";
 			}else {
 				Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));

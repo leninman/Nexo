@@ -117,7 +117,6 @@ public class ReportController {
 			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
 			modelo.addAttribute("menus",getMenu());
-			
 			BigDecimal saldoTOT = new BigDecimal(0);
 			BigDecimal tmp = new BigDecimal(0);
 
@@ -548,7 +547,7 @@ public class ReportController {
 		factory.getObject().removeAttribute("idSucursal");
 		factory.getObject().setAttribute("idSucursal", idSucursal);
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-		
+
 		modelo.addAttribute("menus",getMenu());
 
 		Empresa empresa = empresaRepo.findById(id);
@@ -793,7 +792,7 @@ public class ReportController {
 	@GetMapping(value = "/reporteSucursal")
 	public String reporteSucursal(Model modelo) {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-		
+
 		modelo.addAttribute("menus",getMenu());
 		
 		Empresa empresa = empresaRepo.findById(id);

@@ -72,6 +72,7 @@ public class MapController {
 	
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
+
 		model.addAttribute("menus",getMenu());
 		
 		if (((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1()!=null && !(((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {

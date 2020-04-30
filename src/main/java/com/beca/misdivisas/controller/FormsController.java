@@ -39,6 +39,7 @@ public class FormsController {
 	
 	@GetMapping(value = "/envioEfectivo")
 	public String envioRemesa(Model modelo) {
+
 		modelo.addAttribute("menus",getMenu());
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
