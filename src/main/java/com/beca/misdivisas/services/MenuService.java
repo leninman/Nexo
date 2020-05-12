@@ -44,6 +44,21 @@ public class MenuService {
 
 	}
 	
+	public List<Menu> loadMenuByUserIdAndLevel(int idUsuario, int level) {
+		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByIdUsuario(idUsuario, level);
+		
+		List<Menu> menuList = new ArrayList<Menu>();
+		Menu m = null;
+
+		for (com.beca.misdivisas.jpa.Menu menu : menuItem) {
+			m = getMenu(menu);
+			menuList.add(m);
+		}
+
+		return menuList;
+
+	}
+	
 	public List<Menu> loadMenuByRolId(int rolId) {
 		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByRolId(rolId, 1);
 		List<com.beca.misdivisas.jpa.Menu> subMenuItem = menuRepo.findByRolId(rolId, 2);
