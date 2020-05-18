@@ -26,6 +26,8 @@ public interface Constantes {
 	public static final int RECEPCION_EFECTIVO = 17;
 	//public static final int BILLETE_NO_APTO = 18;
 	//public static final int REMESA_FALTANTE = 19;
+	
+	public static final int MENU_INICIO = 1;
 
 	public static final String  SIMBOLO_DOLAR = "$";
 	public static final String  SIMBOLO_EURO = "€";
@@ -61,7 +63,7 @@ public interface Constantes {
 	
 	public static final String ADMIN_BECA = "ADMIN_BECA";
 	
-	
-	
+	public static final String ADMIN = "Administrador";
+	public static final String ACTIVO = "A";
 	
 }

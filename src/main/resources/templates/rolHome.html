@@ -61,25 +61,47 @@
 
 					<!-- Page Heading -->
 
-					<div th:if="${param.success}">
-						<div class="alert alert-info">Operación Realizada
-							Exitosamente</div>
+					<div th:if="${result}=='success'">	
+							<a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" hidden="true" id="modal1"></a>						
+								<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+									aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered" role="document">
+										<div class="modal-content">
+							
+											<div class="modal-header" style="text-align: right;">
+												<h5 class="modal-title" id="exampleModalLabel">Operación Realizada Exitosamente</h5>
+												<button class="close" type="button" data-dismiss="modal"
+													aria-label="Close">
+													<span aria-hidden="true">×</span>
+												</button>
+											</div>
+											<div class="modal-body"></div>
+											<div style="text-align: center;">
+												<button class="btn btn-primary" type="button" data-dismiss="modal"
+													onclick="location.href = 'rolHome';"
+													style="height: 40px; width: 100px">OK</button>
+											</div>
+											<br />
+										</div>
+									</div>
+								</div>
 					</div>
-					<div th:if="${param.error}">
+					<div th:if="${result}=='error'">
 						<div class="alert alert-danger">No se logró realizar la
 							Operación</div>
 					</div>
 						<div class="container my-5">
-							<h5 align="center">Creación de Roles</h5>
+							<h5 align="center">Crear un Nuevo Rol</h5>
 							<div class="card">
 								<div class="card-body" >
-									<form  action="#"  th:object="${rol}" >
+									<form  action="createRol"  th:object="${rol}" method="post">
 										<table>
 											<tr>
 												<td colspan="10">
 												<div class="form-group col-md-8" style="text-align: left;">
 					                                <label for="nombreRol" class="col-form-label">Rol</label> 
-					                                <input type="text"  class="form-control" id="nombreRol" th:field="*{nombreRol}">
+					                                <input type="text"  class="form-control" id="nombreRol" th:field="*{nombreRol}" th:disabled="${result}=='success' ? 'true': 'false'">
+					                                 <span th:if="${#fields.hasErrors('nombreRol')}" th:errors="*{nombreRol}" class="text-danger"></span>
 					                            </div>
 												</td>
 											</tr>
@@ -94,7 +116,7 @@
 												<td style="width: 2.5%"></td>									
 												<td style="width: 20%">
 													<div class="subject-info-box-1" style="width: 100%">
-													  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" >
+													  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
 													    <option th:each="opcion : ${opciones}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
 													  </select>
 													</div>
@@ -106,21 +128,18 @@
 													</div>										
 												</td>
 												<td style="width: 20%">
-													<div class="subject-info-box-2" style="width: 100%">
-													  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;">
+													<div class="subject-info-box-2" id="DivlstBox2" th:style="${#fields.hasErrors('opciones')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+													  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" th:disabled="${result}=='success' ? 'true': 'false'">
+													  	<option value="1" hidden="true"></option>
+													  	<option th:each="opcion : ${opcionesSelect}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
 													  </select>
 													</div>										
 												</td>
 												<td colspan="2" style="width: 10%"></td>
 												<td style="width: 20%">
 													<div class="subject-info-box-1" style="width: 100%">
-													  <select multiple="multiple" id='lstBox3' class="form-control"  style="height: 400px;" >
-													    <option value="ajax">Ajax</option>
-													    <option value="jquery">jQuery</option>
-													    <option value="javascript">JavaScript</option>
-													    <option value="mootool">MooTools</option>
-													    <option value="prototype">Prototype</option>
-													    <option value="dojo">Dojo</option>
+													  <select multiple="multiple" id='lstBox3' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
+													    <option th:each ="usuario : ${usuarios}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
 													  </select>
 													</div>										
 												</td>
@@ -131,19 +150,27 @@
 													</div>										
 												</td>
 												<td style="width: 20%">
-													<div class="subject-info-box-2" style="width: 100%">
-													  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;">
-		
+													<div class="subject-info-box-2" id="DivlstBox4" th:style="${#fields.hasErrors('usuarios')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+													  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{usuarios}" th:disabled="${result}=='success' ? 'true': 'false'">
+														<option th:each ="usuario : ${usuariosSelect}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
 													  </select>
 													</div>										
 												</td>
 												<td style="width: 2.5%"></td>
 											</tr>
 											<tr>
+											<td colspan="5" align="center">
+											<span th:if="${#fields.hasErrors('opciones')}" th:errors="*{opciones}" class="text-danger"></span>
+											</td>
+											<td colspan="5" align="center">
+											<span th:if="${#fields.hasErrors('usuarios')}" th:errors="*{usuarios}" class="text-danger"></span>
+											</td>											
+											</tr>
+											<tr>
 												<td colspan="10">
 													<br/>
 										            <div class="form-group" style="text-align: center; flex: 0 0 100% !important;">
-						                            	<button class="btn btn-primary" onclick="muestra_lista('lstBox2');" value="Guardar">Guardar</button>
+						                            	<button class="btn btn-primary" value="Guardar">Guardar</button>
 						                            	<!-- <input type="submit" class="btn btn-primary" value="Guardar"> -->
 
 						                            	<a class="btn btn-secondary" href="./rolHome">Cancelar</a>
@@ -200,6 +227,28 @@
 			</div>
 		</div>
 	</div>
+	
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true">
+
+  <!-- Add .modal-dialog-centered to .modal-dialog to vertically center the modal -->
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+      <img alt="error" src="img/error.png" height="40px" width="40px"> 
+      <h5 class="modal-title" id="exampleModalLongTitle" style="text-align: center !important;">Error en los datos ingresados</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modalbody">        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 	<!-- Bootstrap core JavaScript-->
@@ -217,6 +266,14 @@
 	
 	<!-- Custom scripts for all pages-->
 	<script src="js/sb-admin-2.min.js" th:src="@{/js/sb-admin-2.min.js}"></script>
+	<script >
+	$(document).ready(function(){
+		var modal = $('#modal1');
+		if(modal != null){
+			modal.trigger('click');
+		}
+	});
+	</script>
 
 </body>
 

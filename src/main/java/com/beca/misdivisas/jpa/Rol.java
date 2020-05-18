@@ -16,9 +16,9 @@ public class Rol implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="\"SEGURIDAD\".\"seq_rol_idRol\"" )
+	@SequenceGenerator(name="\"SEGURIDAD\".\"seq_rol_idRol\"", sequenceName = "\"SEGURIDAD\".\"seq_rol_idRol\"", allocationSize = 1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="\"SEGURIDAD\".\"seq_rol_idRol\"")
-	@Column(name="\"id_rol\"")
+	@Column(name="\"id_rol\"", unique = true, nullable = false, columnDefinition = "serial")
 	private Integer idRol;
 	
 	@Column(name="rol")

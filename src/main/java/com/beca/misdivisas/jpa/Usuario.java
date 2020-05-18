@@ -286,4 +286,8 @@ public class Usuario implements Serializable {
 		return usuarioRol;
 	}
 
+	public boolean equals(Object obj) {
+		return this.idUsuario == ((Usuario) obj).getIdUsuario();
+	}
+
 }

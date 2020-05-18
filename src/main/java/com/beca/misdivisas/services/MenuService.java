@@ -146,7 +146,7 @@ public class MenuService {
 
 	}
 
-	private Menu getMenu(com.beca.misdivisas.jpa.Menu menu) {
+	public Menu getMenu(com.beca.misdivisas.jpa.Menu menu) {
 		Menu m = new Menu();
 		m.setIdMenu(menu.getIdMenu());
 

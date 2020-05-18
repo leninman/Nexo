@@ -81,4 +81,9 @@ public class Menu {
 	public void setNivel(int nivel) {
 		this.nivel = nivel;
 	}
+
+	@Override
+	public boolean equals(Object obj) {		
+		return this.idMenu == ((Menu)obj).getIdMenu();
+	}
 }

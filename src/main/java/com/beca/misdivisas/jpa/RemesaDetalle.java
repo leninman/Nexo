@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Date;
 
 
 /**
@@ -13,7 +14,9 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="\"REMESA_DETALLE\"", schema ="\"ALMACEN\"")
 @NamedQuery(name="RemesaDetalle.findAll", query="SELECT r FROM RemesaDetalle r")
-public class RemesaDetalle implements Serializable {
+public class RemesaDetalle implements Serializable, Comparable<RemesaDetalle>  {
+	
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -98,4 +101,10 @@ public class RemesaDetalle implements Serializable {
 		this.remesa = remesa;
 	}
 
+	@Override
+	public int compareTo(RemesaDetalle o) {
+		if(fecha == null || o.getFecha() == null )
+			return 0;
+		return fecha.compareTo(o.getFecha());
+	}
 }

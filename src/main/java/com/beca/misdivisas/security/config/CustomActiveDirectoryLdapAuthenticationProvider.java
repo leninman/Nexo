@@ -32,7 +32,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.authentication.AbstractLdapAuthenticationProvider;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -88,9 +87,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	protected DirContextOperations doAuthentication(UsernamePasswordAuthenticationToken auth) {
 		String username = auth.getName();
 		String password = (String) auth.getCredentials();
-		
-		WebAuthenticationDetails details = (WebAuthenticationDetails) auth.getDetails();
-        String userIp = details.getRemoteAddress();
 
 		DirContext ctx = bindAsUser(username, password);
 

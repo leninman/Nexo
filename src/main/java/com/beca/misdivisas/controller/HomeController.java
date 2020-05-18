@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
 import com.beca.misdivisas.interfaces.ILogRepo;
-import com.beca.misdivisas.interfaces.IMenuRepo;
 import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Login;

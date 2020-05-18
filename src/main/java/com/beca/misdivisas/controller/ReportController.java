@@ -187,7 +187,7 @@ public class ReportController {
 
 			for (int i = 0; i < remesaDetalles.size(); i++) {
 				remesaDetalle = remesaDetalles.get(i);
-
+				Collections.sort(remesaDetalle.getRemesa().getRemesaDetalles(), Collections.reverseOrder());
 				rs = new ReporteSucursal();
 
 				if (remesaDetalle.getRemesa().getIdOperacion() != Constantes.RETIRO_BNA
@@ -378,7 +378,6 @@ public class ReportController {
 		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
 		BigDecimal monto = new BigDecimal(0);
-		BigDecimal montoD = new BigDecimal(0);
 		List<ReporteSucursal> reportes = new ArrayList<ReporteSucursal>();
 		ReporteSucursal rs = null;
 		Remesa remesa = null;
@@ -408,12 +407,10 @@ public class ReportController {
 							rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_BNA);
 							rs.setSaldo(Util.formatMonto(monto.toString()));
 							reportes.add(rs);
-							monto = new BigDecimal(0);
-							montoD = new BigDecimal(0);
+							monto = new BigDecimal(0);							
 							break;
 						}
 						monto = new BigDecimal(0);
-						montoD = new BigDecimal(0);
 					}
 				}
 			}
