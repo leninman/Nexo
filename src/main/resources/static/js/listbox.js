@@ -72,3 +72,13 @@ function seleccionarTodos(){
         $(this).attr('selected','selected');
       });
 }
+
+function limpiarTodos(){	
+    $('#lstBox2 option').each(function() {
+        $(this).removeAttr('selected');
+      });
+    
+    $('#lstBox4 option').each(function() {
+        $(this).removeAttr('selected');
+      });
+}

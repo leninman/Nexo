@@ -80,16 +80,35 @@ public class RolController {
 
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 		model.addAttribute("usuario", usuario);
+		
+		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ADMIN);
+		
+		List<Menu> menues =  menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2);
+		
+		
 		if(rol.getNombreRol().isEmpty())
 			result.rejectValue("nombreRol", "", "Debes especificar un nombre para el nuevo Rol");
 		
-		if(rol.getUsuarios() == null || rol.getUsuarios().isEmpty())
+		if(rol.getUsuarios() == null || rol.getUsuarios().isEmpty()) {
 			result.rejectValue("usuarios", "", "Debes seleccionar al menos un Usuario");
+			
+		}
 		
-		if(rol.getOpciones() == null || rol.getOpciones().length ==  0)
+		if(rol.getOpciones() == null || rol.getOpciones().length <=  1) {
 			result.rejectValue("opciones", "", "Debes seleccionar al menos una opción del Menú");
+			
+		}
 		
 		if (result.hasErrors()) {
+			List<Menu> menuList = getMenuList(rol.getOpciones());
+			menues.removeAll(menuList);
+			
+			model.addAttribute("opciones", menues);
+			model.addAttribute("opcionesSelect", menuList);
+			
+			usuarios.removeAll(rol.getUsuarios());
+			model.addAttribute("usuarios", usuarios);
+			model.addAttribute("usuariosSelect", rol.getUsuarios());
 			return "rolHome";
 		}
 		
@@ -100,7 +119,6 @@ public class RolController {
 		newRol.setRol(rol.getNombreRol());
 		rolRepo.save(newRol);
 		
-		//String[] us = rol.getUsuarios();
 		List<Usuario> us = rol.getUsuarios();
 		  UsuarioRol usuarioRol = new UsuarioRol();
 		  
@@ -111,14 +129,6 @@ public class RolController {
 			  uRolRepo.save(usuarioRol);
 			  usuarioRol = new UsuarioRol();			
 		}
-		/*
-		 * for (int i = 0; i<us.length; i++) { usuarioRol.setIdRol(newRol.getIdRol());
-		 * usuarioRol.setIdUsuario(Integer.parseInt(us[i]));
-		 * 
-		 * uRolRepo.save(usuarioRol);
-		 * 
-		 * usuarioRol = new UsuarioRol(); }
-		 */
 
 		String[] mr = rol.getOpciones();
 		MenuRol menuRol = new MenuRol();
@@ -141,12 +151,12 @@ public class RolController {
 			menuRol = new MenuRol();			
 		}
 		
-		List<Menu> menues =  menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2);
+
 		menues.removeAll(menuList);
 		model.addAttribute("opciones", menues);
 		model.addAttribute("opcionesSelect", menuList);
 		
-		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ADMIN);
+		
 		usuarios.removeAll(rol.getUsuarios());
 		model.addAttribute("usuarios", usuarios);
 		model.addAttribute("usuariosSelect", rol.getUsuarios());
@@ -167,5 +177,18 @@ public class RolController {
 		}
 
 		return menu;
+	}
+	
+	private List<Menu> getMenuList(String[] mr){
+		List<Menu> menuList = new ArrayList<Menu>();
+		
+		for (int i = 0; i < mr.length; i++) {
+			if(!mr[i].equalsIgnoreCase("1")) {
+				com.beca.misdivisas.jpa.Menu menu = menuRepo.findById(Integer.parseInt(mr[i]));
+				menuList.add(menuService.getMenu(menu));
+			}
+			
+		}
+		return menuList;
 	}
 }

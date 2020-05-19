@@ -68,12 +68,8 @@
 									<div class="modal-dialog modal-dialog-centered" role="document">
 										<div class="modal-content">
 							
-											<div class="modal-header" style="text-align: right;">
-												<h5 class="modal-title" id="exampleModalLabel">Operación Realizada Exitosamente</h5>
-												<button class="close" type="button" data-dismiss="modal"
-													aria-label="Close">
-													<span aria-hidden="true">×</span>
-												</button>
+											<div class="modal-header" style="text-align: center;">
+												<h5 class="modal-title" id="exampleModalLabel">          Operación Realizada Exitosamente</h5>
 											</div>
 											<div class="modal-body"></div>
 											<div style="text-align: center;">
@@ -170,7 +166,7 @@
 												<td colspan="10">
 													<br/>
 										            <div class="form-group" style="text-align: center; flex: 0 0 100% !important;">
-						                            	<button class="btn btn-primary" value="Guardar">Guardar</button>
+						                            	<button class="btn btn-primary" value="Guardar" onclick="seleccionarTodos();" >Guardar</button>
 						                            	<!-- <input type="submit" class="btn btn-primary" value="Guardar"> -->
 
 						                            	<a class="btn btn-secondary" href="./rolHome">Cancelar</a>
@@ -272,7 +268,10 @@
 		if(modal != null){
 			modal.trigger('click');
 		}
+		limpiarTodos();
 	});
+	
+	
 	</script>
 
 </body>
