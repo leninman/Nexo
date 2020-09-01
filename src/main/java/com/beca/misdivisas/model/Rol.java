@@ -5,6 +5,7 @@ import java.util.List;
 import com.beca.misdivisas.jpa.Usuario;
 
 public class Rol {
+	private int idRol;
 	private String nombreRol;
 	private String[] opciones;
 	private List<Usuario> usuarios;	
@@ -26,6 +27,12 @@ public class Rol {
 	}
 	public void setUsuarios(List<Usuario> usuarios) {
 		this.usuarios = usuarios;
+	}
+	public int getIdRol() {
+		return idRol;
+	}
+	public void setIdRol(int idRol) {
+		this.idRol = idRol;
 	}
 
 

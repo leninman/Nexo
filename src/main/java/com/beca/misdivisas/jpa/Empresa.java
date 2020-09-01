@@ -1,7 +1,5 @@
 package com.beca.misdivisas.jpa;
 
-
-
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -44,6 +42,8 @@ public class Empresa implements Serializable {
 	private Integer rif;
 	
 	private String sigla;
+	
+	private byte[] logo;
 
 	//bi-directional many-to-one association to EstatusEmpresa
 	@ManyToOne
@@ -166,6 +166,14 @@ public class Empresa implements Serializable {
 		sucursal.setEmpresa(null);
 
 		return sucursal;
+	}
+
+	public byte[] getLogo() {
+		return logo;
+	}
+
+	public void setLogo(byte[] logo) {
+		this.logo = logo;
 	}
 
 }

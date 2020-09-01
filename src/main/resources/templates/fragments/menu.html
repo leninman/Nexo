@@ -8,7 +8,7 @@
   			</button>
 		  <div class="collapse navbar-collapse" id="navbarSupportedContent">
 		    <ul class="navbar-nav mr-auto">
-			  <li th:each="menu : ${menus}" th:class="${#lists.size(menu.subMenu)>0} ? 'nav-item dropdown' : 'nav-item'" >
+			  <li th:each="menu : ${menues}" th:class="${#lists.size(menu.subMenu)>0} ? 'nav-item dropdown' : 'nav-item'" >
 		       <a th:class="${menu.accion}!=NULL ? 'nav-link' : 'nav-link dropdown-toggle'" th:href="${menu.accion}!=NULL ? ${menu.accion} : '#'" th:id="${menu.accion} !=NULL ? ${menu.accion} + 'l' : 'navbarDropdown'" 
 		       th:role="${menu.accion}!=NULL ? '' : 'button'" th:data-toggle="${menu.accion}!=NULL ? '' : 'dropdown'" th:aria-haspopup="${menu.accion}!=NULL ? 'false' : 'true'">
 		         <i th:class="${menu.icono}"></i>

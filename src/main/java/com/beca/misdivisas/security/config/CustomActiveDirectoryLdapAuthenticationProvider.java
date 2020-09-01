@@ -311,7 +311,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	///List<String> privileges = roleDao.findPrivilegesForLDAPGroups(groupNames);
 	List<String> privileges = new ArrayList<String>();
 	if(groupNames.contains("GSEG-Nexo-Divisas_ADMIN"))
-		privileges.add(Constantes.ADMIN_BECA);
+		privileges.add(Constantes.ROL_ADMIN_BECA);
 	//Your roles/privileges in database need to have 'ROLE_' prefix or you need to append it here.
 	String DEFAULT_ROLE_PREFIX = "ROLE_";
 	

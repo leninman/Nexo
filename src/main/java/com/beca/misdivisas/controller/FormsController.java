@@ -40,7 +40,7 @@ public class FormsController {
 	@GetMapping(value = "/envioEfectivo")
 	public String envioRemesa(Model modelo) {
 
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 
@@ -58,7 +58,7 @@ public class FormsController {
 
 	@GetMapping(value = "/traspasoEfectivo")
 	public String traspasoEfectivo(Model modelo) {
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 
@@ -76,7 +76,7 @@ public class FormsController {
 
 	@GetMapping(value = "/retiroEfectivo")
 	public String retiroEfectivo(Model modelo) {
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 
@@ -119,8 +119,8 @@ public class FormsController {
 	public List<Menu> getMenu() {
 		List<Menu> menu = null;
 
-		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
-			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+		if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
 
 		} else {
 			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());

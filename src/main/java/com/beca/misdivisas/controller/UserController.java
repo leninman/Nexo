@@ -62,16 +62,16 @@ public class UserController {
 
 	@GetMapping("/usuarioHome")
 	public String userIndex(Model model) {
-		model.addAttribute("menus", getMenu());
+		model.addAttribute(Constantes.MENUES, getMenu());
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 			int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 			List<Usuario> usuarios = usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A");
 			if (usuarios.size() == 0)
 				usuarios = null;
-			model.addAttribute("usuarios", usuarios);
+			model.addAttribute(Constantes.USUARIOS, usuarios);
 
-			registrarLog(Constantes.ADMINISTRAR_USUARIO, Constantes.ADMINISTRAR_USUARIO, Constantes.OPCION_SEGURIDAD,
+			registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, Constantes.TEXTO_ADMINISTRAR_USUARIO, Constantes.OPCION_SEGURIDAD,
 					true);
 
 			return "mainUsuarios";
@@ -84,7 +84,7 @@ public class UserController {
 
 	@GetMapping("/changePassword")
 	public String changePassword(Model model) {
-		model.addAttribute("menus", getMenu());
+		model.addAttribute(Constantes.MENUES, getMenu());
 
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 		model.addAttribute("usuario", usuario);
@@ -93,7 +93,7 @@ public class UserController {
 
 	@GetMapping("/usuarioMainAgregar")
 	public String showSignUpForm(Model model) {
-		model.addAttribute("menus", getMenu());
+		model.addAttribute(Constantes.MENUES, getMenu());
 
 		Usuario usuario = new Usuario();
 		usuario.setHabilitado(false);
@@ -103,10 +103,10 @@ public class UserController {
 
 	@GetMapping("usuarioListar")
 	public String showUpdateForm(Model model) {
-		model.addAttribute("menus", getMenu());
+		model.addAttribute(Constantes.MENUES, getMenu());
 
 		int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-		model.addAttribute("usuarios", usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A"));
+		model.addAttribute(Constantes.USUARIOS, usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A"));
 
 		return "mainUsuarios";
 	}
@@ -170,14 +170,14 @@ public class UserController {
 
 		String detalle = "Agregar Usuario : NombreUsuario(" + usuario.getNombreUsuario() + ");  idUsuario("
 				+ usuario.getIdUsuario() + ");";
-		registrarLog(Constantes.ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_CREAR, true);
+		registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_CREAR, true);
 
 		return "redirect:usuarioListar?success";
 	}
 
 	@PostMapping("usuarioEditar")
 	public String showUpdateForm(@RequestParam("usuarioId") int id, Model model) {
-		model.addAttribute("menus", getMenu());
+		model.addAttribute(Constantes.MENUES, getMenu());
 
 		int idEmpresa = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		Usuario usuarioRep = usuarioRepository.findById(id);
@@ -195,7 +195,7 @@ public class UserController {
 
 	@PostMapping("usuarioUpdate")
 	public String updateUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result, Model model) {
-		model.addAttribute("menus",getMenu());
+		model.addAttribute(Constantes.MENUES,getMenu());
 
 		if (usuarioRep.getContrasena().length() < 8 || usuarioRep.getContrasena().length() > 20)
 			result.rejectValue("contrasena", "", "debe contener entre 8 y 20 caracteres");
@@ -248,13 +248,13 @@ public class UserController {
 		String detalle = "Editar Usuario : NombreUsuario(" + usuario.getNombreUsuario() + ");  idUsuario("
 				+ usuario.getIdUsuario() + ");";
 
-		registrarLog(Constantes.ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_EDICION, true);
+		registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_EDICION, true);
 		return "redirect:/usuarioListar?success";
 	}
 
 	@PostMapping("usuarioChange")
 	public String cambioContrasenaUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result, Model model) {
-		model.addAttribute("menus",getMenu());
+		model.addAttribute(Constantes.MENUES,getMenu());
 
 		Usuario usuario = (Usuario) usuarioRepository.findById(id);
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -308,7 +308,7 @@ public class UserController {
 		factory.getObject().setAttribute("Usuario", usuario);
 		// model.addAttribute("usuarioRep", usuarioRepository.findAll());
 
-		registrarLog(Constantes.ADMINISTRAR_USUARIO, Constantes.CAMBIO_CLAVE, Constantes.OPERACION_EDICION, true);
+		registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, Constantes.CAMBIO_CLAVE, Constantes.OPERACION_EDICION, true);
 
 		return "redirect:/resultadoCambio?success";
 	}
@@ -331,7 +331,7 @@ public class UserController {
 			String detalle = "Eliminar Usuario : NombreUsuario(" + usuario.getNombreUsuario() + ");  idUsuario("
 					+ usuario.getIdUsuario() + ");";
 
-			registrarLog(Constantes.ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_BORRAR, true);
+			registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_BORRAR, true);
 			return "redirect:/usuarioListar?success";
 		}
 	}
@@ -438,8 +438,8 @@ public class UserController {
 	public List<Menu> getMenu() {
 		List<Menu> menu = null;
 
-		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
-			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+		if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
 
 		} else {
 			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());

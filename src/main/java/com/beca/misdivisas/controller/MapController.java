@@ -72,11 +72,11 @@ public class MapController {
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
 
-		model.addAttribute("menus",getMenu());
+		model.addAttribute(Constantes.MENUES,getMenu());
 		
 		if (((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1()!=null && !(((Usuario)factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 			
-			registrarLog(Constantes.REPORTE_MAPA, Constantes.REPORTE_MAPA,Constantes.OPCION_MAPA, true);
+			registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA,Constantes.OPCION_MAPA, true);
 			return "mapa";
     	}else {
 			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
@@ -122,7 +122,7 @@ public class MapController {
 			}
 		}
 		String Detalle= "Consulta: Obtiene la lista de las sucursales de la empresa";
-		registrarLog(Constantes.REPORTE_MAPA, Detalle,Constantes.OPCION_MAPA, true);
+		registrarLog(Constantes.TEXTO_REPORTE_MAPA, Detalle,Constantes.OPCION_MAPA, true);
 		return locaciones;
 	}
 
@@ -186,8 +186,8 @@ public class MapController {
 	public List<Menu> getMenu() {
 		List<Menu> menu = null;
 
-		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
-			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+		if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
 
 		} else {
 			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());

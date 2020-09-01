@@ -74,7 +74,7 @@ public class HomeController {
 		factory.getObject().removeAttribute("Usuario");
 		factory.getObject().setAttribute("Usuario", usuario);
 
-		model.addAttribute("menus",getMenu());
+		model.addAttribute(Constantes.MENUES,getMenu());
 		
 		registrarLog("Acceso al sistema", "Ingreso", "Login", true);
 
@@ -88,7 +88,7 @@ public class HomeController {
 			if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 					&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
 				
-				model.addAttribute("menus",getMenu());
+				model.addAttribute(Constantes.MENUES,getMenu());
 
 				return "main";
 			}else {
@@ -150,8 +150,8 @@ public class HomeController {
 	public List<Menu> getMenu() {
 		List<Menu> menu = null;
 		
-		if(request.isUserInRole(Constantes.ADMIN_BECA)) { 			
-			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+		if(request.isUserInRole(Constantes.ROL_ADMIN_BECA)) { 			
+			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
 			
 		}else {
 			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());

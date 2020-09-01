@@ -50,11 +50,11 @@ public class MenuService {
 		List<Menu> menuList = new ArrayList<Menu>();
 		Menu m = null;
 
-		for (com.beca.misdivisas.jpa.Menu menu : menuItem) {
+		for (com.beca.misdivisas.jpa.Menu menu : menuItem) {			
 			m = getMenu(menu);
+			m.setNombreOpcion(menuRepo.findById(menu.getIdMenuPadre()).get().getNombreOpcion()+" - "+m.getNombreOpcion());
 			menuList.add(m);
 		}
-
 		return menuList;
 
 	}

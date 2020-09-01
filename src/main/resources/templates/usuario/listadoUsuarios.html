@@ -4,7 +4,7 @@
 		<h5 align="center">Listado de Usuarios</h5>
 		<div class="card">
 			<div class="card-body" align="center">
-				<div th:switch="${usuarios}" class="container my-5">
+				<div th:switch="${Usuarios}" class="container my-5">
 					
 					<input type="hidden" id="botonAgregar" value="H">
 					 
@@ -28,7 +28,7 @@
 								</thead>
 								
 								<tbody>
-									<tr th:each="usuario : ${usuarios}">
+									<tr th:each="usuario : ${Usuarios}">
 										<td th:text="${usuario.nombreUsuario}"></td>
 										<td th:text="${usuario.email}"></td>
 										<div th:if="${usuario.habilitado}">

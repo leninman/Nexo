@@ -26,6 +26,9 @@ public class Rol implements Serializable {
 	
 	@Column(name="\"id_empresa\"")
 	private Integer idEmpresa;
+	
+	@Column(name="estado")
+	private String estado;
 
 	//bi-directional many-to-one association to UsuarioRol
 	@OneToMany(mappedBy="rol")
@@ -118,6 +121,14 @@ public class Rol implements Serializable {
 		menuRol.setRol(null);
 
 		return menuRol;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 
 }

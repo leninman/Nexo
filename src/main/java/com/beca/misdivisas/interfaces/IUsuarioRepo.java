@@ -20,4 +20,7 @@ public interface IUsuarioRepo extends JpaRepository<Usuario, Integer> {
 	@Query("select distinct(u) from Usuario u,UsuarioRol ur, Rol r where u.idUsuario = ur.idUsuario and ur.idRol = r.idRol and u.idEmpresa = ?1 and u.estado = ?2 and r.rol not in (?3) order by u.nombreUsuario asc")
 	List<Usuario> findAllByEmpresaAndEstadoAndNotInRol(int idEmpresa, String estado, String usuarioRol);
 
+	
+	@Query("select distinct(u) from Usuario u,UsuarioRol ur, Rol r where u.idUsuario = ur.idUsuario and ur.idRol = r.idRol and u.idEmpresa = ?1 and u.estado = ?2 and r.rol in (?3) order by u.nombreUsuario asc")
+	List<Usuario> findAllByEmpresaAndEstadoInRol(int idEmpresa, String estado, String usuarioRol);
 }

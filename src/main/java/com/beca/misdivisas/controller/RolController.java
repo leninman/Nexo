@@ -65,7 +65,7 @@ public class RolController {
 		model.addAttribute("opciones", menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2));
 
 		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),
-				Constantes.ACTIVO, Constantes.ADMIN);
+				Constantes.ACTIVO, Constantes.ROL_ADMIN);
 		model.addAttribute("usuarios", usuarios);
 
 		Rol rol = new Rol();
@@ -81,7 +81,7 @@ public class RolController {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 		model.addAttribute("usuario", usuario);
 		
-		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ADMIN);
+		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ROL_ADMIN);
 		
 		List<Menu> menues =  menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2);
 		
@@ -169,8 +169,8 @@ public class RolController {
 	public List<Menu> getMenu() {
 		List<Menu> menu = null;
 
-		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
-			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+		if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
 
 		} else {
 			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());

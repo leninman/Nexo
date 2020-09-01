@@ -116,7 +116,7 @@ public class ReportController {
 			Empresa empresa = empresaRepo.findById(id);
 			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
-			modelo.addAttribute("menus",getMenu());
+			modelo.addAttribute(Constantes.MENUES,getMenu());
 			BigDecimal saldoTOT = new BigDecimal(0);
 			BigDecimal tmp = new BigDecimal(0);
 
@@ -288,7 +288,7 @@ public class ReportController {
 
 	@GetMapping(value = "/reporteNoAptos")
 	public String reporteNoAptos(Model modelo) {
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 		
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
@@ -466,7 +466,7 @@ public class ReportController {
 
 	@GetMapping(value = "/trackingRemesas")
 	public String trackingRemesas(Model modelo) {
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 
 		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
 				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
@@ -545,7 +545,7 @@ public class ReportController {
 		factory.getObject().setAttribute("idSucursal", idSucursal);
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -566,7 +566,7 @@ public class ReportController {
 		modelo.addAttribute("totalEuros", Util.formatMonto(montoEuro.toString()));
 
 		String Detalle = "Consulta: idSucursal (" + idSucursal + "); ";
-		registrarLog(Constantes.REPORTE_MAPA, Detalle, Constantes.OPCION_MAPA, true);
+		registrarLog(Constantes.TEXTO_REPORTE_MAPA, Detalle, Constantes.OPCION_MAPA, true);
 
 		return "reporteGrafico";
 	}
@@ -703,7 +703,7 @@ public class ReportController {
 
 	@GetMapping(value = "/remesasPendientes")
 	public String remesasPendientes(Model modelo) {
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -782,7 +782,7 @@ public class ReportController {
 		}
 
 		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa(" + id + "))";
-		registrarLog(Constantes.REMESAS_PENDIENTES, Detalle, Constantes.REMESAS_PENDIENTES, true);
+		registrarLog(Constantes.TEXTO_REMESAS_PENDIENTES, Detalle, Constantes.TEXTO_REMESAS_PENDIENTES, true);
 		return rem;
 	}
 
@@ -790,7 +790,7 @@ public class ReportController {
 	public String reporteSucursal(Model modelo) {
 		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
 
-		modelo.addAttribute("menus",getMenu());
+		modelo.addAttribute(Constantes.MENUES,getMenu());
 		
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
@@ -898,8 +898,8 @@ public class ReportController {
 	public List<Menu> getMenu() {
 		List<Menu> menu = null;
 
-		if (request.isUserInRole(Constantes.ADMIN_BECA)) {
-			menu = menuService.loadMenuByRolName(Constantes.ADMIN_BECA);
+		if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) {
+			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
 
 		} else {
 			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
