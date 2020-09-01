@@ -75,28 +75,16 @@ public final class Constantes {
 	public static final String OPCION_GRAFICO = "Vista del Grafico";
 	public static final String OPCION_LOGIN = "Acceso al sistema";
 	
+
+	public static final String ROLES = "roles";
+
 	public static final String ROL_ADMIN_BECA = "ADMIN_BECA";
 	public static final String ROL_CONSULTOR = "CONSULTOR";
 	public static final String ROL_ADMINISTRADOR = "Administrador";
 	public static final String ROL_ADMIN ="ADMIN";
 	public static final String INACTIVO = "I";
 	public static final String ACTIVO = "A";
-	
-	public static final String USUARIO_INTERNO = "Interno";
-	
-	public static final String CHANGE_PASSWORD = "changePassword";
-	public static final String USER_NAME = "username";
-	public static final String CONTRASENA = "contrasena";
-	public static final String REPITA_CONTRASENA ="repitaContrasena";
-	public static final String NUEVA_CONTRASENA = "nuevaContrasena";
-	public static final String INTENTOS = "intentos";
-	public static final String NOMBRE_USUARIO = "nombreUsuario";
-	public static final String USUARIO = "Usuario";
-	public static final String USUARIOS = "Usuarios";
-	public static final String ID_EMPRESA ="idEmpresa";
-	public static final String ID_SUCURSAL = "idSucursal";
-	public static final String U_SUARIO = "usuario";
-	public static final String CAMBIO_C = "cambioC";
+	public static final String EDIT = "edit";
 	
 	public static final String INDEX = "index";
 	public static final String GRAFICO ="grafico";
@@ -133,5 +121,25 @@ public final class Constantes {
 	public static final String MENSAJE_VAL_CONTRASENA_1 = "debe contener entre 8 y 20 caracteres";
 	public static final String MENSAJE_VAL_CONTRASENA_2 = "debe contener al menos una mayúscula, una minúscula, un número y un caracter especial ! @ # $ * . _";
 	public static final String MENSAJE_VAL_CONTRASENA_3 = "debe coincidir";
+	
+	public static final String USUARIO_INTERNO = "Interno";
+	
+	public static final String CHANGE_PASSWORD = "changePassword";
+	public static final String USER_NAME = "username";
+	public static final String CONTRASENA = "contrasena";
+	public static final String REPITA_CONTRASENA ="repitaContrasena";
+	public static final String NUEVA_CONTRASENA = "nuevaContrasena";
+	public static final String INTENTOS = "intentos";
+	public static final String NOMBRE_USUARIO = "nombreUsuario";
+	public static final String USUARIO = "Usuario";
+	public static final String USUARIOS = "Usuarios";
+	public static final String ID_EMPRESA ="idEmpresa";
+	public static final String ID_SUCURSAL = "idSucursal";
+	public static final String U_SUARIO = "usuario";
+	public static final String CAMBIO_C = "cambioC";
+
+	
+	//public static final String 
+
 	
 }

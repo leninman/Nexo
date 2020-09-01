@@ -59,6 +59,20 @@ public class MenuService {
 
 	}
 	
+	public List<Menu> loadMenuByroleIdAndLevel(int rolId, int level) {
+		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByRolId(rolId, 2);
+		
+		List<Menu> menuList = new ArrayList<Menu>();
+		Menu m = null;
+
+		for (com.beca.misdivisas.jpa.Menu menu : menuItem) {			
+			m = getMenu(menu);
+			m.setNombreOpcion(menuRepo.findById(menu.getIdMenuPadre()).get().getNombreOpcion()+" - "+m.getNombreOpcion());
+			menuList.add(m);
+		}
+		return menuList;
+
+	}
 	public List<Menu> loadMenuByRolId(int rolId) {
 		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByRolId(rolId, 1);
 		List<com.beca.misdivisas.jpa.Menu> subMenuItem = menuRepo.findByRolId(rolId, 2);
@@ -70,6 +84,7 @@ public class MenuService {
 
 		for (com.beca.misdivisas.jpa.Menu menu : menuItem) {
 			m = getMenu(menu);
+			m.setNombreOpcion(menuRepo.findById(menu.getIdMenuPadre()).get().getNombreOpcion()+" - "+m.getNombreOpcion());			
 			subMenuList = new ArrayList<Menu>();
 
 			for (com.beca.misdivisas.jpa.Menu subMenu : subMenuItem) {
@@ -117,9 +132,9 @@ public class MenuService {
 
 	}
 	
-	public List<Menu> loadMenuByRolIdAndIdEmpresa(int rolId, int idEmpresa) {
-		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByIdUsuarioAndIdEmpresa(rolId, idEmpresa, 1);
-		List<com.beca.misdivisas.jpa.Menu> subMenuItem = menuRepo.findByIdUsuarioAndIdEmpresa(rolId, idEmpresa, 2);
+	public List<Menu> loadMenuByUserIdAndIdEmpresa(int userId, int idEmpresa) {
+		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByIdUsuarioAndIdEmpresa(userId, idEmpresa, 1);
+		List<com.beca.misdivisas.jpa.Menu> subMenuItem = menuRepo.findByIdUsuarioAndIdEmpresa(userId, idEmpresa, 2);
 		List<Menu> menuList = new ArrayList<Menu>();
 		List<Menu> subMenuList = new ArrayList<Menu>();
 
