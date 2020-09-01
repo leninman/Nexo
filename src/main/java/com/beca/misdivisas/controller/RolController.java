@@ -292,26 +292,22 @@ public class RolController {
 		
 		return "rol/roleHome";
 	}
-	
-	@GetMapping("/deleteRole")
-	public String deleteRole(Model model) {
+
+	@PostMapping("/deleteRole")
+	public String deleteRole(@RequestParam("rolId") int rolId, Model model) {
 		model.addAttribute(Constantes.MENUES, getMenu());
 
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
-
-		model.addAttribute("opciones", menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2));
-
-		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(), Constantes.ACTIVO, Constantes.ROL_ADMIN);
-		model.addAttribute(Constantes.USUARIOS, usuarios);
 		
+		rolRepo.deleteByRolId(rolId, Constantes.INACTIVO);
+
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
-		model.addAttribute("edit",false);
 		
-		Rol rol = new Rol();
-		model.addAttribute("rol", rol);
+		model.addAttribute("result", "success");
+		
+		return "rol/mainRol";
 
-		return "rol/roleHome";
 	}
 
 	public List<Menu> getMenu() {
@@ -339,14 +335,14 @@ public class RolController {
 		}
 		return menuList;
 	}
-	
-	private List<Usuario> getUserList(List<UsuarioRol> usuarioRols) {
-		List<Usuario> usuarios = new ArrayList<Usuario>();
-		for (UsuarioRol usuario : usuarioRols) {
-			usuarios.add(usuario.getUsuario());
-		}
-		return usuarios;
-	}
+
+
+	/*
+	 * private List<Usuario> getUserList(List<UsuarioRol> usuarioRols) {
+	 * List<Usuario> usuarios = new ArrayList<Usuario>(); for (UsuarioRol usuario :
+	 * usuarioRols) { usuarios.add(usuario.getUsuario()); } return usuarios; }
+	 */
+
 	
 	/*
 	 * private List<Menu> getMenuList(String[] mr){ List<Menu> menuList = new
