@@ -1,6 +1,8 @@
 package com.beca.misdivisas.controller;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +27,7 @@ import com.beca.misdivisas.interfaces.IRolRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRolRepo;
 import com.beca.misdivisas.jpa.Log;
+import com.beca.misdivisas.jpa.Rol;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.jpa.UsuarioRol;
 import com.beca.misdivisas.model.Menu;
@@ -56,6 +59,9 @@ public class UserController {
 
 	@Autowired
 	private MenuService menuService;
+	
+	@Autowired
+	private IRolRepo rolRepo;
 
 	@Autowired
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -98,6 +104,14 @@ public class UserController {
 		Usuario usuario = new Usuario();
 		usuario.setHabilitado(false);
 		model.addAttribute("usuario", usuario);
+		List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);
+		Collections.sort(roles);
+		model.addAttribute(Constantes.ROLES, roles);
+		
+		List<Rol> rolesSelect = new ArrayList<Rol>();
+		
+		model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
+		
 		return "addUsuario";
 	}
 
@@ -187,8 +201,17 @@ public class UserController {
 			return "redirect:/usuarioListar?error";
 
 		else {
-			usuarioRep.setContrasena(null);
+			usuarioRep.setContrasena(null);			
+			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);			
+			
+			List<Rol> rolesSelect = rolRepo.findByIdUsuarioAndEstado(id, Constantes.ACTIVO);
+			
+			if(roles != null && rolesSelect != null)
+				roles.removeAll(rolesSelect);
 			model.addAttribute("usuario", usuarioRep);
+			model.addAttribute(Constantes.ROLES, roles);
+			model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
+			
 			return "updateUsuario";
 		}
 	}

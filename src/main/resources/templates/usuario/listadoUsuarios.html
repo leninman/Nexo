@@ -266,6 +266,9 @@
 							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${usuario.habilitado}"/>
 
                             </div>
+                            <div  class="form-group col-md-8">
+								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />		
+							</div>
                             <div class="form-group col-md-8" style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" value="Guardar">
                             	<a class="btn btn-secondary" href="./usuarioHome">Cancelar</a>

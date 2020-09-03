@@ -77,6 +77,7 @@ public final class Constantes {
 	
 
 	public static final String ROLES = "roles";
+	public static final String ROLES_SELECT = "rolesSelect";
 
 	public static final String ROL_ADMIN_BECA = "ADMIN_BECA";
 	public static final String ROL_CONSULTOR = "CONSULTOR";

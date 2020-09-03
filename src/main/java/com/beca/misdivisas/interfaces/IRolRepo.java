@@ -20,4 +20,7 @@ public interface IRolRepo extends JpaRepository<Rol, Integer> {
 	List<Rol> findAll();
 	List<Rol> findAllByOrderByIdEmpresaAsc();
 	List<Rol> findByIdEmpresaAndEstado(int idEmpresa, String estado);
+	@Query("select r from  Rol r, UsuarioRol ur where r.idRol = ur.idRol and  ur.idUsuario =?1 and r.estado=?2")
+	List<Rol> findByIdUsuarioAndEstado(int idUsuario, String estado);
+	
 }
