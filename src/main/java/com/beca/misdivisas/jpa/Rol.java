@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name="\"ROL\"", schema ="\"SEGURIDAD\"")
 @NamedQuery(name="Rol.findAll", query="SELECT r FROM Rol r")
-public class Rol implements Serializable {
+public class Rol implements Serializable, Comparable<Rol> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -129,6 +129,11 @@ public class Rol implements Serializable {
 
 	public void setEstado(String estado) {
 		this.estado = estado;
+	}
+
+	@Override
+	public int compareTo(Rol r) {		
+		return rol.compareTo(r.rol);	
 	}
 
 }

@@ -77,7 +77,7 @@
 										
 										<div sec:authorize="hasRole('ADMIN_BECA')">
 											<td>
-												<form  method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${rol.idRol}">
+												<form  method="POST" th:action="@{editRoleHome}" th:attr="id='form'+${rol.idRol}">
 													<input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
 										            <button type="submit" name="submit"  title="Editar" class="btn btn-secondary">
 										            	<i class="far fa-edit ml-2" ></i>
@@ -143,48 +143,42 @@
 
 
 
-<th:block th:fragment="updateUsuario">
-<div class="container my-5">
-        <h5 align="center">Actualizaci&oacute;n de Usuario</h5>
-        <div class="card">
-            <div class="card-body">
-                <div class="col-md-10">
-                    <form action="#" th:action="@{/usuarioUpdate}" th:object="${rol}" method="post">
-                        <div class="row">
-                        	<input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
-                            <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario">
-                       	
-                        	<div class="form-group col-md-8">
-                                <label for="contrasena" class="col-form-label">Contrase&ntilde;a</label> <input type="password" th:field="*{contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label">Repita Contrase&ntilde;a</label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
-                            </div> 
-                            <div class="form-group col-md-8">
-                                <label for="nombreCompleto" class="col-form-label">Nombre Completo</label> <input type="text" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> <span th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-8">
-                                <label for="email" class="col-form-label">E-mail</label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="E-mail"> <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-8">
-                                <label for="habilitado" class="col-form-label">Habilitado</label> 
-                                
-                                <input type="hidden" value="on" name="_habilitado"/>
-							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${rol.habilitado}"/>
-							    
-                            </div>
-                            <div class="form-group col-md-8" Style="text-align: center;">
-                            	<input type="submit" class="btn btn-primary" value="Guardar">
-                            	<a class="btn btn-secondary" href="./usuarioHome">Cancelar</a>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<th:block th:fragment="listadoRolesUsuario">
+	<div class="card-body" >
+		<table>
+			<tr>
+				<td colspan="5"><h5 align="center">Roles</h5></td>
+			</tr>
+			<tr>
+				<td colspan="2.5" align="center">Disponibles</td>
+				<td colspan="2.5" align="center">Asignados</td>
+			</tr>
+			<tr>
+				<td style="width: 2%"></td>									
+				<td style="width: 45%">
+					<div class="subject-info-box-1">
+					  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 200px;" >
+					    <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.rol}" ></option>
+					  </select>
+					</div>
+				</td>
+				<td style="width: 6%">
+					<div class="subject-info-arrows text-center">												  
+					  <input type='button' id='btnRight' value='>' class="btn btn-default" onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');"/><br />
+					  <input type='button' id='btnLeft' value='<' class="btn btn-default" onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"/><br />												  
+					</div>										
+				</td>
+				<td style="width: 45%">
+					<div class="subject-info-box-2" >
+					  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 200px;" >
+					  	<option th:each="rol : ${rolesSelect}" th:value="${rol.idRol}" th:text="${rol.rol}" ></option>
+					  </select>
+					</div>										
+				</td>
+				<td style="width: 2%"></td>
+			</tr>
+		</table>
+	</div>
 </th:block>
 
 <th:block th:fragment="cambioContrasena">

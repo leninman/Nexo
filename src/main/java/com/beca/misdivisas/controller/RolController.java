@@ -67,7 +67,7 @@ public class RolController {
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
-		return "rol/mainRol";
+		return "rol/mainRole";
 	}
 	
 	@GetMapping("/createRoleHome")
@@ -306,7 +306,7 @@ public class RolController {
 		
 		model.addAttribute("result", "success");
 		
-		return "rol/mainRol";
+		return "rol/mainRole";
 
 	}
 
