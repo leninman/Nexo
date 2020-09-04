@@ -23,6 +23,7 @@ import com.beca.misdivisas.interfaces.IUsuarioRepo;
 import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.jpa.UsuarioRol;
+import com.beca.misdivisas.util.Constantes;
 
 @Service
 public class UsuarioService implements UserDetailsService {
@@ -58,9 +59,9 @@ public class UsuarioService implements UserDetailsService {
 			us = repo.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(username,"A");
 			if (us!=null) {				
 					
-					session.removeAttribute("Usuario");
+					session.removeAttribute(Constantes.USUARIO);
 					us.setTipoUsuario("Externo");
-					session.setAttribute("Usuario", us);				
+					session.setAttribute(Constantes.USUARIO, us);				
 					
 					Date date = new Date();
 					
@@ -77,15 +78,16 @@ public class UsuarioService implements UserDetailsService {
 					logRepo.save(audit);
 
 			}
-		}else
-			throw new UsernameNotFoundException("Id de Usuario Vacio"); 
+		}else {
+			throw new UsernameNotFoundException("Id de Usuario Vacio");
+		}
 		
 		if(us!=null && us.getUsuarioRols()!=null && !us.getUsuarioRols().isEmpty()) {
 			
 			roles = new ArrayList<>();
 			for (Iterator<UsuarioRol> iterator = us.getUsuarioRols().iterator(); iterator.hasNext();) {
 				
-				UsuarioRol rol = (UsuarioRol) iterator.next();
+				UsuarioRol rol = iterator.next();
 				roles.add(new SimpleGrantedAuthority("ROLE_" + rol.getRol().getRol()));
 			}
 			userDet = new User(us.getNombreCompleto(), us.getContrasena(), us.getHabilitado(), true, true, true, roles);
@@ -106,24 +108,24 @@ public class UsuarioService implements UserDetailsService {
 		
 		int intentos;
 		
-		if(session.getAttribute("Usuario")!= null) {
-			Usuario usuario = (Usuario) session.getAttribute("Usuario");
-			if(session.getAttribute("username")!= null) {
-				if(usuario.getNombreUsuario().equals((String)session.getAttribute("username"))) {
-					if (session.getAttribute("intentos") != null)
-						intentos = (int) session.getAttribute("intentos") + 1;
+		if(session.getAttribute(Constantes.USUARIO)!= null) {
+			Usuario usuario = (Usuario) session.getAttribute(Constantes.USUARIO);
+			if(session.getAttribute(Constantes.USER_NAME)!= null) {
+				if(usuario.getNombreUsuario().equals(session.getAttribute(Constantes.USER_NAME))) {
+					if (session.getAttribute(Constantes.INTENTOS) != null)
+						intentos = (int) session.getAttribute(Constantes.INTENTOS) + 1;
 					else
 						intentos = 1;
 				}
 				else {
-					session.removeAttribute("username");
-					session.setAttribute("username", usuario.getNombreUsuario());
+					session.removeAttribute(Constantes.USER_NAME);
+					session.setAttribute(Constantes.USER_NAME, usuario.getNombreUsuario());
 					intentos = 1;
 				}
 			}
 			else {
-				session.removeAttribute("username");
-				session.setAttribute("username", usuario.getNombreUsuario());
+				session.removeAttribute(Constantes.USER_NAME);
+				session.setAttribute(Constantes.USER_NAME, usuario.getNombreUsuario());
 				intentos = 1;
 			}
 			
@@ -132,8 +134,8 @@ public class UsuarioService implements UserDetailsService {
 				repo.save(usuario);
 			}
 			else {
-				session.removeAttribute("intentos");
-				session.setAttribute("intentos", intentos);
+				session.removeAttribute(Constantes.INTENTOS);
+				session.setAttribute(Constantes.INTENTOS, intentos);
 			}
 		}
 

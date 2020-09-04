@@ -9,7 +9,7 @@
 					<input type="hidden" id="botonAgregar" value="H">
 					 
 					<p class="my-5"> 
-						<a id="boton_agregar" href="usuarioMainAgregar" class="btn btn-secondary" title="Nuevo Usuario" tabindex="-1"> <i
+						<a id="boton_agregar" href="usuarioMainAgregar" class="btn btn-secondary" th:title="#{msj.usuario.crear}" tabindex="-1"> <i
 									class="fas fa-user-plus ml-2"></i></a>
 					</p>
 					
@@ -28,30 +28,30 @@
 								</thead>
 								
 								<tbody>
-									<tr th:each="usuario : ${Usuarios}">
-										<td th:text="${usuario.nombreUsuario}"></td>
-										<td th:text="${usuario.email}"></td>
-										<div th:if="${usuario.habilitado}">
+									<tr th:each="Usuario : ${Usuarios}">
+										<td th:text="${Usuario.nombreUsuario}"></td>
+										<td th:text="${Usuario.email}"></td>
+										<div th:if="${Usuario.habilitado}">
 											<td th:text="Si"></td>
 										</div>
-										<div th:unless="${usuario.habilitado}">
+										<div th:unless="${Usuario.habilitado}">
 											<td th:text="No"></td>
 										</div>
 										
 										<div sec:authorize="hasRole('ADMIN')">
 											<td>
-												<form th:if="${!usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
-													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
-										            <button type="submit" name="submit"  class="btn btn-secondary">
+												<form th:if="${!Usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${Usuario.idUsuario}">
+													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${Usuario.idUsuario}" />
+										            <button type="submit" name="submit"  class="btn btn-secondary" th:title="#{msj.usuario.editar}">
 										            	<i class="fas fa-user-edit ml-2" ></i>
 										            </button>										           										            
 										        </form>
 											</td>											
 											<td>
-											<div th:if="${!usuario.admin}">
-												<button type="button" title="Eliminar" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
+											<div th:if="${!Usuario.admin}">
+												<button type="button" th:title="#{msj.usuario.eliminar}" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${Usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
 										        <!-- Logout Modal-->
-												<div class="modal fade" th:attr="id='recordDeleteModal'+${usuario.idUsuario}" tabindex="-1" role="dialog"
+												<div class="modal fade" th:attr="id='recordDeleteModal'+${Usuario.idUsuario}" tabindex="-1" role="dialog"
 													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-centered" role="document">
 														<div class="modal-content">
@@ -64,12 +64,12 @@
 																</button>
 															</div>
 															<div class="modal-body"></div>
-																<form method="POST" th:action="@{usuarioEliminar}" th:attr="id='form'+${usuario.idUsuario}">
+																<form method="POST" th:action="@{usuarioEliminar}" th:attr="id='form'+${Usuario.idUsuario}">
 																	<div style="text-align: center;">
 																		<button class="btn btn-secondary" type="button" data-dismiss="modal" style="height:40px;width:100px">
 																			No
 																		</button>
-																		<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
+																		<input type="hidden" name="usuarioId" id="usuarioId" th:value="${Usuario.idUsuario}" />
 											            				<button type="submit" name="submit"  class="btn btn-primary" style="height:40px;width:100px">
 											            					Si
 											            				</button>
@@ -87,19 +87,19 @@
 										
 										<div sec:authorize="hasRole('ADMIN_BECA')">
 											<td>
-												<form th:if="${usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${usuario.idUsuario}">
-													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
-										            <button type="submit" name="submit"  class="btn btn-secondary">
+												<form th:if="${Usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${Usuario.idUsuario}">
+													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${Usuario.idUsuario}" />
+										            <button type="submit" name="submit"  class="btn btn-secondary" th:title="#{msj.usuario.editar}">
 										            	<i class="fas fa-user-edit ml-2" ></i>
 										            </button>										           										            
 										        </form>										
 											</td>
 											
 											<td>
-											<div th:if="${usuario.admin}">
-												<button type="button" title="Eliminar" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
+											<div th:if="${Usuario.admin}">
+												<button type="button" th:title="#{msj.usuario.eliminar}" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${Usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
 										        <!-- Logout Modal-->
-												<div class="modal fade" th:attr="id='recordDeleteModal'+${usuario.idUsuario}" tabindex="-1" role="dialog"
+												<div class="modal fade" th:attr="id='recordDeleteModal'+${Usuario.idUsuario}" tabindex="-1" role="dialog"
 													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-centered" role="document">
 														<div class="modal-content">
@@ -112,12 +112,12 @@
 																</button>
 															</div>
 															<div class="modal-body"></div>
-																<form method="POST" th:action="@{usuarioEliminar}" th:attr="id='form'+${usuario.idUsuario}">
+																<form method="POST" th:action="@{usuarioEliminar}" th:attr="id='form'+${Usuario.idUsuario}">
 																	<div style="text-align: center;">
 																		<button class="btn btn-secondary" type="button" data-dismiss="modal" style="height:40px;width:100px">
 																			No
 																		</button>
-																		<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
+																		<input type="hidden" name="usuarioId" id="usuarioId" th:value="${Usuario.idUsuario}" />
 											            				<button type="submit" name="submit"  class="btn btn-primary" style="height:40px;width:100px">
 											            					Si
 											            				</button>
@@ -151,13 +151,11 @@
 
 </th:block>
 
-
-
 <th:block th:fragment="updateUsuario">
-<div class="container my-5">
+<div class="container my-5" align="center">
         <h5 align="center">Actualizaci&oacute;n de Usuario</h5>
-        <div class="card">
-            <div class="card-body">
+        <div class="card" style="width: 50%">
+            <div class="card-body" style="text-align: left;width: 170%">
                 <div class="col-md-10">
                     <form action="#" th:action="@{/usuarioUpdate}" th:object="${usuario}" method="post">
                         <div class="row">
@@ -165,16 +163,21 @@
                             <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario">
                        	
                         	<div class="form-group col-md-8">
-                                <label for="contrasena" class="col-form-label">Contrase&ntilde;a</label> <input type="password" th:field="*{contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-danger"></span>
+                                <label for="contrasena" class="col-form-label">Contrase&ntilde;a</label> 
+                                <input type="password" th:field="*{contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> 
+                                <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label">Repita Contrase&ntilde;a</label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
+                                <label for="repitaContrasena" class="col-form-label">Repita Contrase&ntilde;a</label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> 
+                                <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
                             </div> 
                             <div class="form-group col-md-8">
-                                <label for="nombreCompleto" class="col-form-label">Nombre Completo</label> <input type="text" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> <span th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
+                                <label for="nombreCompleto" class="col-form-label">Nombre Completo</label> <input type="text" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> 
+                                <span th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="email" class="col-form-label">E-mail</label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="E-mail"> <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
+                                <label for="email" class="col-form-label">E-mail</label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="E-mail"> 
+                                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
                                 <label for="habilitado" class="col-form-label">Habilitado</label> 
@@ -194,17 +197,16 @@
             </div>
         </div>
     </div>
-
 </th:block>
 
 <th:block th:fragment="cambioContrasena">
-<div class="container my-5">
+<div class="container my-5" >
         <h5 align="center">Cambio de Contrase&ntilde;a</h5>
-        <div class="card">
-            <div class="card-body">
+        <div class="card" style="width: 50%">
+            <div class="card-body" style="text-align: left;width: 170%">
                 <div class="col-md-10">
                     <form action="#" th:action="@{/usuarioChange}" th:object="${usuario}" method="post">
-                        <div class="row">
+                        <div class="row" >
                         	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
                             <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario" value="a">
                             <input type="hidden" th:field="*{email}" class="form-control" id="email" value="a@a">
@@ -237,10 +239,10 @@
 </th:block>
 
 <th:block th:fragment="addUsuario">
-<div class="container my-5">
+<div class="container my-5" align="center">
         <h5 align="center">Creaci&oacute;n de Usuario</h5>
-        <div class="card">
-            <div class="card-body">
+        <div class="card" style="width: 50%">
+            <div class="card-body" style="text-align: left;width: 170%">
                 <div class="col-md-10">
                     <form action="#" th:action="@{/usuarioAgregar}" th:object="${usuario}" method="post">
                         <div class="row">

@@ -37,20 +37,16 @@ import org.springframework.util.StringUtils;
 
 import com.beca.misdivisas.util.Constantes;
 
-
+@SuppressWarnings("deprecation")
 public final class CustomActiveDirectoryLdapAuthenticationProvider extends AbstractLdapAuthenticationProvider {
 	
 	
 
 	private static final Pattern SUB_ERROR_CODE = Pattern.compile(".*data\\s([0-9a-f]{3,4}).*");
 
-	private static final int USERNAME_NOT_FOUND = 0x525;
-	private static final int INVALID_PASSWORD = 0x52e;
-	private static final int NOT_PERMITTED = 0x530;
 	private static final int PASSWORD_EXPIRED = 0x532;
 	private static final int ACCOUNT_DISABLED = 0x533;
 	private static final int ACCOUNT_EXPIRED = 0x701;
-	private static final int PASSWORD_NEEDS_RESET = 0x773;
 	private static final int ACCOUNT_LOCKED = 0x775;
 
 	private final String domain;
@@ -58,14 +54,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private final String url;
 	private boolean convertSubErrorCodesToExceptions;
 	private String searchFilter = "(&(objectClass=user)(sAMAccountName={0}))";
-								  
 
-// this is your DAO class attribute and setter
-	//private RoleDao roleDao;
-
-	/*public void setRoleDao(RoleDao roleDao) {
-		this.roleDao = roleDao;
-	}*/
 
 	ContextFactory contextFactory = new ContextFactory();
 
@@ -87,13 +76,13 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	protected DirContextOperations doAuthentication(UsernamePasswordAuthenticationToken auth) {
 		String username = auth.getName();
 		String password = (String) auth.getCredentials();
-
+		
 		DirContext ctx = bindAsUser(username, password);
 
 		try {
 			return searchForUser(ctx, username);
 		} catch (javax.naming.NamingException e) {
-			//logger.error("Failed to locate directory entry for authenticated user: " + username, e);
+			logger.error(e.getLocalizedMessage());
 			throw badCredentials(e);
 		} finally {
 			LdapUtils.closeContext(ctx);
@@ -126,15 +115,11 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	}
 
 	private void handleBindException(String bindPrincipal, NamingException exception) {
-		//if (logger.isDebugEnabled()) {
-		//	logger.debug("Authentication for " + bindPrincipal + " failed:" + exception);
-		//}
+
 		int subErrorCode = parseSubErrorCode(exception.getMessage());
 		if (subErrorCode <= 0) {
-			//logger.debug("Failed to locate AD-specific sub-error code in message");
 			return;
 		}
-		//logger.info("Active Directory authentication failed: " + subCodeToLogMessage(subErrorCode));
 		if (convertSubErrorCodesToExceptions) {
 			raiseExceptionForErrorCode(subErrorCode, exception);
 		}
@@ -149,8 +134,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	}
 
 	private void raiseExceptionForErrorCode(int code, NamingException exception) {
-		String hexString = Integer.toHexString(code);
-		//Throwable cause = new ActiveDirectoryAuthenticationException(hexString, exception.getMessage(), exception);
 		switch (code) {
 		case PASSWORD_EXPIRED:
 			throw new CredentialsExpiredException("LdapAuthenticationProvider.credentialsExpired"+
@@ -169,28 +152,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		}
 	}
 
-	private String subCodeToLogMessage(int code) {
-		switch (code) {
-		case USERNAME_NOT_FOUND:
-			return "User was not found in directory";
-		case INVALID_PASSWORD:
-			return "Supplied password was invalid";
-		case NOT_PERMITTED:
-			return "User not permitted to logon at this time";
-		case PASSWORD_EXPIRED:
-			return "Password has expired";
-		case ACCOUNT_DISABLED:
-			return "Account is disabled";
-		case ACCOUNT_EXPIRED:
-			return "Account expired";
-		case PASSWORD_NEEDS_RESET:
-			return "User must reset password";
-		case ACCOUNT_LOCKED:
-			return "Account locked";
-		}
-		return "Unknown (error code " + Integer.toHexString(code) + ")";
-	}
-
 	private BadCredentialsException badCredentials() {
 		return new BadCredentialsException("LdapAuthenticationProvider.badCredentials" + "Bad credentials");
 	}
@@ -198,14 +159,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private BadCredentialsException badCredentials(Throwable cause) {
 		return (BadCredentialsException) badCredentials().initCause(cause);
 	}
-	
-	/*@Override
-    public Authentication authenticate(Authentication auth) {
-        WebAuthenticationDetails details = (WebAuthenticationDetails) auth.getDetails();
-        String userIp = details.getRemoteAddress();
-		return auth;
-       
-	}*/
 
 	private DirContextOperations searchForUser(DirContext context, String username) throws javax.naming.NamingException {
 		SearchControls searchControls = new SearchControls();
@@ -218,8 +171,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		try {
 			return SpringSecurityLdapTemplate.searchForSingleEntryInternal(context, searchControls, searchRoot,	searchFilter, new Object[] { username });
 		} catch (IncorrectResultSizeDataAccessException incorrectResults) {
-			// Search should never return multiple results if properly configured - just
-			// rethrow
 			if (incorrectResults.getActualSize() != 0) {
 				throw incorrectResults;
 			}
@@ -233,7 +184,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private String searchRootFromPrincipal(String bindPrincipal) {
 		int atChar = bindPrincipal.lastIndexOf('@');
 		if (atChar < 0) {
-			//logger.debug("User principal '" + bindPrincipal	+ "' does not contain the domain, and no domain has been configured");
 			throw badCredentials();
 		}
 		return rootDnFromDomain(bindPrincipal.substring(atChar + 1, bindPrincipal.length()));
@@ -278,19 +228,11 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		
 		String[] groups = userData.getStringAttributes("memberOf");
 		if (groups == null) {
-			//log.debug("No values for 'memberOf' attribute. No Authorities in Active Directory!");
-			//return AuthorityUtils.NO_AUTHORITIES;
 			throw badCredentials(new Exception());
 		}
-		//if (log.isDebugEnabled()) {
-			//logger.debug("'memberOf' attribute values: " + Arrays.asList(groups));
-		//}
-
 		List<GrantedAuthority> authorities = createGrantedAuthoritiesFromLdapGroups(groups);
 		
 		if (authorities == null || authorities.isEmpty()) {
-			//log.debug("No values for 'memberOf' attribute. No Authorities in Active Directory!");
-			//return AuthorityUtils.NO_AUTHORITIES;
 			throw badCredentials(new Exception());
 		}
 		return authorities;
@@ -299,7 +241,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private List<GrantedAuthority> createGrantedAuthoritiesFromLdapGroups(String[] groups) {
 		
 	List<String> groupNames = new ArrayList<>(groups.length);
-	//'groups' is array of Acitve Directory groups which user that tries to authenticate has. 
 	for (String group : groups) {
 		String groupName = new DistinguishedName(group).removeLast().getValue();
 		groupNames.add(groupName);
@@ -307,9 +248,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 
 	//I use Active Directory groups that user which tries to login has and get all application privileges for them from database.
 	//You can map privileges or roles form database to application roles and easily use them in application for example in @Secured annotation
-	
-	///List<String> privileges = roleDao.findPrivilegesForLDAPGroups(groupNames);
-	List<String> privileges = new ArrayList<String>();
+	List<String> privileges = new ArrayList<>();
 	if(groupNames.contains("GSEG-Nexo-Divisas_ADMIN"))
 		privileges.add(Constantes.ROL_ADMIN_BECA);
 	//Your roles/privileges in database need to have 'ROLE_' prefix or you need to append it here.
@@ -317,7 +256,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	
 	return privileges.stream()
 			.map(privilege -> org.apache.commons.lang3.StringUtils.appendIfMissing(DEFAULT_ROLE_PREFIX, privilege))
-			.map(privilege -> new SimpleGrantedAuthority((String) privilege)).collect(Collectors.toList());
+			.map(privilege -> new SimpleGrantedAuthority(privilege)).collect(Collectors.toList());
 	}
 	
 }

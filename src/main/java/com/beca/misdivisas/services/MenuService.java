@@ -177,4 +177,32 @@ public class MenuService {
 
 		return m;
 	}
+	
+	public List<Menu> getMenu(Integer idUsuario) {
+		List<Menu> menu = null;
+
+		/*
+		 * if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) { menu =
+		 * loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
+		 * 
+		 * } else {
+		 */
+			menu = loadMenuByUserId(idUsuario);
+		//}
+
+		return menu;
+	}
+	
+	public List<Menu> getMenuList(String[] mr){
+		List<Menu> menuList = new ArrayList<Menu>();
+		
+		for (int i = 0; i < mr.length; i++) {
+			if(!mr[i].equalsIgnoreCase("1")) {
+				com.beca.misdivisas.jpa.Menu menu = menuRepo.findById(Integer.parseInt(mr[i]));
+				menuList.add(getMenu(menu));
+			}
+			
+		}
+		return menuList;
+	}
 }

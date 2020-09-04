@@ -1,12 +1,16 @@
 package com.beca.misdivisas.util;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -50,7 +54,7 @@ public class Util {
 						&& fechaInicial.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)
 					diffDays++;
 			}
-			if (diaHabil == true)
+			if (diaHabil)
 				diffDays++;
 
 			fechaInicial.add(Calendar.DATE, 1);
@@ -71,7 +75,7 @@ public class Util {
 
 	public static String diaHabilPrevio(List<Date> listaFechasNoLaborables) {
 		boolean hasta = true;
-		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat formato = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
 		Calendar cal = new GregorianCalendar();
 		Date fecha;
 		try {
@@ -98,6 +102,7 @@ public class Util {
 		fecha.set(Calendar.MINUTE, 0);
 		fecha.set(Calendar.SECOND, 0);
 		fecha.set(Calendar.MILLISECOND, 0);
+		boolean result = true;
 
 		if (listaFechasNoLaborables != null) {
 			Date fechaC = fecha.getTime();
@@ -105,30 +110,30 @@ public class Util {
 			if (fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY && fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
 				for (int i = 0; i < listaFechasNoLaborables.size(); i++) {
 					if (fechaC.equals(listaFechasNoLaborables.get(i))) {
-						return false;
+						result = false;
 					}
 				}				
 			} else {
-				return false;
+				result = false;
 			}
 		} else {
 			if (fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
 					&& fecha.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
-				return true;
+				result = true;
 			} else {
-				return false;
+				result = false;
 			}
 		}
-		return true;
+		return result;
 	}
 	
 	public List<Date> obtenerFeriados(String prop){
 		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
 		String bancarios = prop;
+		List<Date> fechas = new ArrayList<>();
 		
 		if(bancarios!=null && !bancarios.isEmpty()) {
-			String [] bancariosSplit = bancarios.split(",");
-			List<Date> fechas = new ArrayList<Date>();
+			String [] bancariosSplit = bancarios.split(",");		
 	
 			for(int i =  0; i< bancariosSplit.length; i++) {
 				try {				
@@ -137,8 +142,24 @@ public class Util {
 					e.printStackTrace();
 				}
 			}
-			return fechas;
 		}
-		return null;
+		return fechas;
+	}
+	
+	public static String getRemoteIp(HttpServletRequest request) {
+		String ip="";
+		if(request.getHeader("x-forwarded-for")!= null)
+			ip= request.getHeader("x-forwarded-for");
+		else
+			ip= request.getRemoteAddr();
+		
+		return ip;
+	}
+	
+	public static long getDateDiff(Timestamp date1, TimeUnit timeUnit) {
+        Instant instante = Instant.now();
+		Timestamp ahora = Timestamp.from(instante);
+	    long diffInMillies = ahora.getTime() - date1.getTime();
+	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
 	}
 }

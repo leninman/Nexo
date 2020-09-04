@@ -3,7 +3,7 @@
 	<div class="container my-2">
 		<div class="card">
 			<div class="card-body">
-				<div th:switch="${usuarios}" class="container my-5">
+				<div th:switch="${Usuarios}" class="container my-5">
 					<p class="my-5">
 						<a href="/signup" class="btn btn-primary"> <i
 							class="fas fa-user-plus ml-2"> Agregar Usuarios</i></a>
@@ -24,7 +24,7 @@
 								</thead>
 								
 								<tbody>
-									<tr th:each="usuario : ${usuarios}">
+									<tr th:each="usuario : ${Usuarios}">
 										<td th:text="${usuario.nombre}"></td>
 										<td th:text="${usuario.email}"></td>
 										<td th:text="${usuario.fechaHoraUltimaConexion}"></td>
@@ -54,7 +54,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="col-md-8">
-                    <form action="#" th:action="@{/update/{id}(id=${usuario.id})}" th:object="${usuario}" method="post">
+                    <form action="#" th:action="@{/update/{id}(id=${Usuario.id})}" th:object="${Usuario}" method="post">
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="nombre" class="col-form-label">Nombre</label> <input type="text" th:field="*{nombre}" class="form-control" id="nombre" placeholder="Nombre"> <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></span>
@@ -86,7 +86,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="col-md-10">
-                    <form action="#" th:action="@{/add}" th:object="${usuario}" method="post">
+                    <form action="#" th:action="@{/add}" th:object="${Usuario}" method="post">
                         <div class="row">                        
                         	 <div class="form-group col-md-8">
                                 <label for="id" class="col-form-label">ID</label> <input type="text" th:field="*{id}" class="form-control" id="id" placeholder="ID"> 

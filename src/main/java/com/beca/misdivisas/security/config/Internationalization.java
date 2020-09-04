@@ -2,6 +2,7 @@ package com.beca.misdivisas.security.config;
 
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -10,8 +11,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import com.beca.misdivisas.security.interceptor.UserContextInterceptor;
+
 @Configuration
 public class Internationalization implements WebMvcConfigurer  {
+	
+   @Autowired	
+   private UserContextInterceptor userContextInterceptor;
    
    @Bean
    public LocaleResolver localeResolver() {
@@ -31,5 +37,6 @@ public class Internationalization implements WebMvcConfigurer  {
    @Override
    public void addInterceptors(InterceptorRegistry registry) {
      registry.addInterceptor(localeChangeInterceptor());
+     registry.addInterceptor(userContextInterceptor).excludePathPatterns("/vendor/**", "/css/**", "/js/**", "/img/**", "/images/**");
    }
 }

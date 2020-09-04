@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.beca.misdivisas.util.Constantes;
+
 public class ReporteSucursal implements Comparable<ReporteSucursal> {
 	private String fecha;
 	private String sucursal;
@@ -81,7 +83,7 @@ public class ReporteSucursal implements Comparable<ReporteSucursal> {
 
 	@Override
 	public int compareTo(ReporteSucursal s) {
-		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat formato = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
 		Date date1, date2;
 		try {
 			if (getFecha() != null && s.getFecha() != null) {

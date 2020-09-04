@@ -20,16 +20,16 @@
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-               	<div sec:authorize="hasRole('ADMIN')">
+               	<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
 	               	<a class="dropdown-item" href="./changePassword" id="changePassword">
 	                  <i class="fas fas fa-user-lock fa-sm fa-fw mr-2 text-gray-400"></i>
 	                  Cambiar Contrase&ntilde;a
 	                </a>
                 </div>
-                <div sec:authorize="hasRole('CONSULTOR')">
-	               	<a class="dropdown-item" href="./changePassword" id="changePassword">
-	                  <i class="fas fas fa-user-lock fa-sm fa-fw mr-2 text-gray-400"></i>
-	                  Cambiar Contrase&ntilde;a
+                <div sec:authorize="hasAnyRole('ADMIN_BECA')">
+	               	<a class="dropdown-item" href="./changeCompany" id="changeUser">
+	                  <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+	                  Cambiar de Empresa
 	                </a>
                 </div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
@@ -39,7 +39,30 @@
               </div>
             </li>			
           </ul>
-     </nav>
-     		<!-- End of Topbar -->
+     </nav>     
+     <!-- End of Topbar -->
+     
+     <!-- Session Modal-->
+     <div class="modal fade" id="sessionModal" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+	 	<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">				
+				<div class="modal-header" style="text-align: right;">
+					<h5 class="modal-title" id="exampleModalLabel">Su sesi&oacute;n esta por expirar, desea extenderla &#63;</h5>
+					<button class="close" type="button" data-dismiss="modal" aria-label="Close">x</button>
+				</div>
+				<div class="modal-body" ></div>
+				<div  style="text-align: center;" >
+					<button class="btn btn-secondary" type="button"
+						data-dismiss="modal" onclick="location.href = 'logout';" style="height:40px;width:100px">No</button>
+					<button class="btn btn-primary" type="button"
+						data-dismiss="modal" onclick="extendSession()"style="height:40px;width:100px">Si</button>
+				</div>
+				<br/>
+				</div>
+			</div>
+	    </div>
+		
+		<script src="js/sessionCheck.js"></script>
     
 </th:block>

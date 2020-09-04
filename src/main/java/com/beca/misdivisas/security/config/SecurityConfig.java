@@ -17,8 +17,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.beca.misdivisas.interfaces.ILogRepo;
 
-
-
 @EnableWebSecurity
 @Configuration
 @EnableAutoConfiguration
@@ -31,27 +29,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private String ldapUrl;
 	
 	@Value("${ldap.base.dn}")
-	private String ldapBaseDn;
-	
-	/*
-	@Value("${ldap.urls}")
-	private String ldapUrls;
-	
-	@Value("${ldap.username}")
-	private String ldapSecurityPrincipal;
-	
-	@Value("${ldap.password}")
-	private String ldapPrincipalPassword;
-	
-	@Value("${ldap.user.dn.pattern}")
-	private String ldapUserDnPattern;
-	
-	@Value("${ldap.enabled}")
-	private String ldapEnabled;*/
+	private String ldapBaseDn;	
 	
 	@Autowired
-	private UserDetailsService userDetailsService;
-	
+	private UserDetailsService userDetailsService;	
 	
 	@Autowired
 	private BCryptPasswordEncoder bCrypt;
@@ -66,40 +47,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	}
 	
-	/*
+
 	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-        http
-        	.authorizeRequests()
-        		.antMatchers("/login**").permitAll()
-        		.antMatchers("/profile/**").fullyAuthenticated()
-            	.antMatchers("/").permitAll()
-            	.and()
-            .formLogin()
-            	.loginPage("/login")
-            	.failureUrl("/login?error")
-            	.permitAll()
-            	.and()
-            .logout()
-            	.invalidateHttpSession(true)
-            	.deleteCookies("JSESSIONID")
-            	.permitAll();
-	}
-	*/
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		
-			auth.authenticationProvider(activeDAOAuthenticationProvider());
-		
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {		
+			auth.authenticationProvider(activeDAOAuthenticationProvider());		
 			auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
-			//.userDetailsService(userDetailsService());
 
 	}
-	
-	/*@Bean
-	public AuthenticationManager authenticationManager() {
-		return new ProviderManager(Arrays.asList(activeDirectoryLdapAuthenticationProvider()));
-	}*/
+
 	
 	@Bean
 	public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
@@ -140,7 +95,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          .loginProcessingUrl("/login") //the url to submit the username and password to
          .usernameParameter("username")
          .passwordParameter("password")
-		 .defaultSuccessUrl("/main", true)  //the landing page after a successful login
+         .successHandler(new CustomAuthenticationSuccessHandler())
+		 //.defaultSuccessUrl("/main", true)  //the landing page after a successful login
          .failureUrl("/login?error") //the landing page after an unsuccessful login
          //.failureHandler(authenticationFailureHandler())         
          .and()		 
@@ -149,54 +105,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 .logoutSuccessUrl("/login?logout").deleteCookies("JSESSIONID")
 		 .invalidateHttpSession(true);
     }
-
-	 /** @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-        
-        			.antMatchers(
-                            "/",
-                            "/js/**",
-                            "/css/**",
-                            "/scss/**",
-                            "/img/**",
-                            "/vendor/**").permitAll()
-        			
-                    .antMatchers("/user/**").hasRole("USER")
-                    .anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll().and().logout()
-                    									.invalidateHttpSession(true)
-                    									.clearAuthentication(true)
-                    									.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    									.logoutSuccessUrl("/login?logout")
-                    									.permitAll()
-                    									.and()
-                    									.exceptionHandling()
-                    									.accessDeniedHandler(accessDeniedHandler);
-        
-       http.authorizeRequests().antMatchers("/", "/home").permitAll().antMatchers("/admin").hasRole("ADMIN")
-        .anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll().and().logout()
-        .permitAll();
-        http.exceptionHandling().accessDeniedPage("/403"); 
-    } */
-
-  /*  @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    	auth.userDetailsService(userDetailsService).passwordEncoder(bCrypt);
-    	
-    }*/
-    
-  /*  
-    @Autowired
-    DataSource dataSource;
-   
-    @Autowired
-    public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-    System.out.println("OJOOOOOOOOOO configAuthentication");  
-    auth.jdbcAuthentication().dataSource(dataSource)
-      .usersByUsernameQuery("select id,clave, habilitado from usuario where id=?")
-     .authoritiesByUsernameQuery("select id_usuario, rol from usuario_rol where id_usuario=?");
-    
-    System.out.println(auth);
-    }
-*/
 }

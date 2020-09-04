@@ -50,14 +50,6 @@ public class Remesa implements Serializable, Comparable<Remesa> {
 	@JoinColumns({ @JoinColumn(name = "\"id_agencia\"", insertable = false, updatable = false) })
 	private Agencia agencia;
 
-	// bi-directional many-to-one association to EstatusRemesa
-	/*
-	 * @ManyToOne
-	 * 
-	 * @JoinColumns({@JoinColumn(name = "\"idEstatusRemesa\"", insertable = false,
-	 * updatable = false) }) private EstatusRemesa estatusRemesa;
-	 */
-
 	// bi-directional many-to-one association to Operacion
 	@ManyToOne
 	@JoinColumns({ @JoinColumn(name = "\"id_operacion\"", insertable = false, updatable = false) })
@@ -75,7 +67,6 @@ public class Remesa implements Serializable, Comparable<Remesa> {
 
 	// bi-directional many-to-one association to RemesaMonto
 	@OneToMany(mappedBy = "remesa")
-	// private List<RemesaMonto> remesaMontos;
 	private List<RemesaDetalle> remesaDetalles;
 
 	public Remesa() {
@@ -105,18 +96,6 @@ public class Remesa implements Serializable, Comparable<Remesa> {
 		this.descripcion = descripcion;
 	}
 
-	/*
-	 * public Timestamp getFechaConfirmacion() { return this.fechaConfirmacion; }
-	 * 
-	 * public void setFechaConfirmacion(Timestamp fechaConfirmacion) {
-	 * this.fechaConfirmacion = fechaConfirmacion; }
-	 * 
-	 * public Timestamp getFechaRecepcion() { return this.fechaRecepcion; }
-	 * 
-	 * public void setFechaRecepcion(Timestamp fechaRecepcion) { this.fechaRecepcion
-	 * = fechaRecepcion; }
-	 */
-
 	public Integer getIdAgencia() {
 		return this.idAgencia;
 	}
@@ -125,12 +104,6 @@ public class Remesa implements Serializable, Comparable<Remesa> {
 		this.idAgencia = idAgencia;
 	}
 
-	/*
-	 * public Integer getIdEstatusRemesa() { return this.idEstatusRemesa; }
-	 * 
-	 * public void setIdEstatusRemesa(Integer idEstatusRemesa) {
-	 * this.idEstatusRemesa = idEstatusRemesa; }
-	 */
 
 	public Integer getIdOperacion() {
 		return this.idOperacion;
@@ -194,13 +167,6 @@ public class Remesa implements Serializable, Comparable<Remesa> {
 		this.agencia = agencia;
 	}
 
-	/*
-	 * public EstatusRemesa getEstatusRemesa() { return this.estatusRemesa; }
-	 * 
-	 * public void setEstatusRemesa(EstatusRemesa estatusRemesa) {
-	 * this.estatusRemesa = estatusRemesa; }
-	 */
-
 	public Operacion getOperacion() {
 		return this.operacion;
 	}
@@ -224,23 +190,6 @@ public class Remesa implements Serializable, Comparable<Remesa> {
 	public void setTransportista(Transportista transportista) {
 		this.transportista = transportista;
 	}
-
-	/*
-	 * public List<RemesaMonto> getRemesaMontos() { return this.remesaMontos; }
-	 * 
-	 * public void setRemesaMontos(List<RemesaMonto> remesaMontos) {
-	 * this.remesaMontos = remesaMontos; }
-	 * 
-	 * public RemesaMonto addRemesaMonto(RemesaMonto remesaMonto) {
-	 * getRemesaMontos().add(remesaMonto); remesaMonto.setRemesa(this);
-	 * 
-	 * return remesaMonto; }
-	 * 
-	 * public RemesaMonto removeRemesaMonto(RemesaMonto remesaMonto) {
-	 * getRemesaMontos().remove(remesaMonto); remesaMonto.setRemesa(null);
-	 * 
-	 * return remesaMonto; }
-	 */
 
 	public List<RemesaDetalle> getRemesaDetalles() {
 		return this.remesaDetalles;

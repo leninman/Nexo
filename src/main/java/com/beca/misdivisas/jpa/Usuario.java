@@ -7,9 +7,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.beca.misdivisas.util.Constantes;
+import com.beca.misdivisas.util.Util;
+
 import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -30,8 +34,8 @@ public class Usuario implements Serializable {
 
 	private Integer idUsuario;
 
-	@NotNull(message = "requerida")
-	@NotBlank(message = "requerida")
+	@NotNull(message = "es requerida")
+	@NotBlank(message = "es requerida")
 	//@Size(min=8, max=20, message = "debe contener entre 8 y 20 caracteres") 
 	@Column(name="contrasena")
 	private String contrasena;
@@ -75,7 +79,7 @@ public class Usuario implements Serializable {
 	@NotNull(message = "requerido")
 	@NotBlank(message = "requerido")
 	@Column(name="\"nombre_usuario\"")
-	@Size(min=8, max=20, message = "debe contener entre 8 y 20 caracteres")
+	@Size(min=8, max=20, message = Constantes.MENSAJE_VAL_CONTRASENA_1)
 	private String nombreUsuario;
 	
 	private String estado;
@@ -237,7 +241,7 @@ public class Usuario implements Serializable {
 	public Boolean getAdmin() {
 		this.admin = false;
 		for (Iterator<UsuarioRol> iterator = usuarioRols.iterator(); iterator.hasNext();) {
-			UsuarioRol usuarioRol = (UsuarioRol) iterator.next();
+			UsuarioRol usuarioRol = iterator.next();
 			if (usuarioRol.getRol().getRol().equals("ADMIN"))
 				this.admin = true;
 		}
@@ -285,7 +289,31 @@ public class Usuario implements Serializable {
 
 		return usuarioRol;
 	}
+	
+	public Boolean hasAnyRol(String... nombreRol) {
+		boolean result = false;
+		
+		for (String rol : nombreRol) {
+			for (Iterator<UsuarioRol> iterator = usuarioRols.iterator(); iterator.hasNext();) {
+				UsuarioRol usuarioRol = iterator.next();
+				if (usuarioRol.getRol().getRol().equals(rol))
+					result = true;
+			}
+		}
 
+		return result;
+	}
+	
+	public boolean esClaveVencida(long dias) {
+		if(this.fechaActualizacionContrasena != null) {
+			long dif = Util.getDateDiff(this.fechaActualizacionContrasena, TimeUnit.DAYS);
+			if( dif > dias ){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean equals(Object obj) {
 		return this.idUsuario == ((Usuario) obj).getIdUsuario();
 	}

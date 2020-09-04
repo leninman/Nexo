@@ -1,7 +1,7 @@
 package com.beca.misdivisas.controller;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,16 +15,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
-import com.beca.misdivisas.interfaces.ILogRepo;
-import com.beca.misdivisas.jpa.Log;
+import com.beca.misdivisas.jpa.Rol;
 import com.beca.misdivisas.jpa.Usuario;
+import com.beca.misdivisas.jpa.UsuarioRol;
 import com.beca.misdivisas.model.Login;
-import com.beca.misdivisas.model.Menu;
+import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
+import com.beca.misdivisas.util.Util;
 
 @Controller
 public class HomeController {
@@ -36,74 +36,84 @@ public class HomeController {
 	private ObjectFactory<HttpSession> factory;
 
 	@Autowired
-	private ILogRepo logRepo;
+	private LogService logServ;
 
 	@Autowired
 	private HttpServletRequest request;
-		
+	
 	@Autowired
 	private MenuService menuService;
 
-	@RequestMapping(value = "/")
+	@GetMapping(value = "/")
 	public String home() {
-		return "login";
+		return Constantes.LOGIN;
 	}
 
 	@GetMapping("/login")
 	public String login(HttpServletRequest request) {
-		return "login";
+		return Constantes.LOGIN;
 	}
-
 
 	@PostMapping(value = "/login")
 	public String main() {
-		return "main";
+		return Constantes.MAIN;
 	}
 
 	@PostMapping(value = "/mainBECA")
 	public String mainBECA(Login login, Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		Usuario usuario = new Usuario();
 
 		usuario.setNombreUsuario(auth.getName());
 		usuario.setEmpresa(empresaRepository.findById(login.getEmpresa().getIdEmpresa().intValue()));
 		usuario.setIdEmpresa(login.getEmpresa().getIdEmpresa());
-		usuario.setTipoUsuario("Interno");
+		usuario.setTipoUsuario(Constantes.USUARIO_INTERNO);
 		usuario.setContrasena1("local");
-		factory.getObject().removeAttribute("Usuario");
-		factory.getObject().setAttribute("Usuario", usuario);
+		Rol rol = new Rol();
+		rol.setRol(Constantes.ROL_ADMIN_BECA);
+		UsuarioRol urol = new UsuarioRol();
+		urol.setRol(rol);
+		List<UsuarioRol> usuarioRols = new ArrayList<>();
+		usuarioRols.add(urol);
+		usuario.setUsuarioRols(usuarioRols);
+		factory.getObject().removeAttribute(Constantes.USUARIO);
+		factory.getObject().setAttribute(Constantes.USUARIO, usuario);
+		model.addAttribute(Constantes.U_SUARIO, usuario);
+		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		HttpSession session = factory.getObject();
+		logServ.registrarLog("Acceso al sistema", "Ingreso", Constantes.LOGIN, Util.getRemoteIp(request),
+				(Usuario) session.getAttribute(Constantes.USUARIO));
 
-		model.addAttribute(Constantes.MENUES,getMenu());
-		
-		registrarLog("Acceso al sistema", "Ingreso", "Login", true);
-
-		return "main";
+		return Constantes.MAIN;
 	}
 
 	@GetMapping(value = "/main")
 	public String main_href(Login login, Model model) {
-
-		if (factory.getObject().getAttribute("Usuario") != null) {
-			if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-					&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-				
-				model.addAttribute(Constantes.MENUES,getMenu());
-
-				return "main";
-			}else {
-				Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-				model.addAttribute("usuario", usuario);
-				return "changePassword";
-			}
-		}
-
-		else {
-			login.setEmpresas(empresaRepository.findAll());
-			model.addAttribute("login", login);
-
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		model.addAttribute(Constantes.U_SUARIO, usuario);
+		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		
+		if (usuario != null) {
+			return Constantes.MAIN;
+		} else {
+			login.setEmpresas(empresaRepository.findAllOrderByName());
+			model.addAttribute(Constantes.LOGIN, login);
 			return "loginBECA";
 		}
+	}
+
+	@GetMapping(value = "/changeCompany")
+	public String cambioDeEmpresa(Login login, Model model) {
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		model.addAttribute(Constantes.U_SUARIO, usuario);
+		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		login.setEmpresas(empresaRepository.findAllOrderByName());
+		model.addAttribute(Constantes.LOGIN, login);
+		String detalle = MessageFormat.format(Constantes.TEXTO_CAMBIO_EMPRESA, usuario.getEmpresa().getEmpresa());
+		logServ.registrarLog(Constantes.CAMBIO_EMPRESA, detalle, Constantes.CAMBIO_EMPRESA, Util.getRemoteIp(request), usuario);
+
+		return "loginBECA";
 	}
 
 	@GetMapping(value = "/grafico")
@@ -116,48 +126,5 @@ public class HomeController {
 	public String index() {
 		return "index";
 	}
-
-	/*
-	 * @GetMapping("/access-denied") public String accessDenied() { return
-	 * "/error/access-denied"; }
-	 * 
-	 * @RequestMapping(value="/403") public String Error403(){ return "403"; }
-	 */
-	public void registrarLog(String accion, String detalle, String opcion, boolean resultado) {
-		Date date = new Date();
-		Log audit = new Log();
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-		String ip = request.getRemoteAddr();
-		HttpSession session = factory.getObject();
-		Usuario us = (Usuario) session.getAttribute("Usuario");
-		if (us != null) {
-			audit.setIdEmpresa(us.getIdEmpresa());
-			audit.setIdUsuario(us.getIdUsuario());
-			audit.setNombreUsuario(us.getNombreUsuario());
-		} else {
-			audit.setNombreUsuario(auth.getName());
-		}
-		audit.setFecha(new Timestamp(date.getTime()));
-		audit.setIpOrigen(ip);
-		audit.setAccion(accion);
-		audit.setDetalle(detalle);
-		audit.setOpcionMenu(opcion);
-		audit.setResultado(true);
-		logRepo.save(audit);
-	}
 	
-	public List<Menu> getMenu() {
-		List<Menu> menu = null;
-		
-		if(request.isUserInRole(Constantes.ROL_ADMIN_BECA)) { 			
-			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
-			
-		}else {
-			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
-		}
-		
-		return menu;
-	}
-
 }

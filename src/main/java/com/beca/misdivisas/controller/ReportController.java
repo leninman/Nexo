@@ -1,8 +1,8 @@
 package com.beca.misdivisas.controller;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -29,30 +29,26 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
 import com.beca.misdivisas.interfaces.IEstatusRemesaRepo;
-import com.beca.misdivisas.interfaces.ILogRepo;
 import com.beca.misdivisas.interfaces.IRemesaRepo;
 import com.beca.misdivisas.interfaces.ISucursalRepo;
 import com.beca.misdivisas.jpa.Empresa;
-import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Pieza;
 import com.beca.misdivisas.jpa.Remesa;
 import com.beca.misdivisas.jpa.RemesaDetalle;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.DatosReporteMapa;
-import com.beca.misdivisas.model.Menu;
 import com.beca.misdivisas.model.ReporteIrregularidades;
 import com.beca.misdivisas.model.ReporteRemesa;
 import com.beca.misdivisas.model.ReporteSucursal;
 import com.beca.misdivisas.model.ReporteSucursalMapa;
 import com.beca.misdivisas.services.MenuService;
+import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
@@ -78,313 +74,293 @@ public class ReportController {
 	private ISucursalRepo sucursalRepo;
 
 	@Autowired
-	private ILogRepo logRepo;
-
-	@Autowired
 	private HttpServletRequest request;
 
 	@Autowired
 	private HttpServletResponse response;
-	
-	@Autowired
-	private MenuService menuService;
 
 	@Autowired
 	private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
+
+	@Autowired
+	private LogService logServ;
+	
+	@Autowired
+	private MenuService menuService;
 
 	@GetMapping("/reporteG")
 	public String reporte() {
 		return "reporteGrafico";
 	}
 
-	@GetMapping(value = "/reporte")
+	@GetMapping(value = "reporte")
 	public String reporte(Model modelo) {
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
+		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		int id = usuario.getIdEmpresa();
+		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
+		BigDecimal montoPendienteDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
+				Constantes.ESTATUS_PENDIENTE);
+		BigDecimal montoPendienteEuro = remesaRepo.getLastRemesaByStatus(id, Constantes.EUR,
+				Constantes.ESTATUS_PENDIENTE);
+		BigDecimal montoPendienteEntregaDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
+				Constantes.ESTATUS_PENDIENTE_ENTREGA);
+		BigDecimal montoPendienteEntregaEuro = remesaRepo.getLastRemesaByStatus(id, Constantes.EUR,
+				Constantes.ESTATUS_PENDIENTE_ENTREGA);
+		Empresa empresa = empresaRepo.findById(id);
+		modelo.addAttribute(Constantes.CLIENTE,
+				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
-		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
+		BigDecimal saldoTOT;
+		BigDecimal tmp;
 
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy 23:59:59");
-			BigDecimal montoPendienteDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
-					Constantes.ESTATUS_PENDIENTE);
-			BigDecimal montoPendienteEuro = remesaRepo.getLastRemesaByStatus(id, Constantes.EUR,
-					Constantes.ESTATUS_PENDIENTE);
-			BigDecimal montoPendienteEntregaDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
-					Constantes.ESTATUS_PENDIENTE_ENTREGA);
-			BigDecimal montoPendienteEntregaEuro = remesaRepo.getLastRemesaByStatus(id, Constantes.EUR,
-					Constantes.ESTATUS_PENDIENTE_ENTREGA);
-			Empresa empresa = empresaRepo.findById(id);
-			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+		saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.USD, formato2.format(new Date()));
 
-			modelo.addAttribute(Constantes.MENUES,getMenu());
-			BigDecimal saldoTOT = new BigDecimal(0);
-			BigDecimal tmp = new BigDecimal(0);
-
-			saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.USD, formato2.format(new Date()));
-
-			if (montoPendienteDolar == null)
-				montoPendienteDolar = BigDecimal.valueOf(0.00);
-			if (montoPendienteEuro == null)
-				montoPendienteEuro = BigDecimal.valueOf(0.00);
-			if (montoPendienteEntregaDolar == null) {
-				montoPendienteEntregaDolar = BigDecimal.valueOf(0.00);
-			}
-			if (montoPendienteEntregaEuro == null) {
-				montoPendienteEntregaEuro = BigDecimal.valueOf(0.00);
-			}
-			Util u = new Util();
-			List<Date> fechas = u.obtenerFeriados(this.bancarios);
-			modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
-
-			tmp = saldoTOT.subtract(montoPendienteEntregaDolar);
-
-			modelo.addAttribute("totalDolares", Util.formatMonto(String.valueOf(saldoTOT)));
-			modelo.addAttribute("pendienteDolares", Util.formatMonto(montoPendienteDolar.toString()));
-			modelo.addAttribute("pendienteEntregaDolares", Util.formatMonto(montoPendienteEntregaDolar.toString()));
-			modelo.addAttribute("disponibleDolares", Util.formatMonto(String.valueOf(tmp)));
-			tmp = new BigDecimal(0);
-			saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.EUR, formato2.format(new Date()));
-
-			tmp = saldoTOT.subtract(montoPendienteEntregaEuro);
-
-			modelo.addAttribute("totalEuros", Util.formatMonto(String.valueOf(saldoTOT)));
-			modelo.addAttribute("pendienteEuros", Util.formatMonto(montoPendienteEuro.toString()));
-			modelo.addAttribute("pendienteEntregaEuros", Util.formatMonto(montoPendienteEntregaEuro.toString()));
-			modelo.addAttribute("disponibleEuros", Util.formatMonto(String.valueOf(tmp)));
-
-			registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA, Constantes.OPCION_POSICION,
-					true);
-
-			return "reporte";
-
-		} else {
-			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-			modelo.addAttribute("usuario", usuario);
-			return "changePassword";
+		if (montoPendienteDolar == null)
+			montoPendienteDolar = BigDecimal.valueOf(0.00);
+		if (montoPendienteEuro == null)
+			montoPendienteEuro = BigDecimal.valueOf(0.00);
+		if (montoPendienteEntregaDolar == null) {
+			montoPendienteEntregaDolar = BigDecimal.valueOf(0.00);
 		}
+		if (montoPendienteEntregaEuro == null) {
+			montoPendienteEntregaEuro = BigDecimal.valueOf(0.00);
+		}
+		Util u = new Util();
+		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 
+		tmp = saldoTOT.subtract(montoPendienteEntregaDolar);
+
+		modelo.addAttribute(Constantes.TOTAL_DOLARES, Util.formatMonto(String.valueOf(saldoTOT)));
+		modelo.addAttribute(Constantes.PENDIENTE_DOLARES, Util.formatMonto(montoPendienteDolar.toString()));
+		modelo.addAttribute("pendienteEntregaDolares", Util.formatMonto(montoPendienteEntregaDolar.toString()));
+		modelo.addAttribute("disponibleDolares", Util.formatMonto(String.valueOf(tmp)));
+		saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.EUR, formato2.format(new Date()));
+
+		tmp = saldoTOT.subtract(montoPendienteEntregaEuro);
+
+		modelo.addAttribute(Constantes.TOTAL_EUROS, Util.formatMonto(String.valueOf(saldoTOT)));
+		modelo.addAttribute(Constantes.PENDIENTE_EUROS, Util.formatMonto(montoPendienteEuro.toString()));
+		modelo.addAttribute("pendienteEntregaEuros", Util.formatMonto(montoPendienteEntregaEuro.toString()));
+		modelo.addAttribute("disponibleEuros", Util.formatMonto(String.valueOf(tmp)));
+
+		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA,
+				Constantes.POSICION_CONSOLIDADA, Util.getRemoteIp(request), usuario);
+
+		return Constantes.REPORTE;
 	}
 
-	@RequestMapping(path = "/remesa/{fechaI}/{fechaF}/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/remesa/{fechaI}/{fechaF}/{moneda}", produces = "application/json")
 	@ResponseBody
 	public List<ReporteSucursal> getAllRemesas(@PathVariable String fechaI, @PathVariable String fechaF,
 			@PathVariable String moneda) {
-		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
-		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		DateFormat formato1 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
+		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
 
-		List<ReporteSucursal> reportes = new ArrayList<ReporteSucursal>();
+		List<ReporteSucursal> reportes = new ArrayList<>();
 		ReporteSucursal rs = null;
 		RemesaDetalle remesaDetalle = null;
 		BigDecimal saldo = new BigDecimal(0);
 
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
 		try {
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+			int id = usuario.getIdEmpresa();
 
-			saldo = remesaRepo.getTotalByEmpresaAndDate(id, Integer.parseInt(moneda), fechaI + " 00:00:00");
+			saldo = remesaRepo.getTotalByEmpresaAndDate(id, Integer.parseInt(moneda),
+					fechaI + Constantes.FORMATO_HORA_0);
 
 			List<RemesaDetalle> remesaDetalles = remesaRepo.findRemeDetalle(id, Integer.parseInt(moneda),
-					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"));
+					formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
+					formato2.parse(fechaF + Constantes.FORMATO_HORA_235959));
 
 			for (int i = 0; i < remesaDetalles.size(); i++) {
 				remesaDetalle = remesaDetalles.get(i);
 				Collections.sort(remesaDetalle.getRemesa().getRemesaDetalles(), Collections.reverseOrder());
 				rs = new ReporteSucursal();
 
-				if (remesaDetalle.getRemesa().getIdOperacion() != Constantes.RETIRO_BNA
-						&& remesaDetalle.getRemesa().getIdOperacion() != Constantes.DEBITO_POR_REINTEGRO_BNA) {
-					if (remesaDetalle.getRemesa().getRemesaDetalles().size() > 0) {
-						rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getFecha()));
+				if (!remesaDetalle.getRemesa().getRemesaDetalles().isEmpty()) {
+					rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getFecha()));
+				}
+
+				rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte());
+				String desc = "";
+				if (remesaDetalle.getRemesa().getOperacion().getIdTipoOperacion() == Constantes.CREDITO) {
+					if (remesaDetalle.getRemesa().getDescripcion() != null
+							&& !remesaDetalle.getRemesa().getDescripcion().isEmpty()) {
+						String[] s = remesaDetalle.getRemesa().getDescripcion().split(" ");
+
+						if (s.length > 2) {
+							for (int j = 2; j < s.length; j++) {
+								desc += " " + s[j];
+							}
+							rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - " + desc);
+						} else {
+							rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
+									+ remesaDetalle.getRemesa().getSucursal().getSucursal());
+						}
 					}
 
-					rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte());
-					String desc = "";
-					if (remesaDetalle.getRemesa().getOperacion().getIdTipoOperacion() == Constantes.CREDITO) {
-						if (remesaDetalle.getRemesa().getIdOperacion() != Constantes.TRASPASO_CLIENTES
-								|| remesaDetalle.getRemesa().getIdOperacion() != Constantes.TRASPASO) {
-							if (remesaDetalle.getRemesa().getDescripcion() != null
-									&& !remesaDetalle.getRemesa().getDescripcion().isEmpty()) {
-								String[] s = remesaDetalle.getRemesa().getDescripcion().split(" ");
-								if (s.length > 2) {
-									for (int j = 2; j < s.length; j++) {
-										desc += " " + s[j];
-									}
-									rs.setConcepto(
-											remesaDetalle.getRemesa().getOperacion().getOperacion() + " - " + desc);
-								} else {
-									rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
-											+ remesaDetalle.getRemesa().getSucursal().getSucursal());
-								}
+					rs.setCredito(Util
+							.formatMonto(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto().toString()));
+					saldo = saldo.add(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto());
+				} else {
+
+					rs.setDebito(Util.formatMonto(
+							remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto().negate().toString()));
+					desc = "";
+					if (remesaDetalle.getRemesa().getDescripcion() != null
+							&& !remesaDetalle.getRemesa().getDescripcion().isEmpty()) {
+						String[] s = remesaDetalle.getRemesa().getDescripcion().split(" ");
+						if (s.length > 2) {
+							for (int j = 2; j < s.length; j++) {
+								desc += " " + s[j];
 							}
+							rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - " + desc);
+						} else {
+							rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
+									+ remesaDetalle.getRemesa().getSucursal().getSucursal());
 						}
-
-						rs.setCredito(Util.formatMonto(
-								remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto().toString()));
-						saldo = saldo.add(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto());
-					} else {
-
-						rs.setDebito(Util.formatMonto(
-								remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto().negate().toString()));
-						desc = "";
-						if (remesaDetalle.getRemesa().getDescripcion() != null
-								&& !remesaDetalle.getRemesa().getDescripcion().isEmpty()) {
-							String[] s = remesaDetalle.getRemesa().getDescripcion().split(" ");
-							if (s.length > 2) {
-								for (int j = 2; j < s.length; j++) {
-									desc += " " + s[j];
-								}
-								rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - " + desc);
-							} else {
-								rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
-										+ remesaDetalle.getRemesa().getSucursal().getSucursal());
-							}
-						}
-
-						saldo = saldo.subtract(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto());
 					}
 
+					saldo = saldo.subtract(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto());
+				}
+
+				rs.setSaldo(Util.formatMonto(saldo.toString()));
+				reportes.add(rs);
+
+				if (remesaDetalle.getRemesa().getOperacion().getIdTipoOperacion() == Constantes.CREDITO && remesaDetalle
+						.getRemesa().getRemesaDetalles().get(0).getIdEstatusRemesa() == Constantes.ESTATUS_CANCELADA) {
+					rs = new ReporteSucursal();
+					rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles()
+							.get(remesaDetalle.getRemesa().getRemesaDetalles().size() - 1).getFecha()));
+					rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte() + " - " + Constantes.CANCELADA);
+					rs.setDebito(Util.formatMonto(
+							remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto().negate().toString()));
+					rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
+							+ Constantes.STRING_CANCELADA);
+
+					saldo = saldo.subtract(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto());
 					rs.setSaldo(Util.formatMonto(saldo.toString()));
 					reportes.add(rs);
+				}
 
-					if (remesaDetalle.getRemesa().getOperacion().getIdTipoOperacion() == Constantes.CREDITO
-							&& remesaDetalle.getRemesa().getRemesaDetalles().get(0)
-									.getIdEstatusRemesa() == Constantes.ESTATUS_CANCELADA) {
-						rs = new ReporteSucursal();
-						rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles()
-								.get(remesaDetalle.getRemesa().getRemesaDetalles().size() - 1).getFecha()));
-						rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte() + "- Cancelada");
-						rs.setDebito(Util.formatMonto(
-								remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto().negate().toString()));
-						rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
-								+ Constantes.STRING_CANCELADA);
-
-						saldo = saldo.subtract(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getMonto());
-						rs.setSaldo(Util.formatMonto(saldo.toString()));
-						reportes.add(rs);
-					}
-
-					BigDecimal tmp = getMontoFromPiezas(remesaDetalle.getRemesa().getPiezas());
-					if (tmp.compareTo(new BigDecimal(0)) == 1
-							&& remesaDetalle.getRemesa().getIdOperacion() != Constantes.DIFERENCIA_FALTANTE) {
-						rs = new ReporteSucursal();
-						rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getFecha()));
-						rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte() + "-BNA");
-						rs.setDebito(Util.formatMonto(tmp.negate().toString()));
-						rs.setConcepto(remesaDetalle.getRemesa().getOperacion().getOperacion() + " - "
-								+ Constantes.STRING_BNA);
-						saldo = saldo.subtract(tmp);
-						rs.setSaldo(Util.formatMonto(saldo.toString()));
-						reportes.add(rs);
-					}
+				BigDecimal tmp = getMontoFromPiezas(remesaDetalle.getRemesa().getPiezas());
+				if (tmp.compareTo(new BigDecimal(0)) == 1
+						&& remesaDetalle.getRemesa().getIdOperacion() != Constantes.DIFERENCIA_FALTANTE) {
+					rs = new ReporteSucursal();
+					rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getFecha()));
+					rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte() + "-BNA");
+					rs.setDebito(Util.formatMonto(tmp.negate().toString()));
+					rs.setConcepto(
+							remesaDetalle.getRemesa().getOperacion().getOperacion() + " - " + Constantes.STRING_BNA);
+					saldo = saldo.subtract(tmp);
+					rs.setSaldo(Util.formatMonto(saldo.toString()));
+					reportes.add(rs);
 				}
 			}
 
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
-		String detalle = "Consulta: fecha inicio(" + fechaI + "); fecha fin(" + fechaF + "); moneda(" + moneda + ")";
-		registrarLog(Constantes.POSICION_CONSOLIDADA, detalle, Constantes.OPCION_POSICION, true);
+		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_PARAMETROS, fechaI, fechaF, moneda);
+		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, detalle, Constantes.POSICION_CONSOLIDADA,
+				Util.getRemoteIp(request), usuario);
+
 		return reportes;
 	}
 
 	@GetMapping(value = "/reporteNoAptos")
 	public String reporteNoAptos(Model modelo) {
-		modelo.addAttribute(Constantes.MENUES,getMenu());
-		
-		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
-			
-			// DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-			List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
-			List<Remesa> remesasEuro = remesaRepo.getLasRemesaByMoneda(id, Constantes.EUR);
-			BigDecimal noAptoD = new BigDecimal(0), noAptoE = new BigDecimal(0), retiroD = new BigDecimal(0),
-					retiroE = new BigDecimal(0);
-			for (int i = 0; i < remesasDolar.size(); i++) {
-				if (!remesasDolar.get(i).getPiezas().isEmpty()) {
-					if (remesasDolar.get(i).getIdOperacion() != Constantes.RETIRO_BNA
-							&& remesasDolar.get(i).getIdOperacion() != Constantes.DEBITO_POR_REINTEGRO_BNA) {
-						if (remesasDolar.get(i).getIdOperacion() != Constantes.DIFERENCIA_FALTANTE)
-							for (int j = 0; j < remesasDolar.get(i).getPiezas().size(); j++) {
-								noAptoD = noAptoD.add(new BigDecimal(
-										remesasDolar.get(i).getPiezas().get(j).getCantidadNoApta() 
-										* remesasDolar.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
-							}
-					} else {
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
+		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+
+		int id = usuario.getIdEmpresa();
+		List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
+		List<Remesa> remesasEuro = remesaRepo.getLasRemesaByMoneda(id, Constantes.EUR);
+		BigDecimal noAptoD = new BigDecimal(0), noAptoE = new BigDecimal(0), retiroD = new BigDecimal(0),
+				retiroE = new BigDecimal(0);
+		for (int i = 0; i < remesasDolar.size(); i++) {
+			if (!remesasDolar.get(i).getPiezas().isEmpty()) {
+				if (remesasDolar.get(i).getIdOperacion() != Constantes.RETIRO_BNA
+						&& remesasDolar.get(i).getIdOperacion() != Constantes.DEBITO_POR_REINTEGRO_BNA) {
+					if (remesasDolar.get(i).getIdOperacion() != Constantes.DIFERENCIA_FALTANTE)
 						for (int j = 0; j < remesasDolar.get(i).getPiezas().size(); j++) {
-							retiroD = retiroD.add(new BigDecimal(remesasDolar.get(i).getPiezas().get(j).getCantidadNoApta() 
-									* remesasDolar.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
+							noAptoD = noAptoD.add(new BigDecimal(
+									remesasDolar.get(i).getPiezas().get(j).getCantidadNoApta() * remesasDolar.get(i)
+											.getPiezas().get(j).getDenominacion().getDenominacion()));
 						}
+				} else {
+					for (int j = 0; j < remesasDolar.get(i).getPiezas().size(); j++) {
+						retiroD = retiroD.add(new BigDecimal(remesasDolar.get(i).getPiezas().get(j).getCantidadNoApta()
+								* remesasDolar.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
 					}
 				}
 			}
-			for (int i = 0; i < remesasEuro.size(); i++) {
-				if (!remesasEuro.get(i).getPiezas().isEmpty()) {
-					if (remesasEuro.get(i).getIdOperacion() != Constantes.RETIRO_BNA
-							&& remesasEuro.get(i).getIdOperacion() != Constantes.DEBITO_POR_REINTEGRO_BNA) {
-						for (int j = 0; j < remesasEuro.get(i).getPiezas().size(); j++) {
-							noAptoE = noAptoE.add(new BigDecimal(
-									remesasEuro.get(i).getPiezas().get(j).getCantidadNoApta() 
-									* remesasEuro.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
-						}
-					} else {
-						for (int j = 0; j < remesasEuro.get(i).getPiezas().size(); j++) {
-							retiroE = retiroE.add(new BigDecimal(remesasEuro.get(i).getPiezas().get(j).getCantidadNoApta() 
-									* remesasEuro.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
-						}
+		}
+		for (int i = 0; i < remesasEuro.size(); i++) {
+			if (!remesasEuro.get(i).getPiezas().isEmpty()) {
+				if (remesasEuro.get(i).getIdOperacion() != Constantes.RETIRO_BNA
+						&& remesasEuro.get(i).getIdOperacion() != Constantes.DEBITO_POR_REINTEGRO_BNA) {
+					for (int j = 0; j < remesasEuro.get(i).getPiezas().size(); j++) {
+						noAptoE = noAptoE.add(new BigDecimal(remesasEuro.get(i).getPiezas().get(j).getCantidadNoApta()
+								* remesasEuro.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
+					}
+				} else {
+					for (int j = 0; j < remesasEuro.get(i).getPiezas().size(); j++) {
+						retiroE = retiroE.add(new BigDecimal(remesasEuro.get(i).getPiezas().get(j).getCantidadNoApta()
+								* remesasEuro.get(i).getPiezas().get(j).getDenominacion().getDenominacion()));
 					}
 				}
 			}
-
-			Empresa empresa = empresaRepo.findById(id);
-			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
-
-			/*
-			 * if (!remesasDolar.isEmpty()) modelo.addAttribute("fechaCorte",
-			 * formato.format(remesasDolar.get(0).getRemesaDetalles().get(0).getFecha()));
-			 */
-
-			Util u = new Util();
-			List<Date> fechas = u.obtenerFeriados(this.bancarios);
-			modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
-
-			if (remesasDolar.size() > 0) {
-				noAptoD = noAptoD.subtract(retiroD);
-				modelo.addAttribute("totalDolares", Util.formatMonto(noAptoD.toString()));
-			} else {
-				modelo.addAttribute("totalDolares", "0,00");
-			}
-
-			if (remesasEuro.size() > 0) {
-				noAptoE = noAptoE.subtract(retiroE);
-				modelo.addAttribute("totalEuros", Util.formatMonto(noAptoE.toString()));
-			} else {
-				modelo.addAttribute("totalEuros", "0,00");
-			}
-			registrarLog(Constantes.POSICION_BNA, Constantes.POSICION_BNA, Constantes.OPCION_BNA, true);
-			return "reporteNoAptos";
-
-		} else {
-			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-			modelo.addAttribute("usuario", usuario);
-			return "changePassword";
 		}
 
+		Empresa empresa = empresaRepo.findById(id);
+		modelo.addAttribute(Constantes.CLIENTE,
+				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+
+		Util u = new Util();
+		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
+
+		if (!remesasDolar.isEmpty()) {
+			noAptoD = noAptoD.subtract(retiroD);
+			modelo.addAttribute(Constantes.TOTAL_DOLARES, Util.formatMonto(noAptoD.toString()));
+		} else {
+			modelo.addAttribute(Constantes.TOTAL_DOLARES, "0,00");
+		}
+
+		if (!remesasEuro.isEmpty()) {
+			noAptoE = noAptoE.subtract(retiroE);
+			modelo.addAttribute(Constantes.TOTAL_EUROS, Util.formatMonto(noAptoE.toString()));
+		} else {
+			modelo.addAttribute(Constantes.TOTAL_EUROS, "0,00");
+		}
+		logServ.registrarLog(Constantes.POSICION_BNA, Constantes.POSICION_BNA, Constantes.POSICION_BNA,
+				Util.getRemoteIp(request), usuario);
+
+		return Constantes.REPORTE_NA;
 	}
 
-	@RequestMapping(path = "/remesaNoApta/{fechaI}/{fechaF}/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/remesaNoApta/{fechaI}/{fechaF}/{moneda}", produces = "application/json")
 	@ResponseBody
-	public List<ReporteSucursal> getAllRemesasNoAptas(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable String moneda) {
-		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
-		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+	public List<ReporteSucursal> getAllRemesasNoAptas(@PathVariable String fechaI, @PathVariable String fechaF,
+			@PathVariable String moneda) {
+		DateFormat formato1 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
+		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		List<ReporteSucursal> reportes = new ArrayList<>();
 
 		BigDecimal monto = new BigDecimal(0);
-		List<ReporteSucursal> reportes = new ArrayList<ReporteSucursal>();
 		ReporteSucursal rs = null;
 		Remesa remesa = null;
 		try {
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+			int id = usuario.getIdEmpresa();
 			List<Remesa> remesas = remesaRepo.findRemesaByEmpresaId(id, Integer.parseInt(moneda),
-					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"));
+					formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
+					formato2.parse(fechaF + Constantes.FORMATO_HORA_235959));
 
 			for (int i = 0; i < remesas.size(); i++) {
 				remesa = remesas.get(i);
@@ -392,7 +368,7 @@ public class ReportController {
 					rs = new ReporteSucursal();
 					List<Pieza> piezas = remesa.getPiezas();
 					for (Iterator<Pieza> iterator = piezas.iterator(); iterator.hasNext();) {
-						Pieza pieza = (Pieza) iterator.next();
+						Pieza pieza = iterator.next();
 						if (pieza.getCantidadNoApta() > 0) {
 							rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
 							rs.setReferencia(remesa.getCartaPorte());
@@ -401,13 +377,14 @@ public class ReportController {
 								int parcial = piezae.getCantidadNoApta() * piezae.getDenominacion().getDenominacion();
 								monto = monto.add(new BigDecimal(parcial));
 							}
-							if (remesa.getIdOperacion().equals(Constantes.RETIRO_BNA) || remesa.getIdOperacion().equals(Constantes.DEBITO_POR_REINTEGRO_BNA))
+							if (remesa.getIdOperacion().equals(Constantes.RETIRO_BNA)
+									|| remesa.getIdOperacion().equals(Constantes.DEBITO_POR_REINTEGRO_BNA))
 								monto = monto.negate();
 
 							rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_BNA);
 							rs.setSaldo(Util.formatMonto(monto.toString()));
 							reportes.add(rs);
-							monto = new BigDecimal(0);							
+							monto = new BigDecimal(0);
 							break;
 						}
 						monto = new BigDecimal(0);
@@ -416,23 +393,25 @@ public class ReportController {
 			}
 
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 
-		String detalle = "Consulta: fecha inicio(" + fechaI + "); fecha fin(" + fechaF + "); moneda(" + moneda + ")";
-		registrarLog(Constantes.POSICION_BNA, detalle, Constantes.OPCION_BNA, true);
+		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_PARAMETROS, fechaI, fechaF, moneda);
+		logServ.registrarLog(Constantes.POSICION_BNA, detalle, Constantes.POSICION_BNA, Util.getRemoteIp(request),
+				usuario);
 		Collections.sort(reportes);
 		return reportes;
 	}
 
-	@RequestMapping(path = "/irregularidades/{cartaPorte}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/irregularidades/{cartaPorte}", produces = "application/json")
 	@ResponseBody
 	public List<ReporteIrregularidades> getIrregularidades(@PathVariable String cartaPorte) {
-		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
+		DateFormat formato1 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		List<ReporteIrregularidades> irregularidades = new ArrayList<>();
 
-		List<ReporteIrregularidades> irregularidades = new ArrayList<ReporteIrregularidades>();
 		ReporteIrregularidades ri = null;
-		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		int id = usuario.getIdEmpresa();
 		try {
 			List<Remesa> remesas = remesaRepo.findRemesaByCartaporteAndIdEmpresa(id, cartaPorte);
 
@@ -458,50 +437,45 @@ public class ReportController {
 				}
 			}
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
+		String detalle = MessageFormat.format(Constantes.CONSULTA_IRREGULARIDADES, cartaPorte);
+		logServ.registrarLog(Constantes.POSICION_BNA, detalle, Constantes.POSICION_BNA, Util.getRemoteIp(request),
+				usuario);
 
 		return irregularidades;
 	}
 
 	@GetMapping(value = "/trackingRemesas")
 	public String trackingRemesas(Model modelo) {
-		modelo.addAttribute(Constantes.MENUES,getMenu());
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
+		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		int id = usuario.getIdEmpresa();
 
-		if (((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1() != null
-				&& !(((Usuario) factory.getObject().getAttribute("Usuario")).getContrasena1().trim().equals(""))) {
+		Empresa empresa = empresaRepo.findById(id);
+		modelo.addAttribute(Constantes.CLIENTE,
+				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
-			int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-
-			Empresa empresa = empresaRepo.findById(id);
-			modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
-
-			return "trackingRemesas";
-
-		} else {
-			Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
-			modelo.addAttribute("usuario", usuario);
-			return "changePassword";
-		}
+		return Constantes.REPORTE_TRACK;
 	}
 
-	@RequestMapping(path = "/remesabycartaporte/{fechaI}/{fechaF}/{cartaPorte}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/remesabycartaporte/{fechaI}/{fechaF}/{cartaPorte}", produces = "application/json")
 	@ResponseBody
-	public List<ReporteRemesa> getRemesaPorCataporte(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable String cartaPorte) {
-		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+	public List<ReporteRemesa> getRemesaPorCataporte(@PathVariable String fechaI, @PathVariable String fechaF,
+			@PathVariable String cartaPorte) {
+		DateFormat formato = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMM);
+		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		List<ReporteRemesa> rem = new ArrayList<>();
+		int id = usuario.getIdEmpresa();
 		List<Remesa> remesas = null;
-
 		Date d1, d2;
-
-		List<ReporteRemesa> rem = new ArrayList<ReporteRemesa>();
-
 		ReporteRemesa reprem = null;
 
 		try {
-			d1 = formato2.parse(fechaI + " 00:00:00");
-			d2 = formato2.parse(fechaF + " 23:59:59");
+			d1 = formato2.parse(fechaI + Constantes.FORMATO_HORA_0);
+			d2 = formato2.parse(fechaF + Constantes.FORMATO_HORA_235959);
 			remesas = remesaRepo.findRemesaByCartaporteAndIdEmpresaByDate(id, cartaPorte, d1, d2);
 
 			if (remesas != null && !remesas.isEmpty()) {
@@ -527,31 +501,34 @@ public class ReportController {
 				}
 			}
 
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
+		} catch (NumberFormatException | ParseException e) {
+			logger.error(e.getLocalizedMessage());
 		}
-		String Detalle = "Consulta de Remesas por Cart Porte: fecha inicio(" + fechaI + "); fecha fin(" + fechaF
-				+ "); carta porte(" + cartaPorte + ")";
-		registrarLog(Constantes.TRACKING_REMESAS, Detalle, Constantes.OPCION_TRACKING, true);
+
+		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_CARTAPORTE, fechaI, fechaF, cartaPorte);
+		logServ.registrarLog(Constantes.TRACKING_REMESAS, detalle, Constantes.TRACKING_REMESAS,
+				Util.getRemoteIp(request), usuario);
+
 		return rem;
 	}
 
 	@PostMapping(value = "/reporte")
 	public String getAcumuladoSucursal(@RequestParam("sucursalId") int idSucursal, Model modelo) {
-		modelo.addAttribute("idSucursal", idSucursal);
-		factory.getObject().removeAttribute("idSucursal");
-		factory.getObject().setAttribute("idSucursal", idSucursal);
-		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		modelo.addAttribute(Constantes.ID_SUCURSAL, idSucursal);
+		factory.getObject().removeAttribute(Constantes.ID_SUCURSAL);
+		factory.getObject().setAttribute(Constantes.ID_SUCURSAL, idSucursal);
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
+		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 
-		modelo.addAttribute(Constantes.MENUES,getMenu());
-
+		int id = usuario.getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
-		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+		modelo.addAttribute(Constantes.CLIENTE,
+				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 
 		Optional<Sucursal> sucursal = sucursalRepo.findById(idSucursal);
-		modelo.addAttribute("nombreSucursal", sucursal.get().getSucursal());
+		if (sucursal.isPresent())
+			modelo.addAttribute("nombreSucursal", sucursal.get().getSucursal());
 
 		BigDecimal montoDolar = getMontoTotalBySucursal(idSucursal, Constantes.USD);
 		BigDecimal montoEuro = getMontoTotalBySucursal(idSucursal, Constantes.EUR);
@@ -562,16 +539,20 @@ public class ReportController {
 		if (montoEuro == null)
 			montoEuro = new BigDecimal(0);
 
-		modelo.addAttribute("totalDolares", Util.formatMonto(montoDolar.toString()));
-		modelo.addAttribute("totalEuros", Util.formatMonto(montoEuro.toString()));
+		modelo.addAttribute(Constantes.TOTAL_DOLARES, Util.formatMonto(montoDolar.toString()));
+		modelo.addAttribute(Constantes.TOTAL_EUROS, Util.formatMonto(montoEuro.toString()));
 
-		String Detalle = "Consulta: idSucursal (" + idSucursal + "); ";
-		registrarLog(Constantes.TEXTO_REPORTE_MAPA, Detalle, Constantes.OPCION_MAPA, true);
+		String detalle = "Consulta: idSucursal (" + idSucursal + "); ";
 
-		return "reporteGrafico";
+		HttpSession session = factory.getObject();
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, detalle, Constantes.TEXTO_REPORTE_MAPA, Util.getRemoteIp(request),
+				(Usuario) session.getAttribute(Constantes.USUARIO));
+
+		return Constantes.REPORTE_GRAFICO;
+
 	}
 
-	@RequestMapping(path = "/reporte/sucursalesG/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/reporte/sucursalesG/{moneda}", produces = "application/json")
 	@ResponseBody
 	public DatosReporteMapa getMontosPorMes(@PathVariable int moneda) {
 		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy 00:00:00");
@@ -581,27 +562,26 @@ public class ReportController {
 		String[] meses = new String[12];
 		ReporteSucursalMapa reporte = null;
 		DatosReporteMapa rm = new DatosReporteMapa();
-		int idSucursal = (int) factory.getObject().getAttribute("idSucursal");
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		int idSucursal = (int) factory.getObject().getAttribute(Constantes.ID_SUCURSAL);
 		LocalDate dd = LocalDate.now().minusMonths(12).withDayOfMonth(1);
-
 		List<ReporteSucursalMapa> reportes, reportesS, reportesF;
 		try {
 			reportes = remesaRepo.getTotalMensualBySucursal(idSucursal, moneda, Constantes.ESTATUS_PROCESADA,
-					Constantes.RECEPCION_EFECTIVO, formato.parse(dd.toString() + " 00:00:00"));
+					Constantes.RECEPCION_EFECTIVO, formato.parse(dd.toString() + Constantes.FORMATO_HORA_0));
 			reportesS = remesaRepo.getTotalMensualBySucursal(idSucursal, moneda, Constantes.ESTATUS_PROCESADA,
-					Constantes.DIFERENCIA_SOBRANTE, formato.parse(dd.toString() + " 00:00:00"));
+					Constantes.DIFERENCIA_SOBRANTE, formato.parse(dd.toString() + Constantes.FORMATO_HORA_0));
 
 			reportes = calculaMontos(reportes, reportesS, Constantes.CREDITO);
 
 			reportesF = remesaRepo.getTotalMensualBySucursal(idSucursal, moneda, Constantes.ESTATUS_ENTREGADA,
-					Constantes.DIFERENCIA_FALTANTE, formato.parse(dd.toString() + " 00:00:00"));
+					Constantes.DIFERENCIA_FALTANTE, formato.parse(dd.toString() + Constantes.FORMATO_HORA_0));
 
 			reportes = calculaMontos(reportes, reportesF, Constantes.DEBITO);
 
 			for (int i = 0; i < reportes.size(); i++) {
 				reporte = reportes.get(i);
 				meses[reporte.getMes() - 1] = nombreMes[reporte.getMes() - 1] + '\'' + reporte.getAno() % 100;
-				;
 				montos[reporte.getMes() - 1] = reporte.getSuma();
 			}
 
@@ -615,10 +595,11 @@ public class ReportController {
 			rm.setMontos(montos);
 
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
-		String detalle = "Consulta: idSucursal (" + idSucursal + ");  moneda(" + moneda + ");";
-		registrarLog(Constantes.REPORTE_GRAFICO, detalle, Constantes.OPCION_GRAFICO, true);
+		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_SUCURSAL, idSucursal, moneda);
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_GRAFICO, detalle, Constantes.TEXTO_REPORTE_GRAFICO, Util.getRemoteIp(request),
+				usuario);
 
 		return rm;
 	}
@@ -628,7 +609,7 @@ public class ReportController {
 		BigDecimal parcial = new BigDecimal(0);
 		if (piezas != null) {
 			for (Iterator<Pieza> iterator = piezas.iterator(); iterator.hasNext();) {
-				Pieza pieza = (Pieza) iterator.next();
+				Pieza pieza = iterator.next();
 				if (pieza.getCantidadNoApta() > 0) {
 					parcial = BigDecimal.valueOf(pieza.getCantidadNoApta() * pieza.getDenominacion().getDenominacion());
 					monto = monto.add(parcial);
@@ -680,52 +661,35 @@ public class ReportController {
 		return recepcion;
 	}
 
-	public void registrarLog(String accion, String detalle, String opcion, boolean resultado) {
-		Date date = new Date();
-		Log audit = new Log();
-
-		String ip = request.getRemoteAddr();
-		HttpSession session = factory.getObject();
-		Usuario us = (Usuario) session.getAttribute("Usuario");
-
-		audit.setFecha(new Timestamp(date.getTime()));
-		audit.setIpOrigen(ip);
-		audit.setAccion(accion);
-		audit.setDetalle(detalle);
-		audit.setIdEmpresa(us.getIdEmpresa());
-		audit.setIdUsuario(us.getIdUsuario());
-		audit.setNombreUsuario(us.getNombreUsuario());
-		audit.setOpcionMenu(opcion);
-		audit.setResultado(true);
-		logRepo.save(audit);
-		logger.info("Ip origen: " + ip + " Accion:" + accion + " Detalle:" + detalle + " Opcion:" + opcion);
-	}
-
 	@GetMapping(value = "/remesasPendientes")
 	public String remesasPendientes(Model modelo) {
-		modelo.addAttribute(Constantes.MENUES,getMenu());
-		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
+		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+
+		int id = usuario.getIdEmpresa();
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
 		Empresa empresa = empresaRepo.findById(id);
-		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+		modelo.addAttribute(Constantes.CLIENTE,
+				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 		Util u = new Util();
 		List<Date> fechas = u.obtenerFeriados(this.bancarios);
-		modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
+		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 		response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=strict");
-		return "remesasPendientes";
+
+		return Constantes.REPORTE_REMESAS_PENDIENTES;
 	}
 
-	@RequestMapping(path = "/remesaEntregaPendiente", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/remesaEntregaPendiente", produces = "application/json")
 	@ResponseBody
 	public List<ReporteRemesa> getRemesasPendientes() {
-		DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-
-		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
+		DateFormat formato = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
 		List<Remesa> remesas = null;
-
-		List<ReporteRemesa> rem = new ArrayList<ReporteRemesa>();
-
+		List<ReporteRemesa> rem = new ArrayList<>();
 		ReporteRemesa reprem = null;
-
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		int id = usuario.getIdEmpresa();
 		try {
 			remesas = remesaRepo.findRemesasPendientesByIdEmpresa(id);
 			if (remesas != null && !remesas.isEmpty()) {
@@ -781,50 +745,61 @@ public class ReportController {
 			logger.error(e.getLocalizedMessage());
 		}
 
-		String Detalle = "Consulta de Remesas Pendiente por Entregar: IdEmpresa(" + id + "))";
-		registrarLog(Constantes.TEXTO_REMESAS_PENDIENTES, Detalle, Constantes.TEXTO_REMESAS_PENDIENTES, true);
+		String detalle = MessageFormat.format(Constantes.CONSULTA_PENDIENTE_ENTREGA, id);
+		logServ.registrarLog(Constantes.TEXTO_REMESAS_PENDIENTES, detalle, Constantes.TEXTO_REMESAS_PENDIENTES,
+				Util.getRemoteIp(request), usuario);
+
 		return rem;
 	}
 
 	@GetMapping(value = "/reporteSucursal")
 	public String reporteSucursal(Model modelo) {
-		int id = ((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa();
-
-		modelo.addAttribute(Constantes.MENUES,getMenu());
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		modelo.addAttribute(Constantes.U_SUARIO, usuario);
 		
+		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		
+		int id = usuario.getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
-		modelo.addAttribute("cliente", empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+
+		modelo.addAttribute(Constantes.CLIENTE,
+				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
 		Util u = new Util();
 		List<Date> fechas = u.obtenerFeriados(this.bancarios);
-		modelo.addAttribute("fechaCorte", Util.diaHabilPrevio(fechas));
+		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 
 		List<Sucursal> sucs = sucursalRepo.findSucursalByEmpId(id);
-		modelo.addAttribute("sucursales", sucs);
+		modelo.addAttribute(Constantes.SUCURSALES, sucs);
 
-		return "reporteSucursal";
+		return Constantes.REPORTE_SUCURSAL;
 	}
 
-	@RequestMapping(path = "/reporteSucursal/{fechaI}/{fechaF}/{sucursal}/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/reporteSucursal/{fechaI}/{fechaF}/{sucursal}/{moneda}", produces = "application/json")
 	@ResponseBody
-	public List<ReporteSucursal> getReporteSucursal(@PathVariable String fechaI, @PathVariable String fechaF, @PathVariable int sucursal, @PathVariable int moneda) {
-		DateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
-		DateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+	public List<ReporteSucursal> getReporteSucursal(@PathVariable String fechaI, @PathVariable String fechaF,
+			@PathVariable int sucursal, @PathVariable int moneda) {
+		DateFormat formato1 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
+		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
 
 		List<ReporteSucursal> reportes = new ArrayList<ReporteSucursal>();
 		ReporteSucursal rs = null;
 		Remesa remesa = null;
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
 
 		try {
 			List<Remesa> remesas = remesaRepo.findBySucursalGivenDates(sucursal, moneda,
-					formato2.parse(fechaI + " 00:00:00"), formato2.parse(fechaF + " 23:59:59"),
-					Constantes.ESTATUS_PROCESADA, Constantes.RECEPCION_EFECTIVO);
+					formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
+					formato2.parse(fechaF + Constantes.FORMATO_HORA_235959), Constantes.ESTATUS_PROCESADA,
+					Constantes.RECEPCION_EFECTIVO);
 
-			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda, formato2.parse(fechaI + " 00:00:00"),
-					formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_PROCESADA,
+			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda,
+					formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
+					formato2.parse(fechaF + Constantes.FORMATO_HORA_235959), Constantes.ESTATUS_PROCESADA,
 					Constantes.DIFERENCIA_SOBRANTE));
 
-			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda, formato2.parse(fechaI + " 00:00:00"),
-					formato2.parse(fechaF + " 23:59:59"), Constantes.ESTATUS_ENTREGADA,
+			remesas.addAll(remesaRepo.findBySucursalGivenDates(sucursal, moneda,
+					formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
+					formato2.parse(fechaF + Constantes.FORMATO_HORA_235959), Constantes.ESTATUS_ENTREGADA,
 					Constantes.DIFERENCIA_FALTANTE));
 
 			Collections.sort(remesas);
@@ -838,7 +813,7 @@ public class ReportController {
 				} else {
 					rs.setDebito(Constantes.EUR_STRING);
 				}
-				if (remesa.getRemesaDetalles().size() > 0) {
+				if (!remesa.getRemesaDetalles().isEmpty()) {
 					rs.setFecha(formato1
 							.format(remesa.getRemesaDetalles().get(remesa.getRemesaDetalles().size() - 1).getFecha()));
 				}
@@ -870,7 +845,7 @@ public class ReportController {
 						&& remesa.getRemesaDetalles().get(0).getIdEstatusRemesa() == Constantes.ESTATUS_CANCELADA) {
 					rs = new ReporteSucursal();
 					rs.setFecha(formato1.format(remesa.getRemesaDetalles().get(0).getFecha()));
-					rs.setReferencia(remesa.getCartaPorte() + "- Cancelada");
+					rs.setReferencia(remesa.getCartaPorte() + " - " + Constantes.CANCELADA);
 					rs.setDebito(Util.formatMonto(remesa.getRemesaDetalles().get(0).getMonto().negate().toString()));
 					rs.setConcepto(remesa.getOperacion().getOperacion() + " - " + Constantes.STRING_CANCELADA);
 					reportes.add(rs);
@@ -878,34 +853,24 @@ public class ReportController {
 			}
 
 		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
-		String detalle = "Consulta: fecha inicio(" + fechaI + "); fecha fin(" + fechaF + ");sucursal(" + sucursal
-				+ "); moneda(" + moneda + ")";
-		registrarLog(Constantes.REPORTE_SUCURSAL, detalle, Constantes.REPORTE_SUCURSAL, true);
+
+		String detalle = MessageFormat.format(Constantes.CONSULTA_DETALLE_POR_SUCURSAL, fechaI, fechaF, sucursal,
+				moneda);
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_SUCURSAL, detalle, Constantes.TEXTO_REPORTE_SUCURSAL,
+				Util.getRemoteIp(request), usuario);
+
 		return reportes;
 	}
 
-	@RequestMapping(path = "/totalPorSucursal/{sucursal}/{moneda}", method = RequestMethod.GET, produces = "application/json")
+	@GetMapping(path = "/totalPorSucursal/{sucursal}/{moneda}", produces = "application/json")
 	@ResponseBody
 	public String getTotalPorSucursal(@PathVariable int sucursal, @PathVariable int moneda) {
-		BigDecimal saldo = new BigDecimal(0);
+		BigDecimal saldo;
 		saldo = getMontoTotalBySucursal(sucursal, moneda);
 		return saldo.toString();
 
-	}
-	
-	public List<Menu> getMenu() {
-		List<Menu> menu = null;
-
-		if (request.isUserInRole(Constantes.ROL_ADMIN_BECA)) {
-			menu = menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
-
-		} else {
-			menu = menuService.loadMenuByUserId(((Usuario) factory.getObject().getAttribute("Usuario")).getIdUsuario());
-		}
-
-		return menu;
 	}
 
 }

@@ -11,10 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.beca.misdivisas.controller.MapController;
 import com.beca.misdivisas.interfaces.ILogRepo;
 import com.beca.misdivisas.jpa.Log;
 import com.beca.misdivisas.jpa.Usuario;
+import com.beca.misdivisas.util.Constantes;
+import com.beca.misdivisas.util.Util;
 
 @Service
 public class LogService {
@@ -22,13 +23,13 @@ public class LogService {
 	private ILogRepo logRepo;
 	
 	@Autowired
-	 private static final Logger logger = LoggerFactory.getLogger(MapController.class);
+	 private static final Logger logger = LoggerFactory.getLogger(LogService.class);
 	
 	public void registrar(HttpSession sesion, HttpServletRequest request,  ILogRepo logRepo) {
 		Date date = new Date();
 		Log audit = new Log();
-		String ip = request.getRemoteAddr();
-		Usuario us = (Usuario) sesion.getAttribute("Usuario");
+		String ip = Util.getRemoteIp(request);
+		Usuario us = (Usuario) sesion.getAttribute(Constantes.USUARIO);
 		if (us != null) {
 			audit.setIdEmpresa(us.getIdEmpresa());
 			audit.setIdUsuario(us.getIdUsuario());
