@@ -1,8 +1,4 @@
-	var locations = [
-      	["Agencia Central", 10.505971, -66.903280, "Agencia Central", "https://cdn.getyourguide.com/img/tour_img-739075-148.jpg", 1],
-      	["Agencia los Carora", 10.174374, -70.081787, "Agencia los Carora", "https://www.centralpark.com/downloads/7777/download/header.central-park-4.jpg?cb=c41c17ea856fbf7a49b80f2d2c0c6c99&w=640", 2],
-      	["Agencia Casanay", 10.444598,-63.391113, "Agencia Casanay","https://www.nycgo.com/images/venues/106/_masthead_rockfellercenterspring_taggeryanceyiv_5990__x_large.jpg", 3]
-      	];
+
 
 	// Array of Icon features
 	var iconFeatures=[];

@@ -98,9 +98,7 @@ public class UserController {
 		Collections.sort(roles);
 		model.addAttribute(Constantes.ROLES, roles);
 		
-		List<Rol> rolesSelect = new ArrayList<Rol>();
-		
-		model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
+		usuario.setUsuarioRols(new ArrayList<UsuarioRol>());
 		
 		return "addUsuario";
 	}
@@ -146,7 +144,7 @@ public class UserController {
 			result.rejectValue(Constantes.REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
 		usuario.setEmpresa(us.getEmpresa());
 		model.addAttribute(Constantes.U_SUARIO, usuario);
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, menuService.getMenu(us.getIdUsuario()));
 
 		if (result.hasErrors()) {
 			return "addUsuario";

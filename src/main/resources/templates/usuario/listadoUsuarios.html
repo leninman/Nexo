@@ -180,12 +180,13 @@
                                 <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="habilitado" class="col-form-label">Habilitado</label> 
-                                
+                                <label for="habilitado" class="col-form-label">Habilitado</label>                                
                                 <input type="hidden" value="on" name="_habilitado"/>
-							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${usuario.habilitado}"/>
-							    
+							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${usuario.habilitado}"/>							    
                             </div>
+                            <div  class="form-group col-md-8">
+								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />		
+							</div>
                             <div class="form-group col-md-8" Style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" value="Guardar">
                             	<a class="btn btn-secondary" href="./usuarioHome">Cancelar</a>

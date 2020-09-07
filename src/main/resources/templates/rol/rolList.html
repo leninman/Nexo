@@ -154,11 +154,11 @@
 				<td colspan="2.5" align="center">Asignados</td>
 			</tr>
 			<tr>
-				<td style="width: 2%"></td>									
+				<td style="width: 2%"></td>					
 				<td style="width: 45%">
 					<div class="subject-info-box-1">
 					  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 200px;" >
-					    <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.rol}" ></option>
+					    <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.rol}" th></option>
 					  </select>
 					</div>
 				</td>
@@ -170,8 +170,8 @@
 				</td>
 				<td style="width: 45%">
 					<div class="subject-info-box-2" >
-					  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 200px;" >
-					  	<option th:each="rol : ${rolesSelect}" th:value="${rol.idRol}" th:text="${rol.rol}" ></option>
+					  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 200px;" >					  
+					  	<option th:each="urol : *{usuarioRols}" th:value="${urol.rol.idRol}" th:text="${urol.rol.rol}" ></option>
 					  </select>
 					</div>										
 				</td>
