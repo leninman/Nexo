@@ -94,7 +94,7 @@ public class UserController {
 		model.addAttribute(Constantes.U_SUARIO, usuarioN);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 
-		List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);
+		List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO);
 		Collections.sort(roles);
 		model.addAttribute(Constantes.ROLES, roles);
 		
