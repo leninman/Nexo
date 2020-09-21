@@ -275,10 +275,10 @@ public class RolController {
 			menuRol = new MenuRol();			
 		}
 
-		
+		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		model.addAttribute("result", "success");
 		
-		return "rol/roleHome";
+		return "rol/mainRole";
 	}
 
 	@PostMapping("/deleteRole")

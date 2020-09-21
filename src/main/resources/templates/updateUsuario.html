@@ -15,7 +15,7 @@
 	<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon">
 
 	<!-- Custom fonts for this template-->
-	<link href="vendor/fontawesome-free/css/all.min.css" th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet" type="text/css">
+	<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
 	<link href="css/fonts-family-nunito.css" rel="stylesheet">
 	
 	<!-- Custom styles for this template-->
@@ -46,14 +46,12 @@
 
 				<!-- Begin Page Content -->
 				<div class="container-fluid">
-
-
 					<!-- Page Heading -->
 					<div th:if="${param.success}">
-     						<div class="alert alert-info">Operación Realizada Exitosamente</div>
+     						<div class="alert alert-info" th:text="#{msj.operacion.exitosa}" ></div>
     				</div>
     				<div th:if="${param.error}">
-     						<div class="alert alert-danger">No se logró realizar la Operación</div>
+     						<div class="alert alert-danger" th:text="#{msj.operacion.fallo}"></div>
     				</div>
 					<div class="row">
 						<th:block th:replace="usuario/listadoUsuarios :: updateUsuario" />
@@ -80,31 +78,6 @@
 	<a class="scroll-to-top rounded" href="#page-top"> <i
 		class="fas fa-angle-up"></i>
 	</a>
-
-	   		<!-- Logout Modal-->
-		<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
-			aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-				
-					<div class="modal-header" style="text-align: right;">
-						<h5 class="modal-title" id="exampleModalLabel">¿Está seguro que desea cerrar la sesi&oacute;n?</h5>
-						<button class="close" type="button" data-dismiss="modal"
-							aria-label="Close">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body" ></div>
-					<div  style="text-align: center;" >
-						<button class="btn btn-secondary" type="button"
-							data-dismiss="modal" style="height:40px;width:100px">No</button>
-						<button class="btn btn-primary" type="button"
-							data-dismiss="modal"onclick="location.href = './logout';" style="height:40px;width:100px">Si</button>
-					</div>
-					<br/>
-				</div>
-			</div>
-	    </div>
     
     <!-- Bootstrap core JavaScript-->
 	<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}" ></script>

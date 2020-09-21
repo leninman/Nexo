@@ -85,24 +85,6 @@ public class UserController {
 		return Constantes.CHANGE_PASSWORD;
 	}
 
-	@GetMapping("/usuarioMainAgregar")
-	public String showSignUpForm(Model model) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		Usuario usuarioN = new Usuario();
-		usuarioN.setHabilitado(false);
-		usuarioN.setEmpresa(usuario.getEmpresa());
-		model.addAttribute(Constantes.U_SUARIO, usuarioN);
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-
-		List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);
-		Collections.sort(roles);
-		model.addAttribute(Constantes.ROLES, roles);
-		
-		usuario.setUsuarioRols(new ArrayList<UsuarioRol>());
-		
-		return "addUsuario";
-	}
-
 	@GetMapping("usuarioListar")
 	public String showUpdateForm(Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
@@ -126,7 +108,25 @@ public class UserController {
 		return "verResultado";
 
 	}
+	
+	@GetMapping("/usuarioMainAgregar")
+	public String showSignUpForm(Model model) {
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		Usuario usuarioN = new Usuario();
+		usuarioN.setHabilitado(false);
+		usuarioN.setEmpresa(usuario.getEmpresa());
+		model.addAttribute(Constantes.U_SUARIO, usuarioN);
+		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 
+		List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO);
+		Collections.sort(roles);
+		model.addAttribute(Constantes.ROLES, roles);
+		
+		usuarioN.setUsuarioRols(new ArrayList<UsuarioRol>());
+		
+		return "usuario/addUsuario";
+	}
+	
 	@PostMapping("usuarioAgregar")
 	public String addUsuario(@Valid Usuario usuario, BindingResult result, Model model) {
 		Usuario us = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
@@ -147,7 +147,7 @@ public class UserController {
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(us.getIdUsuario()));
 
 		if (result.hasErrors()) {
-			return "addUsuario";
+			return "usuario/addUsuario";
 		}
 
 		Date date = new Date();
