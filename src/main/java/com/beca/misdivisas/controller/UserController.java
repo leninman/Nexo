@@ -110,7 +110,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/usuarioMainAgregar")
-	public String showSignUpForm(Model model) {
+	public String showAddUser(Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		Usuario usuarioN = new Usuario();
 		usuarioN.setHabilitado(false);
