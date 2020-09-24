@@ -42,10 +42,10 @@
 				<div class="container-fluid">
 					<!-- Page Heading -->
 					<div th:if="${param.success}">
-     					<div class="alert alert-info">Operación Realizada Exitosamente</div>
+     						<div class="alert alert-info" th:text="#{msj.operacion.exitosa}" ></div>
     				</div>
     				<div th:if="${param.error}">
-     					<div class="alert alert-danger">No se logró realizar la Operación</div>
+     						<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
     				</div>
 					<div class="row">
 						<th:block th:replace="usuario/listadoUsuarios :: addUsuario" />

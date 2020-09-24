@@ -29,8 +29,8 @@
 	<div id="wrapper">
 
 		<!-- Sidebar -->
-		
-		
+
+
 		<!-- End of Sidebar -->
 
 		<!-- Content Wrapper -->
@@ -42,17 +42,17 @@
 				<!-- Topbar -->
 				<th:block th:replace="fragments/header :: header" />
 				<th:block th:replace="fragments/menu :: menuSuperior" />
-        		<!-- End of Topbar -->
+				<!-- End of Topbar -->
 
 				<!-- Begin Page Content -->
 				<div class="container-fluid">
 					<!-- Page Heading -->
 					<div th:if="${param.success}">
-     						<div class="alert alert-info" th:text="#{msj.operacion.exitosa}" ></div>
-    				</div>
-    				<div th:if="${param.error}">
-     						<div class="alert alert-danger" th:text="#{msj.operacion.fallo}"></div>
-    				</div>
+						<div class="alert alert-info" th:text="#{msj.operacion.exitosa}"></div>
+					</div>
+					<div th:if="${param.error}">
+						<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
+					</div>
 					<div class="row">
 						<th:block th:replace="usuario/listadoUsuarios :: updateUsuario" />
 
@@ -78,16 +78,19 @@
 	<a class="scroll-to-top rounded" href="#page-top"> <i
 		class="fas fa-angle-up"></i>
 	</a>
-    
-    <!-- Bootstrap core JavaScript-->
-	<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}" ></script>
-	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"  ></script>
+
+	<!-- Bootstrap core JavaScript-->
+	<script src="vendor/jquery/jquery.min.js"
+		th:src="@{/vendor/jquery/jquery.min.js}"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"
+		th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 	<!-- Core plugin JavaScript-->
-	<script src="vendor/jquery-easing/jquery.easing.min.js" th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"  ></script>
+	<script src="vendor/jquery-easing/jquery.easing.min.js"
+		th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
 
 	<!-- Custom scripts for all pages-->
-	<script src="js/sb-admin-2.min.js"   th:src="@{/js/sb-admin-2.min.js}" ></script>
+	<script src="js/sb-admin-2.min.js" th:src="@{/js/sb-admin-2.min.js}"></script>
 	<script src="js/listbox.js" th:src="@{/js/listbox.js}"></script>
 	<script type="text/javascript">
 		$(document).ready(function enlaces() {

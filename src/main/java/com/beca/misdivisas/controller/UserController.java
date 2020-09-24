@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.beca.misdivisas.interfaces.IMenuRolRepo;
 import com.beca.misdivisas.interfaces.IRolRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRolRepo;
@@ -60,6 +61,9 @@ public class UserController {
 	
 	@Autowired
 	private IRolRepo rolRepo;
+	
+	@Autowired
+	private IUsuarioRolRepo uRolRepo;
 
 	@GetMapping("/usuarioHome")
 	public String userIndex(Model model) {
@@ -115,12 +119,18 @@ public class UserController {
 		Usuario usuarioN = new Usuario();
 		usuarioN.setHabilitado(false);
 		usuarioN.setEmpresa(usuario.getEmpresa());
-		model.addAttribute(Constantes.U_SUARIO, usuarioN);
+		
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuarioN);
+		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 
 		List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO);
 		Collections.sort(roles);
 		model.addAttribute(Constantes.ROLES, roles);
+		
+		List<Rol> rolesSelect = null;
+		model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
 		
 		usuarioN.setUsuarioRols(new ArrayList<UsuarioRol>());
 		
@@ -128,25 +138,34 @@ public class UserController {
 	}
 	
 	@PostMapping("usuarioAgregar")
-	public String addUsuario(@Valid Usuario usuario, BindingResult result, Model model) {
+	public String addUsuario(@Valid com.beca.misdivisas.model.Usuario usuario, BindingResult result, Model model) {
 		Usuario us = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		if (usuarioRepository.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getNombreUsuario(), "A") != null)
+		if (usuarioRepository.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), "A") != null)
 			result.rejectValue(Constantes.NOMBRE_USUARIO, "", "ya esta siendo utilizado");
-		else if (!sonValidosCaracteres(usuario.getNombreUsuario()))
+		else if (!sonValidosCaracteres(usuario.getUsuario().getNombreUsuario()))
 			result.rejectValue(Constantes.NOMBRE_USUARIO, "", "caracteres especiales validos @ . _ -");
 
-		if (usuario.getContrasena().length() < 8 || usuario.getContrasena().length() > 20)
+		if (usuario.getUsuario().getContrasena().length() < 8 || usuario.getUsuario().getContrasena().length() > 20)
 			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
-		else if (!esValidaContrasena(usuario.getContrasena()))
-			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);// % &
+		else if (!esValidaContrasena(usuario.getUsuario().getContrasena()))
+			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);
 
-		else if (!usuario.getContrasena().equals(usuario.getRepitaContrasena()))
+		else if (!usuario.getUsuario().getContrasena().equals(usuario.getUsuario().getRepitaContrasena()))
 			result.rejectValue(Constantes.REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
-		usuario.setEmpresa(us.getEmpresa());
+		usuario.getUsuario().setEmpresa(us.getEmpresa());
+		
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(us.getIdUsuario()));
 
 		if (result.hasErrors()) {
+			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(us.getIdEmpresa(), Constantes.ACTIVO);			
+			List<Rol> rolesSelect = usuario.getPerfiles();
+			
+			if(roles != null && rolesSelect != null)
+				roles.removeAll(rolesSelect);
+
+			model.addAttribute(Constantes.ROLES, roles);
+			model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
 			return "usuario/addUsuario";
 		}
 
@@ -154,14 +173,14 @@ public class UserController {
 		long time = date.getTime();
 		Timestamp ts = new Timestamp(time);
 
-		usuario.setFechaActualizacionContrasena(ts);
+		usuario.getUsuario().setFechaActualizacionContrasena(ts);
 		int idEmpresa = us.getIdEmpresa();
-		usuario.setIdEmpresa(idEmpresa);
+		usuario.getUsuario().setIdEmpresa(idEmpresa);
 		encoder2 = new BCryptPasswordEncoder();
-		usuario.setContrasena(encoder2.encode(usuario.getContrasena()));
-		usuario.setEstado(Constantes.ACTIVO);
+		usuario.getUsuario().setContrasena(encoder2.encode(usuario.getUsuario().getContrasena()));
+		usuario.getUsuario().setEstado(Constantes.ACTIVO);
 
-		usuarioRepository.save(usuario);
+		usuarioRepository.save(usuario.getUsuario());
 
 		UsuarioRol usuarioRol = new UsuarioRol();
 
@@ -171,11 +190,11 @@ public class UserController {
 			usuarioRol.setIdRol(rolRepository.findByRol(Constantes.ROL_CONSULTOR).getIdRol());
 
 		usuarioRol.setIdUsuario(usuarioRepository
-				.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getNombreUsuario(), "A").getIdUsuario());
+				.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), "A").getIdUsuario());
 		usuarioRolRepository.save(usuarioRol);
 
-		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_CREAR, usuario.getNombreUsuario(),
-				usuario.getIdUsuario());
+		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_CREAR, usuario.getUsuario().getNombreUsuario(),
+				usuario.getUsuario().getIdUsuario());
 		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_CREAR,
 				Util.getRemoteIp(request), us);
 
@@ -188,7 +207,10 @@ public class UserController {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		int idEmpresa = usuario.getIdEmpresa();
 		Usuario usuarioRep = usuarioRepository.findById(id);
-		model.addAttribute(Constantes.U_SUARIO, usuarioRep);
+		
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuarioRep);
+		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		if (!usuarioRep.getIdEmpresa().equals(idEmpresa))
 			return "redirect:/usuarioListar?error";
@@ -201,7 +223,7 @@ public class UserController {
 			
 			if(roles != null && rolesSelect != null)
 				roles.removeAll(rolesSelect);
-			model.addAttribute("usuario", usuarioRep);
+
 			model.addAttribute(Constantes.ROLES, roles);
 			model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
 			return "updateUsuario";
@@ -209,16 +231,16 @@ public class UserController {
 	}
 
 	@PostMapping("usuarioUpdate")
-	public String updateUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep, BindingResult result,
+	public String updateUsuario(@RequestParam("usuarioId") int id, @Valid com.beca.misdivisas.model.Usuario usuarioRep, BindingResult result,
 			Model model) {
 		Usuario us = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		usuarioRep.setEmpresa(us.getEmpresa());
+		usuarioRep.getUsuario().setEmpresa(us.getEmpresa());
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(us.getIdUsuario()));
-		if (usuarioRep.getContrasena().length() < 8 || usuarioRep.getContrasena().length() > 20)
+		if (usuarioRep.getUsuario().getContrasena().length() < 8 || usuarioRep.getUsuario().getContrasena().length() > 20)
 			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
-		else if (!esValidaContrasena(usuarioRep.getContrasena()))
+		else if (!esValidaContrasena(usuarioRep.getUsuario().getContrasena()))
 			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);
-		else if (!usuarioRep.getContrasena().equals(usuarioRep.getRepitaContrasena()))
+		else if (!usuarioRep.getUsuario().getContrasena().equals(usuarioRep.getUsuario().getRepitaContrasena()))
 			result.rejectValue(Constantes.REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
 
 		Usuario usuario = usuarioRepository.findById(id);
@@ -228,17 +250,26 @@ public class UserController {
 		usuario.setContrasena3(usuario.getContrasena2());
 		usuario.setContrasena2(usuario.getContrasena1());
 		usuario.setContrasena1(usuario.getContrasena());
-		usuario.setContrasena(usuarioRep.getContrasena());
+		usuario.setContrasena(usuarioRep.getUsuario().getContrasena());
 
-		usuarioRep.setNombreUsuario(usuario.getNombreUsuario());
+		usuarioRep.getUsuario().setNombreUsuario(usuario.getNombreUsuario());
 
-		usuarioRep.setIdUsuario(id);
+		usuarioRep.getUsuario().setIdUsuario(id);
 		model.addAttribute(Constantes.U_SUARIO, usuarioRep);
 
 		if (!esValidaUltimasContrasenas(usuario))
 			result.rejectValue(Constantes.CONTRASENA, "", "no puede ser igual a las últimas 5 utilizadas");
 
 		if (result.hasErrors()) {
+			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);			
+			List<Rol> rolesSelect = usuarioRep.getPerfiles();
+			
+			if(roles != null && rolesSelect != null)
+				roles.removeAll(rolesSelect);
+
+			model.addAttribute(Constantes.ROLES, roles);
+			model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
+			
 			return "updateUsuario";
 		}
 
@@ -246,25 +277,38 @@ public class UserController {
 		long time = date.getTime();
 		Timestamp ts = new Timestamp(time);
 
-		usuarioRep.setFechaActualizacionContrasena(ts);
+		usuarioRep.getUsuario().setFechaActualizacionContrasena(ts);
 
 		encoder2 = new BCryptPasswordEncoder();
-		usuarioRep.setContrasena(encoder2.encode(usuarioRep.getContrasena()));
+		usuarioRep.getUsuario().setContrasena(encoder2.encode(usuarioRep.getUsuario().getContrasena()));
 
-		usuario.setContrasena(usuarioRep.getContrasena());
-		usuario.setNombreCompleto(usuarioRep.getNombreCompleto());
-		usuario.setHabilitado(usuarioRep.getHabilitado() == null ? false : usuarioRep.getHabilitado());
-		usuario.setEmail(usuarioRep.getEmail());
-		usuario.setFechaActualizacionContrasena(usuarioRep.getFechaActualizacionContrasena());
+		usuario.setContrasena(usuarioRep.getUsuario().getContrasena());
+		usuario.setNombreCompleto(usuarioRep.getUsuario().getNombreCompleto());
+		usuario.setHabilitado(usuarioRep.getUsuario().getHabilitado() == null ? false : usuarioRep.getUsuario().getHabilitado());
+		usuario.setEmail(usuarioRep.getUsuario().getEmail());
+		usuario.setFechaActualizacionContrasena(usuarioRep.getUsuario().getFechaActualizacionContrasena());
 
 		usuarioRepository.save(usuario);
+		
+		//eliminamos los perfiles asociados previos
+		uRolRepo.deleteByUserId(usuario.getIdUsuario());
+		//agregamos los perfiles seleccionados
+		  UsuarioRol usuarioRol = new UsuarioRol();
+		  
+		  for (Rol rol : usuarioRep.getPerfiles()) {
+			  usuarioRol.setIdRol(rol.getIdRol());
+			  usuarioRol.setIdUsuario(usuario.getIdUsuario());
+			  
+			  uRolRepo.save(usuarioRol);
+			  usuarioRol = new UsuarioRol();			
+		}
 
 		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, "Editar", usuario.getNombreUsuario(),
 				usuario.getIdUsuario());
 		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_EDICION,
 				Util.getRemoteIp(request), us);
 
-		return "redirect:/main?success";
+		return "redirect:/usuarioHome?success";
 	}
 
 	@PostMapping("usuarioChange")

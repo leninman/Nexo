@@ -17,4 +17,9 @@ public interface IUsuarioRolRepo extends JpaRepository<UsuarioRol, Integer> {
 	@Modifying
 	@Query("delete from UsuarioRol where idRol=?1")
 	void deleteByRolId(int id);
+	
+	@Transactional
+	@Modifying
+	@Query("delete from UsuarioRol where idUsuario=?1")
+	void deleteByUserId(int id);
 }

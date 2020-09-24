@@ -49,12 +49,11 @@
 
 
 					<!-- Page Heading -->
-
 					<div th:if="${result}=='success'">
-     						<div class="alert alert-info">Operación Realizada Exitosamente</div>
+     						<div class="alert alert-info"  th:text="#{msj.operacion.exitosa}"></div>
     				</div>
     				<div th:if="${result}=='error'">
-     						<div class="alert alert-danger">No se logró realizar la Operación</div>
+     						<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
     				</div>
 					<div class="row">
 						<th:block th:replace="rol/rolList :: listadoRoles" />

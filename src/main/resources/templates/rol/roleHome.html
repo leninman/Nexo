@@ -60,7 +60,7 @@
 
 					<!-- Page Heading -->
 					<div class="container my-5">
-						<h5 align="center"><span th:text="${edit} ? 'Edición de Rol' : 'Creación de Rol'" ></span></h5>
+						<h5 align="center"><span th:text="${edit} ? #{etq.perfiles.editar} : #{etq.perfiles.crear}" ></span></h5>
 						<div class="card">
 							<div class="card-body" >
 								<form  th:action="${edit} ? 'editRole' : 'createRole'"  th:object="${rol}" method="post">
@@ -68,7 +68,7 @@
 										<tr>
 											<td colspan="10">
 											<div class="form-group col-md-8" style="text-align: left;">
-				                                <label for="nombreRol" class="col-form-label">Nombre</label> 
+				                                <label for="nombreRol" class="col-form-label" th:text="#{etq.nombre}"></label> 
 				                                <input type="text"  class="form-control" id="nombreRol" th:field="*{nombreRol}" th:disabled="${edit} ? 'true' : 'false'">
 				                                <input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
 				                                <span th:if="${#fields.hasErrors('nombreRol')}" th:errors="*{nombreRol}" class="text-danger"></span>
@@ -79,8 +79,8 @@
 											<td colspan="10"><br/></td>
 										</tr>
 										<tr>
-											<td colspan="5"><h5 align="center">Opciones del Menú</h5></td>
-											<td colspan="5"><h5 align="center">Usuarios</h5>	</td>
+											<td colspan="5"><h5 align="center" th:text="#{etq.menu.opciones}"></h5></td>
+											<td colspan="5"><h5 align="center" th:text="#{etq.usuarios}"></h5>	</td>
 										</tr>
 										<tr>
 											<td style="width: 1%"></td>									
@@ -121,7 +121,7 @@
 											</td>
 											<td style="width: 17%">
 												<div class="subject-info-box-2" id="DivlstBox4" th:style="${#fields.hasErrors('Usuarios')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
-												  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{Usuarios}" th:disabled="${result}=='success' ? 'true': 'false'">
+												  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{usuarios}" th:disabled="${result}=='success' ? 'true': 'false'">
 													<option th:each ="usuario : ${usuariosSelect}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
 												  </select>
 												</div>										
@@ -140,10 +140,8 @@
 											<td colspan="10">
 												<br/>
 									            <div class="form-group" style="text-align: center; flex: 0 0 100% !important;">
-					                            	<button class="btn btn-primary" value="Guardar" onclick="seleccionarTodos();" >Guardar</button>
-					                            	<!-- <input type="submit" class="btn btn-primary" value="Guardar"> -->
-	
-					                            	<a class="btn btn-secondary" href="./roleHome">Cancelar</a>
+					                            	<button class="btn btn-primary" value="Guardar" onclick="seleccionarTodos();" th:text="#{bot.guardar}"></button>	
+					                            	<a class="btn btn-secondary" href="./roleHome" th:text="#{bot.cancelar}"></a>
 					                            </div>										
 											</td>
 										</tr>

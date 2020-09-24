@@ -127,8 +127,8 @@ public final class Constantes {
 	
 	public static final String CHANGE_PASSWORD = "changePassword";
 	public static final String USER_NAME = "username";
-	public static final String CONTRASENA = "contrasena";
-	public static final String REPITA_CONTRASENA ="repitaContrasena";
+	public static final String CONTRASENA = "usuario.contrasena";
+	public static final String REPITA_CONTRASENA ="usuario.repitaContrasena";
 	public static final String NUEVA_CONTRASENA = "nuevaContrasena";
 	public static final String INTENTOS = "intentos";
 	public static final String NOMBRE_USUARIO = "nombreUsuario";

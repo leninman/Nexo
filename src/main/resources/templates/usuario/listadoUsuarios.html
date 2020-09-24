@@ -155,36 +155,36 @@
                 <div class="col-md-10">
                     <form action="#" th:action="@{/usuarioUpdate}" th:object="${usuario}" method="post">
                         <div class="row">
-                        	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
-                            <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario">
+                        	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.usuario.idUsuario}" />
+                            <input type="hidden" th:field="*{usuario.nombreUsuario}" class="form-control" id="nombreUsuario">
                        	
                         	<div class="form-group col-md-8">
                                 <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena}"></label> 
-                                <input type="password" th:field="*{contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> 
-                                <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-danger"></span>
+                                <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> 
+                                <span th:if="${#fields.hasErrors('usuario.contrasena')}" th:errors="*{usuario.contrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> 
-                                <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
+                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> 
+                                <span th:if="${#fields.hasErrors('usuario.repitaContrasena')}" th:errors="*{usuario.repitaContrasena}" class="text-danger"></span>
                             </div> 
                             <div class="form-group col-md-8">
-                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> 
-                                <span th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
+                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> 
+                                <span th:if="${#fields.hasErrors('usuario.nombreCompleto')}" th:errors="*{usuario.nombreCompleto}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="E-mail"> 
-                                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
+                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{usuario.email}" class="form-control" id="email" placeholder="E-mail"> 
+                                <span th:if="${#fields.hasErrors('usuario.email')}" th:errors="*{usuario.email}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
                                 <label for="habilitado" class="col-form-label" th:text="#{etq.habilitado}"></label>                                
                                 <input type="hidden" value="on" name="_habilitado"/>
-							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${usuario.habilitado}"/>							    
+							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="*{usuario.habilitado}" th:field="*{usuario.habilitado}"/>							    
                             </div>
                             <div  class="form-group col-md-8">
 								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />		
 							</div>
                             <div class="form-group col-md-8" Style="text-align: center;">
-                            	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}">
+                            	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}" onclick="seleccionarTodos();">
                             	<a class="btn btn-secondary" href="./usuarioHome" th:text="#{bot.cancelar}"></a>
                             </div>
 
@@ -219,8 +219,6 @@
                             <div class="form-group col-md-8">
                                 <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
                             </div>
-                            
-                            
                             <div class="form-group col-md-8" style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}">
                             	<a class="btn btn-secondary" href="./main" th:text="#{bot.cancelar}"></a>
@@ -245,31 +243,31 @@
                         <div class="row">
 
                             <div class="form-group col-md-8">
-                                <label for="nombreUsuario" class="col-form-label" th:text="#{etq.usuario}"></label> <input type="text" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario" placeholder="Nombre Usuario"> <span th:if="${#fields.hasErrors('nombreUsuario')}" th:errors="*{nombreUsuario}" class="text-danger"></span>
+                                <label for="nombreUsuario" class="col-form-label" th:text="#{etq.usuario}"></label> <input type="text" th:field="*{usuario.nombreUsuario}" class="form-control" id="nombreUsuario" placeholder="Nombre Usuario"> <span th:if="${#fields.hasErrors('usuario.nombreUsuario')}" th:errors="*{nombreUsuario}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena}"></label> <input type="password" th:field="*{contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-danger"></span>
+                                <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena}"></label> <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('usuario.contrasena')}" th:errors="*{usuario.contrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
+                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('usuario.repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> <span th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
+                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> <span th:if="${#fields.hasErrors('usuario.nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{email}" class="form-control" id="email" placeholder="E-mail"> <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></span>
+                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{usuario.email}" class="form-control" id="email" placeholder="E-mail"> <span th:if="${#fields.hasErrors('usuario.email')}" th:errors="*{email}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
                                 <label for="habilitado" class="col-form-label" th:text="#{etq.habilitado}"></label>                                
                                 <input type="hidden" value="on" name="_habilitado"/>
-							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${usuario.habilitado}"/>
+							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${habilitado}"/>
 
                             </div>
                             <div  class="form-group col-md-8">
-								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />		
+								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />
 							</div>
                             <div class="form-group col-md-8" style="text-align: center;">
-                            	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}">
+                            	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}" onclick="seleccionarTodos();">
                             	<a class="btn btn-secondary" href="./usuarioHome" th:text="#{bot.cancelar}"></a>
                             </div>
                         </div>                        
