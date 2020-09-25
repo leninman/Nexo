@@ -31,7 +31,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	private final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico", "/mainBECA",
 			"/changePassword", "/usuarioChange", "/403", "/404", "/error", "/access-denied", "/errorPage");
 
-	private final List<String> ROL_PATHS = Arrays.asList("/roleHome", "/createRoleHome", "/createRole", "/editRoleHome", "/editRole", "/deleteRole");
+	private final List<String> ROL_PATHS = Arrays.asList("/roleHome", "/createRoleHome", "/createRole", "/editRoleHome", "/editRole", "/deleteRole", "/gestionarRoles");
 	
 	private final List<String> CHANGE_PASSWORD_PATHS = Arrays.asList("/EnvioEfectivo", "/TraspasoEfectivo",
 			"/RetiroEfectivo", "/main", "/changeCompany", "/mapa", "/reporte", "/reporteNoAptos", "/trackingRemesas",

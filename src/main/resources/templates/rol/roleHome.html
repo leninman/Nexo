@@ -71,6 +71,7 @@
 				                                <label for="nombreRol" class="col-form-label" th:text="#{etq.nombre}"></label> 
 				                                <input type="text"  class="form-control" id="nombreRol" th:field="*{nombreRol}" th:disabled="${edit} ? 'true' : 'false'">
 				                                <input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
+				                                <input type="hidden" name="gestionarRoles" id="gestionarRoles" th:value="${gestionarRoles}" />
 				                                <span th:if="${#fields.hasErrors('nombreRol')}" th:errors="*{nombreRol}" class="text-danger"></span>
 				                            </div>
 											</td>

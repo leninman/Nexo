@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.beca.misdivisas.interfaces.IMenuRepo;
 import com.beca.misdivisas.model.Menu;
+import com.beca.misdivisas.util.Constantes;
 
 @Service
 public class MenuService {
@@ -44,8 +45,13 @@ public class MenuService {
 
 	}
 	
-	public List<Menu> loadMenuByUserIdAndLevel(int idUsuario, int level) {
-		List<com.beca.misdivisas.jpa.Menu> menuItem = menuRepo.findByIdUsuario(idUsuario, level);
+	public List<Menu> loadMenuByUserIdAndLevel(Integer idUsuario, int nivel) {
+		List<com.beca.misdivisas.jpa.Menu> menuItem = null;
+		
+		if(idUsuario==null)
+			menuItem = menuRepo.findByRolName(Constantes.ROL_ADMIN_BECA, nivel);
+		else
+			menuItem = menuRepo.findByIdUsuario(idUsuario, nivel);
 		
 		List<Menu> menuList = new ArrayList<Menu>();
 		Menu m = null;
@@ -187,6 +193,9 @@ public class MenuService {
 		 * 
 		 * } else {
 		 */
+		if(idUsuario==null)
+			menu = loadMenuByRolName(Constantes.ROL_ADMIN_BECA);
+		else
 			menu = loadMenuByUserId(idUsuario);
 		//}
 

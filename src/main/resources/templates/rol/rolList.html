@@ -32,6 +32,7 @@
 											<td>
 												<form method="POST" th:action="@{editRoleHome}" th:attr="id='form'+${rol.idRol}">
 													<input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
+													<input type="hidden" name="gestionarRoles" id="gestionarRoles" th:value="${gestionarRoles}" />
 										            <button th:if="${rol.rol}!='ADMIN'" type="submit" name="submit"  class="btn btn-secondary">
 										            	<i class="far fa-edit" ></i>
 										            </button>										           										            
@@ -77,6 +78,7 @@
 											<td>
 												<form  method="POST" th:action="@{editRoleHome}" th:attr="id='form'+${rol.idRol}">
 													<input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
+													<input type="hidden" name="gestionarRoles" id="gestionarRoles" th:value="${gestionarRoles}" />
 										            <button type="submit" name="submit"  title="Editar" class="btn btn-secondary">
 										            	<i class="far fa-edit ml-2" ></i>
 										            </button>										           										            

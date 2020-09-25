@@ -92,14 +92,15 @@ public class HomeController {
 	public String main_href(Login login, Model model) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		
-		if (usuario != null) {
+		if(usuario==null) {
+			model.addAttribute(Constantes.MENUES, menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA));
+		login.setEmpresas(empresaRepository.findAllOrderByName());
+		model.addAttribute(Constantes.LOGIN, login);
+		return "loginBECA";
+		}else {
+			model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 			return Constantes.MAIN;
-		} else {
-			login.setEmpresas(empresaRepository.findAllOrderByName());
-			model.addAttribute(Constantes.LOGIN, login);
-			return "loginBECA";
 		}
 	}
 

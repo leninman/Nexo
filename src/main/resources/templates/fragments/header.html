@@ -20,16 +20,20 @@
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+            	<div sec:authorize="hasAnyRole('ADMIN_BECA')">
+					<a class="dropdown-item" href="./gestionarRoles" id="profiles">
+	                  <i class="fas fa-user-tag fa-sm fa-fw mr-2 text-gray-400"></i>
+	                  <span th:text="#{msj.cambiar.perfiles}"></span>
+	                </a>
+	               	<a class="dropdown-item" href="./changeCompany" id="changeUser">
+	                  <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+	                  <span th:text="#{msj.cambiar.cliente}"></span>
+	                </a>
+                </div>
                	<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
 	               	<a class="dropdown-item" href="./changePassword" id="changePassword">
 	                  <i class="fas fas fa-user-lock fa-sm fa-fw mr-2 text-gray-400"></i>
 	                  <span th:text="#{msj.cambiar.contrasena}"> </span>                
-	                </a>
-                </div>
-                <div sec:authorize="hasAnyRole('ADMIN_BECA')">
-	               	<a class="dropdown-item" href="./changeCompany" id="changeUser">
-	                  <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-	                  <span th:text="#{msj.cambiar.cliente}"></span>
 	                </a>
                 </div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">

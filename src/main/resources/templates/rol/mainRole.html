@@ -55,6 +55,12 @@
     				<div th:if="${result}=='error'">
      						<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
     				</div>
+    				<div th:if="${param.success}">
+     						<div class="alert alert-info" th:text="#{msj.operacion.exitosa}" ></div>
+    				</div>
+    				<div th:if="${param.error}">
+     						<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
+    				</div>
 					<div class="row">
 						<th:block th:replace="rol/rolList :: listadoRoles" />
 

@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.beca.misdivisas.interfaces.IMenuRolRepo;
 import com.beca.misdivisas.interfaces.IRolRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRepo;
 import com.beca.misdivisas.interfaces.IUsuarioRolRepo;
@@ -203,7 +202,7 @@ public class UserController {
 	}
 
 	@PostMapping("usuarioEditar")
-	public String showUpdateForm(@RequestParam("usuarioId") int id, Model model) {
+	public String usuarioEditarForm(@RequestParam("usuarioId") int id, Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		int idEmpresa = usuario.getIdEmpresa();
 		Usuario usuarioRep = usuarioRepository.findById(id);
