@@ -1,3 +1,99 @@
+<th:block th:fragment=perfilesCrearEditar>
+	<div class="container my-5">
+		<h5 align="center"><span th:text="${edit} ? #{etq.perfiles.editar} : #{etq.perfiles.crear}" ></span></h5>
+		<div class="card">
+			<div class="card-body" >
+				<form  th:action="${edit} ? 'editRole' : 'createRole'"  th:object="${rol}" method="post">
+					<table>
+						<tr>
+							<td colspan="10">
+							<div class="form-group col-md-8" style="text-align: left;">
+                                <label for="nombreRol" class="col-form-label" th:text="#{etq.nombre}"></label> 
+                                <input type="text"  class="form-control" id="nombreRol" th:field="*{nombreRol}" th:disabled="${edit} ? 'true' : 'false'">
+                                <input type="hidden" name="rolId" id="rolId" th:value="${rol.idRol}" />
+                                <input type="hidden" name="gestionarRoles" id="gestionarRoles" th:value="${gestionarRoles}" />
+                                <span th:if="${#fields.hasErrors('nombreRol')}" th:errors="*{nombreRol}" class="text-danger"></span>
+                            </div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="10"><br/></td>
+						</tr>
+						<tr>
+							<td colspan="5"><h5 align="center" th:text="#{etq.menu.opciones}"></h5></td>
+							<td colspan="5"><h5 align="center" th:text="#{etq.usuarios}"></h5>	</td>
+						</tr>
+						<tr>
+							<td style="width: 1%"></td>									
+							<td style="width: 25%">
+								<div class="subject-info-box-1" style="width: 100%">
+								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
+								    <option th:each="opcion : ${opciones}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
+								  </select>
+								</div>
+							</td>
+							<td>
+								<div class="subject-info-arrows text-center" style="width: 100%">
+									<a href="#" id='btnRight'><i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');"></i></a><br />
+								 	<a href="#" id='btnLeft'><i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"></i></a><br />													  
+								</div>										
+							</td>
+							<td style="width: 25%">
+								<div class="subject-info-box-2" id="DivlstBox2" th:style="${#fields.hasErrors('opciones')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" th:disabled="${result}=='success' ? 'true': 'false'">
+								  	<option value="1" hidden="true"></option>
+								  	<option th:each="opcion : ${opcionesSelect}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
+								  </select>
+								</div>										
+							</td>
+							<td colspan="2" style="width: 5%"></td>
+							<td style="width: 17%">
+								<div class="subject-info-box-1" style="width: 100%">
+								  <select multiple="multiple" id='lstBox3' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
+								    <option th:each ="usuario : ${Usuarios}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
+								  </select>
+								</div>										
+							</td>
+							<td >
+								<div class="subject-info-arrows text-center" style="width: 100%">												  
+								  	<i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox3', 'lstBox4');" onmouseover="cursor:pointer"></i><br />
+								 	<i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox4', 'lstBox3');"></i><br />													  
+								</div>										
+							</td>
+							<td style="width: 17%">
+								<div class="subject-info-box-2" id="DivlstBox4" th:style="${#fields.hasErrors('Usuarios')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+								  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{usuarios}" th:disabled="${result}=='success' ? 'true': 'false'">
+									<option th:each ="usuario : ${usuariosSelect}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
+								  </select>
+								</div>										
+							</td>
+							<td style="width: 1%"></td>
+						</tr>
+						<tr>
+						<td colspan="5" align="center">
+						<span th:if="${#fields.hasErrors('opciones')}" th:errors="*{opciones}" class="text-danger"></span>
+						</td>
+						<td colspan="5" align="center">
+						<span th:if="${#fields.hasErrors('Usuarios')}" th:errors="*{Usuarios}" class="text-danger"></span>
+						</td>											
+						</tr>
+						<tr>
+							<td colspan="10">
+								<br/>
+					            <div class="form-group" style="text-align: center; flex: 0 0 100% !important;">
+	                            	<button class="btn btn-primary" value="Guardar" onclick="seleccionarTodos();" th:text="#{bot.guardar}"></button>	
+	                            	<a class="btn btn-secondary" href="./roleHome" th:text="#{bot.cancelar}"></a>
+	                            </div>										
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</th:block>
+
+
 <th:block th:fragment=listadoRoles>
 
 	<div class="container my-5">
@@ -116,27 +212,17 @@
 													</div>
 											    </div>
 											</div>
-										    </td>
-											<script>document.getElementById("botonAgregar").value = "D";</script>											
+										    </td>										
 										</div>
 									</tr>
 								</tbody>
 							</table>
-							<script>
-							var nombre = document.getElementById("botonAgregar").value;
-								
-							if(nombre == "D")
-									document.getElementById("boton_agregar").className += " disabled"; 
-							</script>
 						</div>
-
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
 </th:block>
 
 
