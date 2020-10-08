@@ -58,6 +58,11 @@ public class HomeController {
 	public String main() {
 		return Constantes.MAIN;
 	}
+	
+	@GetMapping("/cert")
+	public String cert(HttpServletRequest request) {
+		return "cert";
+	}
 
 	@PostMapping(value = "/mainBECA")
 	public String mainBECA(Login login, Model model) {

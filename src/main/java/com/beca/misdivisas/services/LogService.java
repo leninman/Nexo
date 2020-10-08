@@ -52,9 +52,12 @@ public class LogService {
 		audit.setIpOrigen(ip);
 		audit.setAccion(accion);
 		audit.setDetalle(detalle);
-		audit.setIdEmpresa(us.getIdEmpresa());
-		audit.setIdUsuario(us.getIdUsuario());
-		audit.setNombreUsuario(us.getNombreUsuario());
+		if(us!=null) {
+			audit.setIdEmpresa(us.getIdEmpresa());
+			audit.setIdUsuario(us.getIdUsuario());
+			audit.setNombreUsuario(us.getNombreUsuario());
+		}
+
 		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);

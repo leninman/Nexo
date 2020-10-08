@@ -1,5 +1,6 @@
 package com.beca.misdivisas.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +10,13 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -91,7 +94,7 @@ public class MapController {
 				locacion.setLatitud(Double.parseDouble(sucursales.get(i).getLatitud()));
 				locacion.setLongitud(Double.parseDouble(sucursales.get(i).getLongitud()));
 				locacion.setAccion(sucursales.get(i).getIdSucursal().toString());
-				locacion.setLogo("images");
+				locacion.setLogo(Constantes.IMAGES);
 				locacion.setPosicion(i);
 				locaciones.add(locacion);
 			}
@@ -131,6 +134,16 @@ public class MapController {
 	@GetMapping(value = "/images")
 	public ResponseEntity<byte[]> fromClasspathAsResEntity() {
 		int id = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO)).getIdEmpresa();
-		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(empresaRepo.getLogoByIdEmpresa(id));
+		byte[] logo = empresaRepo.getLogoByIdEmpresa(id);
+		if (logo == null || logo.length <= 0) {
+			Resource imageFile = resourceLoader.getResource("classpath:static/img/sucursal.png");
+			try {
+				logo = StreamUtils.copyToByteArray(imageFile.getInputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(logo);
 	}
 }

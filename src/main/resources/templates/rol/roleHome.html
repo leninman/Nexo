@@ -58,8 +58,16 @@
 				<!-- Begin Page Content -->
 				<div class="container-fluid">
 
-					<!-- Page Heading -->
-					<th:block th:replace="rol/rolList :: perfilesCrearEditar" />
+					<!-- Page Heading -->				
+					
+					<!-- IF USER IS Interno -->
+				<div th:if="${usuario.tipoUsuario} == 'Interno' and ${gestionarRoles} ">
+				   <th:block th:replace="rol/rolList :: perfilesCrearEditarInterno" />
+				</div>
+				<!-- ELSE -->
+				<div th:unless="${usuario.tipoUsuario} == 'Interno' and ${gestionarRoles} ">
+				   <th:block th:replace="rol/rolList :: perfilesCrearEditar" />
+				</div>
 				<!-- /.container-fluid -->
 				</div>
 			<!-- End of Main Content -->

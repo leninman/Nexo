@@ -34,6 +34,7 @@ public final class Constantes {
 	
 	public static final String USD_STRING = "USD";
 	public static final String EUR_STRING = "EUR";
+	public static final String IMAGES="images";
 	
 	public static final String MAIN = "main";
 	public static final String STRING_BNA = "Billetes No Aptos";

@@ -61,7 +61,8 @@ public class RolController {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));		
+		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
+		model.addAttribute("gestionarRoles", false);
 		return "rol/mainRole";
 	}
 	
@@ -77,8 +78,8 @@ public class RolController {
 		return "rol/mainRole";
 	}
 	
-	@GetMapping("/createRoleHome")
-	public String createRoleHome(Model model) {
+	@PostMapping("/createRoleHome")
+	public String createRoleHome(Model model,  @RequestParam("gestionarRoles") Boolean gestionarRoles) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 
@@ -89,7 +90,8 @@ public class RolController {
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		model.addAttribute("edit",false);
-
+		model.addAttribute("gestionarRoles", gestionarRoles);
+		
 		Rol rol = new Rol();
 		model.addAttribute("rol", rol);
 
@@ -99,10 +101,11 @@ public class RolController {
 	@PostMapping("/createRole")
 	public String createRol(@Valid Rol rol, BindingResult result, Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Boolean esUsuarioInterno = usuario.getTipoUsuario().equalsIgnoreCase(Constantes.USUARIO_INTERNO);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ROL_ADMIN);
 		
+		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ROL_ADMIN);
 		List<Menu> menues =  menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2);
 		
 		
@@ -122,29 +125,38 @@ public class RolController {
 			model.addAttribute("opciones", menues);
 			model.addAttribute("opcionesSelect", menuList);
 			
-			usuarios.removeAll(rol.getUsuarios());
-			model.addAttribute(Constantes.USUARIOS, usuarios);
-			model.addAttribute("usuariosSelect", rol.getUsuarios());
+			if(!esUsuarioInterno) {				
+				usuarios.removeAll(rol.getUsuarios());
+				model.addAttribute(Constantes.USUARIOS, usuarios);
+				model.addAttribute("usuariosSelect", rol.getUsuarios());
+			}
+
 			return "rol/roleHome";
 		}
 		
 		List<Menu> menuList = new ArrayList<Menu>();
 		
-		com.beca.misdivisas.jpa.Rol newRol = new com.beca.misdivisas.jpa.Rol();
-		newRol.setIdEmpresa(usuario.getIdEmpresa());
+		com.beca.misdivisas.jpa.Rol newRol = new com.beca.misdivisas.jpa.Rol();		
 		newRol.setRol(rol.getNombreRol());
 		newRol.setEstado(Constantes.ACTIVO);
+		if (esUsuarioInterno)
+		newRol.setIdEmpresa(null);
+		else
+		newRol.setIdEmpresa(usuario.getIdEmpresa());
 		rolRepo.save(newRol);
 		
-		List<Usuario> us = rol.getUsuarios();
-		  UsuarioRol usuarioRol = new UsuarioRol();
-		  
-		  for (Usuario usuario2 : us) {
-			  usuarioRol.setIdRol(newRol.getIdRol());
-			  usuarioRol.setIdUsuario(usuario2.getIdUsuario());
+		if(!esUsuarioInterno) {
+			
+			List<Usuario> us = rol.getUsuarios();
+			  UsuarioRol usuarioRol = new UsuarioRol();
 			  
-			  uRolRepo.save(usuarioRol);
-			  usuarioRol = new UsuarioRol();			
+			  for (Usuario usuario2 : us) {
+				  usuarioRol.setIdRol(newRol.getIdRol());
+				  usuarioRol.setIdUsuario(usuario2.getIdUsuario());
+				  
+				  uRolRepo.save(usuarioRol);
+				  usuarioRol = new UsuarioRol();			
+			}
 		}
 
 		String[] mr = rol.getOpciones();
@@ -167,20 +179,16 @@ public class RolController {
 			menuList.add(menuService.getMenu(menu));
 			menuRol = new MenuRol();			
 		}
-		
-
-		menues.removeAll(menuList);
-		model.addAttribute("opciones", menues);
-		model.addAttribute("opcionesSelect", menuList);
-		
-		
-		usuarios.removeAll(rol.getUsuarios());
-		model.addAttribute("usuarios", usuarios);
-		model.addAttribute("usuariosSelect", rol.getUsuarios());
+		if(esUsuarioInterno) {			
+			model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaNullAndEstado(Constantes.ACTIVO));
+			model.addAttribute("gestionarRoles", true);
+		}else {
+			model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
+		}
 		
 		model.addAttribute("result", "success");
 		
-		return "rol/roleHome";
+		return "rol/mainRole";
 	}
 	
 	@PostMapping("/editRoleHome")
@@ -298,14 +306,15 @@ public class RolController {
 	@PostMapping("/deleteRole")
 	public String deleteRole(@RequestParam("rolId") int rolId, Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Boolean esUsuarioInterno = usuario.getTipoUsuario().equalsIgnoreCase(Constantes.USUARIO_INTERNO);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		rolRepo.deleteByRolId(rolId, Constantes.INACTIVO);
 
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		
-		model.addAttribute("result", "success");
-		
+		if(esUsuarioInterno)
+			return "redirect:/gestionarRoles?success";
 		return "rol/mainRole";
 
 	}
