@@ -90,7 +90,7 @@ public class ReportController {
 
 	@GetMapping("/reporteG")
 	public String reporte() {
-		return "reporteGrafico";
+		return Constantes.REPORTE_GRAFICO;
 	}
 
 	@GetMapping(value = "reporte")

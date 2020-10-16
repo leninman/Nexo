@@ -70,7 +70,7 @@ public class UserController {
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		int idEmpresa = usuario.getIdEmpresa();
-		List<Usuario> usuarios = usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A");
+		List<Usuario> usuarios = usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, Constantes.ACTIVO);
 		if (usuarios.isEmpty())
 			usuarios = null;
 		model.addAttribute(Constantes.USUARIOS, usuarios);
@@ -80,19 +80,12 @@ public class UserController {
 		return "mainUsuarios";
 	}
 
-	@GetMapping("/changePassword")
-	public String changePassword(Model model) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.U_SUARIO, usuario);
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-		return Constantes.CHANGE_PASSWORD;
-	}
 
 	@GetMapping("usuarioListar")
 	public String showUpdateForm(Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		int idEmpresa = usuario.getIdEmpresa();
-		model.addAttribute(Constantes.USUARIOS, usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, "A"));
+		model.addAttribute(Constantes.USUARIOS, usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, Constantes.ACTIVO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		return "mainUsuarios";
@@ -103,7 +96,7 @@ public class UserController {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-		List<Usuario> usuarios = usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(usuario.getIdEmpresa(), "A");
+		List<Usuario> usuarios = usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(usuario.getIdEmpresa(), Constantes.ACTIVO);
 		if (usuarios.isEmpty())
 			usuarios = null;
 		model.addAttribute(Constantes.USUARIOS, usuarios);
@@ -139,18 +132,18 @@ public class UserController {
 	@PostMapping("usuarioAgregar")
 	public String addUsuario(@Valid com.beca.misdivisas.model.Usuario usuario, BindingResult result, Model model) {
 		Usuario us = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		if (usuarioRepository.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), "A") != null)
+		if (usuarioRepository.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), Constantes.ACTIVO) != null)
 			result.rejectValue(Constantes.NOMBRE_USUARIO, "", "ya esta siendo utilizado");
 		else if (!sonValidosCaracteres(usuario.getUsuario().getNombreUsuario()))
 			result.rejectValue(Constantes.NOMBRE_USUARIO, "", "caracteres especiales validos @ . _ -");
 
 		if (usuario.getUsuario().getContrasena().length() < 8 || usuario.getUsuario().getContrasena().length() > 20)
-			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
+			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
 		else if (!esValidaContrasena(usuario.getUsuario().getContrasena()))
-			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);
+			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);
 
 		else if (!usuario.getUsuario().getContrasena().equals(usuario.getUsuario().getRepitaContrasena()))
-			result.rejectValue(Constantes.REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
+			result.rejectValue(Constantes.USUARIO_REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
 		usuario.getUsuario().setEmpresa(us.getEmpresa());
 		
 		model.addAttribute(Constantes.U_SUARIO, usuario);
@@ -189,7 +182,7 @@ public class UserController {
 			usuarioRol.setIdRol(rolRepository.findByRol(Constantes.ROL_CONSULTOR).getIdRol());
 
 		usuarioRol.setIdUsuario(usuarioRepository
-				.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), "A").getIdUsuario());
+				.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), Constantes.ACTIVO).getIdUsuario());
 		usuarioRolRepository.save(usuarioRol);
 
 		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_CREAR, usuario.getUsuario().getNombreUsuario(),
@@ -216,7 +209,7 @@ public class UserController {
 
 		else {
 			usuarioRep.setContrasena(null);			
-			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);			
+			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute(Constantes.USUARIO)).getIdEmpresa(), Constantes.ACTIVO);			
 			
 			List<Rol> rolesSelect = rolRepo.findByIdUsuarioAndEstado(id, Constantes.ACTIVO);
 			
@@ -230,17 +223,16 @@ public class UserController {
 	}
 
 	@PostMapping("usuarioUpdate")
-	public String updateUsuario(@RequestParam("usuarioId") int id, @Valid com.beca.misdivisas.model.Usuario usuarioRep, BindingResult result,
-			Model model) {
+	public String updateUsuario(@RequestParam("usuarioId") int id, @Valid com.beca.misdivisas.model.Usuario usuarioRep, BindingResult result, Model model) {
 		Usuario us = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		usuarioRep.getUsuario().setEmpresa(us.getEmpresa());
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(us.getIdUsuario()));
 		if (usuarioRep.getUsuario().getContrasena().length() < 8 || usuarioRep.getUsuario().getContrasena().length() > 20)
-			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
+			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
 		else if (!esValidaContrasena(usuarioRep.getUsuario().getContrasena()))
-			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);
+			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_2);
 		else if (!usuarioRep.getUsuario().getContrasena().equals(usuarioRep.getUsuario().getRepitaContrasena()))
-			result.rejectValue(Constantes.REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
+			result.rejectValue(Constantes.USUARIO_REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
 
 		Usuario usuario = usuarioRepository.findById(id);
 
@@ -257,10 +249,10 @@ public class UserController {
 		model.addAttribute(Constantes.U_SUARIO, usuarioRep);
 
 		if (!esValidaUltimasContrasenas(usuario))
-			result.rejectValue(Constantes.CONTRASENA, "", "no puede ser igual a las últimas 5 utilizadas");
+			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", "no puede ser igual a las últimas 5 utilizadas");
 
 		if (result.hasErrors()) {
-			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute("Usuario")).getIdEmpresa(), Constantes.ACTIVO);			
+			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute(Constantes.USUARIO)).getIdEmpresa(), Constantes.ACTIVO);			
 			List<Rol> rolesSelect = usuarioRep.getPerfiles();
 			
 			if(roles != null && rolesSelect != null)
@@ -302,7 +294,7 @@ public class UserController {
 			  usuarioRol = new UsuarioRol();			
 		}
 
-		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, "Editar", usuario.getNombreUsuario(),
+		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_EDICION, usuario.getNombreUsuario(),
 				usuario.getIdUsuario());
 		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_EDICION,
 				Util.getRemoteIp(request), us);
@@ -310,6 +302,15 @@ public class UserController {
 		return "redirect:/usuarioHome?success";
 	}
 
+	
+	@GetMapping("/changePassword")
+	public String changePassword(Model model) {
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		model.addAttribute(Constantes.U_SUARIO, usuario);
+		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		return Constantes.CHANGE_PASSWORD;
+	}
+	
 	@PostMapping("usuarioChange")
 	public String cambioContrasenaUsuario(@RequestParam("usuarioId") int id, @Valid Usuario usuarioRep,
 			BindingResult result, Model model) {
@@ -387,7 +388,7 @@ public class UserController {
 
 			usuario.setEstado("I");
 			usuarioRepository.save(usuario);
-			String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, "Eliminar", usuario.getNombreUsuario(),
+			String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_EDICION, usuario.getNombreUsuario(),
 					usuario.getIdUsuario());
 
 			HttpSession session = factory.getObject();

@@ -26,7 +26,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	private final List<String> MAPA_PATHS = Arrays.asList("/mapa", "/sucursales");
 	private final List<String> USER_PATHS = Arrays.asList("/usuarioHome", "/changePassword", "/usuarioMainAgregar",
 			"/usuarioListar", "/resultadoCambio", "/usuarioEditar", "/usuarioAgregar", "/usuarioUpdate",
-			"/usuarioEliminar");
+			"/usuarioEliminar" , "/cert");
 	private final List<String> FORM_PATHS = Arrays.asList("/EnvioEfectivo", "/TraspasoEfectivo", "/RetiroEfectivo");
 	private final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico", "/mainBECA",
 			"/changePassword", "/usuarioChange", "/403", "/404", "/error", "/access-denied", "/errorPage");
@@ -66,6 +66,10 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			if (servletPath.equalsIgnoreCase("/main")||servletPath.equalsIgnoreCase("/mainBECA")) {
 				return true;
 			}
+			if (OTROS_PATHS.contains(servletPath)) {
+				return true;
+			}
+
 			response.sendRedirect(request.getContextPath() + "/login");
 			return false;
 		} else {

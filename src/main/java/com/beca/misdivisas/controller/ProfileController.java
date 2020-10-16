@@ -30,7 +30,7 @@ import com.beca.misdivisas.services.RolService;
 import com.beca.misdivisas.util.Constantes;
 
 @Controller
-public class RolController {
+public class ProfileController {
 	@Autowired
 	private ObjectFactory<HttpSession> factory;
 
