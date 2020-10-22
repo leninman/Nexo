@@ -61,12 +61,17 @@ public final class Constantes {
 	public static final String CONSULTA_DETALLE_POR_SUCURSAL = "Consulta: fecha inicio({0}); fecha fin({1});sucursal({2}); moneda({3})";
 	public static final String TEXTO_CAMBIO_EMPRESA = "Cambio a Empresa: {0}";
 	
-	public static final String OPERACION_CONSULTA = "Consulta";
-	public static final String OPERACION_EDICION = "Edicion";
-	public static final String OPERACION_CREAR = "Creacion";
-	public static final String OPERACION_BORRAR = "Borrado";
-	public static final String OPERACION_DESCARGA = "Descarga";
+	public static final String OP_CONSULTA = "Consulta";
+	public static final String OP_EDICION = "Edicion";
+	public static final String OP_CREAR = "Creacion";
+	public static final String OP_BORRAR = "Borrado";
+	public static final String OP_DESCARGA = "Descarga";
+	public static final String OP_SOLICITUD = "Solicitud";
+	public static final String OP_ENV_EFECTIVO = "EnvioEfectivo";
+	public static final String OP_TRAS_EFECTIVO = "TraspasoEfectivo";
+	public static final String OP_RET_EFECTIVO = "RetiroEfectivo";
 	public static final String CAMBIO_CLAVE = "Cambio de clave";
+	
 
 	public static final String OPCION_POSICION = "Posicion Consolidada";
 	public static final String OPCION_BNA = "Billetes No Aptos";
@@ -75,8 +80,11 @@ public final class Constantes {
 	public static final String OPCION_MAPA = "Vista del Mapa";
 	public static final String OPCION_GRAFICO = "Vista del Grafico";
 	public static final String OPCION_LOGIN = "Acceso al sistema";
+	public static final String OPCION_STR_EFECTIVO = "Solicitud {0} de Efectivo";
+	public static final String OPCION_SELECT ="opcionesSelect";
 	
-
+	public static final String DOMINIO = "BCEXT001";
+	public static final String ROL = "rol";
 	public static final String ROLES = "roles";
 	public static final String ROLES_SELECT = "rolesSelect";
 
@@ -87,6 +95,7 @@ public final class Constantes {
 	public static final String INACTIVO = "I";
 	public static final String ACTIVO = "A";
 	public static final String EDIT = "edit";
+	public static final String SUCCESS = "success";
 	
 	public static final String INDEX = "index";
 	public static final String GRAFICO ="grafico";
@@ -110,6 +119,14 @@ public final class Constantes {
 	public static final String REPORTE_GRAFICO = "reportes/reporteGrafico";
 	public static final String REPORTE_REMESAS_PENDIENTES = "reportes/remesasPendientes";
 	public static final String REPORTE_SUCURSAL = "reporteSucursal";
+	public static final String ROL_MAIN = "rol/mainRole";
+	public static final String ROL_HOME = "rol/roleHome";
+	public static final String USUARIO_MAIN = "mainUsuarios";
+	public static final String USUARIO_ADD = "usuario/addUsuario";
+	public static final String USUARIO_SELECT = "usuariosSelect";
+	public static final String VER_RESULTADO = "verResultado";
+	public static final String PERFILES_GESTIONAR = "redirect:/gestionarRoles?success";
+	public static final String ERROR = "error/error";
 	
 	
 	//public static final String 
@@ -125,13 +142,14 @@ public final class Constantes {
 	public static final String MENSAJE_VAL_CONTRASENA_3 = "debe coincidir";
 	
 	public static final String USUARIO_INTERNO = "Interno";
+	public static final String USUARIO_EXTERNO = "Externo";
 	
 	public static final String CHANGE_PASSWORD = "usuario/changePassword";
 	public static final String USER_NAME = "username";
 	public static final String CONTRASENA = "contrasena";
 	public static final String REPITA_CONTRASENA ="repitaContrasena";
 	public static final String USUARIO_CONTRASENA = "usuario.contrasena";
-	public static final String USUARIO_REPITA_CONTRASENA ="usurio.repitaContrasena";
+	public static final String USUARIO_REPITA_CONTRASENA ="usuario.repitaContrasena";
 	
 	public static final String NUEVA_CONTRASENA = "nuevaContrasena";
 	public static final String INTENTOS = "intentos";
@@ -141,7 +159,9 @@ public final class Constantes {
 	public static final String ID_EMPRESA ="idEmpresa";
 	public static final String ID_SUCURSAL = "idSucursal";
 	public static final String U_SUARIO = "usuario";
+	public static final String U_SUARIOS = "usuarios";
 	public static final String CAMBIO_C = "cambioC";
+	public static final String OPCIONES = "opciones";
 
 	
 	//public static final String 

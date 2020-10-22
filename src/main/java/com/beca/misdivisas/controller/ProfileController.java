@@ -58,32 +58,32 @@ public class ProfileController {
 	@GetMapping("/roleHome")
 	public String roleHome(Model model) {	
 
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		model.addAttribute("gestionarRoles", false);
-		return "rol/mainRole";
+		return Constantes.ROL_MAIN;
 	}
 	
 	@GetMapping("/gestionarRoles")
 	public String gestionarRoles(Model model) {	
 
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario())); 
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaNullAndEstado(Constantes.ACTIVO));
 		model.addAttribute("gestionarRoles", true);
 		
-		return "rol/mainRole";
+		return Constantes.ROL_MAIN;
 	}
 	
 	@PostMapping("/createRoleHome")
 	public String createRoleHome(Model model,  @RequestParam("gestionarRoles") Boolean gestionarRoles) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 
-		model.addAttribute("opciones", menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2));
+		model.addAttribute(Constantes.OPCIONES, menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2));
 
 		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(), Constantes.ACTIVO, Constantes.ROL_ADMIN);
 		model.addAttribute(Constantes.USUARIOS, usuarios);
@@ -93,14 +93,14 @@ public class ProfileController {
 		model.addAttribute("gestionarRoles", gestionarRoles);
 		
 		Rol rol = new Rol();
-		model.addAttribute("rol", rol);
+		model.addAttribute(Constantes.ROL, rol);
 
-		return "rol/roleHome";
+		return Constantes.ROL_HOME;
 	}
 
 	@PostMapping("/createRole")
 	public String createRol(@Valid Rol rol, BindingResult result, Model model) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		Boolean esUsuarioInterno = usuario.getTipoUsuario().equalsIgnoreCase(Constantes.USUARIO_INTERNO);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
@@ -114,7 +114,7 @@ public class ProfileController {
 		
 		
 		if(rol.getOpciones() == null || rol.getOpciones().length <=  1) {
-			result.rejectValue("opciones", "", "Debes seleccionar al menos una opción del Menú");
+			result.rejectValue(Constantes.OPCIONES, "", "Debes seleccionar al menos una opción del Menú");
 			
 		}
 		
@@ -122,16 +122,16 @@ public class ProfileController {
 			List<Menu> menuList = getMenuList(rol.getOpciones());
 			menues.removeAll(menuList);
 			
-			model.addAttribute("opciones", menues);
-			model.addAttribute("opcionesSelect", menuList);
+			model.addAttribute(Constantes.OPCIONES, menues);
+			model.addAttribute(Constantes.OPCION_SELECT, menuList);
 			
 			if(!esUsuarioInterno) {				
 				usuarios.removeAll(rol.getUsuarios());
 				model.addAttribute(Constantes.USUARIOS, usuarios);
-				model.addAttribute("usuariosSelect", rol.getUsuarios());
+				model.addAttribute(Constantes.USUARIO_SELECT, rol.getUsuarios());
 			}
 
-			return "rol/roleHome";
+			return Constantes.ROL_HOME;
 		}
 		
 		List<Menu> menuList = new ArrayList<Menu>();
@@ -186,14 +186,14 @@ public class ProfileController {
 			model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		}
 		
-		model.addAttribute("result", "success");
+		model.addAttribute(Constantes.SUCCESS, true);
 		
-		return "rol/mainRole";
+		return Constantes.ROL_MAIN;
 	}
 	
 	@PostMapping("/editRoleHome")
 	public String editRol(@RequestParam("rolId") int rolId, @RequestParam("gestionarRoles") Boolean gestionarRoles, Model model) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);		
 		
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
@@ -205,7 +205,7 @@ public class ProfileController {
 		model.addAttribute(Constantes.EDIT,true);
 		
 		Rol rol = rolService.getRolById(rolId);
-		model.addAttribute("rol", rol);		
+		model.addAttribute(Constantes.ROL, rol);		
 		
 		List<Menu> menuList = menuService.loadMenuByroleIdAndLevel(rolId, 2);
 		List<Usuario> usuariosSelect = userRepo.findAllByEmpresaAndEstadoInRol(usuario.getIdEmpresa(), Constantes.ACTIVO, rolId);
@@ -213,24 +213,24 @@ public class ProfileController {
 		if(menuList != null)
 		menues.removeAll(menuList);
 		
-		model.addAttribute("opciones", menues);
-		model.addAttribute("opcionesSelect", menuList);
+		model.addAttribute(Constantes.OPCIONES, menues);
+		model.addAttribute(Constantes.OPCION_SELECT, menuList);
 		
 		if(usuariosSelect !=null)
 		usuarios.removeAll(usuariosSelect);
 		
 		model.addAttribute(Constantes.USUARIOS, usuarios);
-		model.addAttribute("usuariosSelect", usuariosSelect);
+		model.addAttribute(Constantes.USUARIO_SELECT, usuariosSelect);
 		
 		model.addAttribute("gestionarRoles", gestionarRoles);
 		
-		return "rol/roleHome";
+		return Constantes.ROL_HOME;
 	}
 	
 	
 	@PostMapping("/editRole")
 	public String editRol(@RequestParam("rolId") int rolId, @RequestParam("gestionarRoles") Boolean gestionarRoles, @Valid Rol rol, BindingResult result, Model model) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		model.addAttribute("usuario", usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		List<Usuario> usuarios = userRepo.findAllByEmpresaAndEstadoAndNotInRol(usuario.getIdEmpresa(),Constantes.ACTIVO, Constantes.ROL_ADMIN);
@@ -238,7 +238,7 @@ public class ProfileController {
 		List<Menu> menues =  menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2);
 		
 		if(rol.getOpciones() == null || rol.getOpciones().length <=  1) {
-			result.rejectValue("opciones", "", "Debes seleccionar al menos una opción del Menú");
+			result.rejectValue(Constantes.OPCIONES, "", "Debes seleccionar al menos una opción del Menú");
 			
 		}
 		
@@ -246,13 +246,13 @@ public class ProfileController {
 			List<Menu> menuList = getMenuList(rol.getOpciones());
 			menues.removeAll(menuList);
 			
-			model.addAttribute("opciones", menues);
-			model.addAttribute("opcionesSelect", menuList);
+			model.addAttribute(Constantes.OPCIONES, menues);
+			model.addAttribute(Constantes.OPCION_SELECT, menuList);
 			
 			usuarios.removeAll(rol.getUsuarios());
-			model.addAttribute("usuarios", usuarios);
-			model.addAttribute("usuariosSelect", rol.getUsuarios());
-			return "rol/roleHome";
+			model.addAttribute(Constantes.U_SUARIOS, usuarios);
+			model.addAttribute(Constantes.USUARIO_SELECT, rol.getUsuarios());
+			return Constantes.ROL_HOME;
 		}
 		
 		List<Menu> menuList = new ArrayList<Menu>();
@@ -296,16 +296,16 @@ public class ProfileController {
 		}
 
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
-		model.addAttribute("result", "success");
+		model.addAttribute(Constantes.SUCCESS, true);
 		
 		if(gestionarRoles!=null && gestionarRoles)
-			return "redirect:/gestionarRoles?success";
-		return "rol/mainRole";
+			return Constantes.PERFILES_GESTIONAR;
+		return Constantes.ROL_MAIN;
 	}
 
 	@PostMapping("/deleteRole")
 	public String deleteRole(@RequestParam("rolId") int rolId, Model model) {
-		Usuario usuario = ((Usuario) factory.getObject().getAttribute("Usuario"));
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		Boolean esUsuarioInterno = usuario.getTipoUsuario().equalsIgnoreCase(Constantes.USUARIO_INTERNO);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
@@ -314,8 +314,8 @@ public class ProfileController {
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		
 		if(esUsuarioInterno)
-			return "redirect:/gestionarRoles?success";
-		return "rol/mainRole";
+			return Constantes.PERFILES_GESTIONAR;
+		return Constantes.ROL_MAIN;
 
 	}
 

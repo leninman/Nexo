@@ -49,10 +49,10 @@
 
 
 					<!-- Page Heading -->
-					<div th:if="${result}=='success'">
+					<div th:if="${success} == true">
      						<div class="alert alert-info"  th:text="#{msj.operacion.exitosa}"></div>
     				</div>
-    				<div th:if="${result}=='error'">
+    				<div th:if="${success} == false">
      						<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
     				</div>
     				<div th:if="${param.success}">

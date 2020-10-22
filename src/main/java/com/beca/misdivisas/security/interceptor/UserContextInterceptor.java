@@ -29,7 +29,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			"/usuarioEliminar" , "/cert");
 	private final List<String> FORM_PATHS = Arrays.asList("/EnvioEfectivo", "/TraspasoEfectivo", "/RetiroEfectivo");
 	private final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico", "/mainBECA",
-			"/changePassword", "/usuarioChange", "/403", "/404", "/error", "/access-denied", "/errorPage");
+			"/changePassword", "/usuarioChange", "/403", "/404", "error", "/access-denied", "/errorPage");
 
 	private final List<String> ROL_PATHS = Arrays.asList("/roleHome", "/createRoleHome", "/createRole", "/editRoleHome", "/editRole", "/deleteRole", "/gestionarRoles");
 	
@@ -80,7 +80,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 				return false;
 			}
 			//valida clave vencida
-			if(!servletPath.equalsIgnoreCase("/changePassword") && !servletPath.equalsIgnoreCase("/usuarioChange")&& !servletPath.equalsIgnoreCase("/error") && usuario.esClaveVencida(vencimientoClave)) {
+			if(!servletPath.equalsIgnoreCase("/changePassword") && !servletPath.equalsIgnoreCase("/usuarioChange")&& !servletPath.equalsIgnoreCase("error/error") && usuario.esClaveVencida(vencimientoClave)) {
 				request.getSession().setAttribute(Constantes.CAMBIO_C, true);
 				response.sendRedirect(request.getContextPath() + "/changePassword");
 				return false;

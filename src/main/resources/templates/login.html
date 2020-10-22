@@ -61,8 +61,8 @@
 				      <p class="text-primary" th:text="#{msj.sesion.finalizada}"></p>
 				    </div>
                     <br/> 
-				    <!-- Begin DigiCert site seal HTML and JavaScript -->
-					<div id="DigiCertClickID_X6HouWUF" data-language="en" class="allow-test-seal">						
+				    <!-- Begin DigiCert site seal HTML and JavaScript th:class="${#lists.size(menu.subMenu)>0} ? 'nav-item dropdown' : 'nav-item'" -->
+					<div id="DigiCertClickID_X6HouWUF" data-language="en" th:class="!${dominio} ? 'allow-test-seal' : ''">						
 					</div>
 					<!-- End DigiCert site seal HTML and JavaScript -->	
                     </form>                
