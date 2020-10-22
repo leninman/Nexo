@@ -59,8 +59,6 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 		}		
 		
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		
-
 
 		if (usuario == null) {
 			if (servletPath.equalsIgnoreCase("/main")||servletPath.equalsIgnoreCase("/mainBECA")) {
@@ -80,7 +78,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 				return false;
 			}
 			//valida clave vencida
-			if(!servletPath.equalsIgnoreCase("/changePassword") && !servletPath.equalsIgnoreCase("/usuarioChange")&& !servletPath.equalsIgnoreCase("/error") && usuario.esClaveVencida(vencimientoClave)) {
+			if(!servletPath.equalsIgnoreCase("/changePassword") && !servletPath.equalsIgnoreCase("/usuarioChange")&& !servletPath.equalsIgnoreCase("error/error") && usuario.esClaveVencida(vencimientoClave)) {
 				request.getSession().setAttribute(Constantes.CAMBIO_C, true);
 				response.sendRedirect(request.getContextPath() + "/changePassword");
 				return false;

@@ -56,11 +56,11 @@ public class UsuarioService implements UserDetailsService {
 		HttpSession session = factory.getObject();
 				
 		if (username!=null && username.length() > 0) {
-			us = repo.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(username,"A");
+			us = repo.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(username,Constantes.ACTIVO);
 			if (us!=null) {				
 					
 					session.removeAttribute(Constantes.USUARIO);
-					us.setTipoUsuario("Externo");
+					us.setTipoUsuario(Constantes.USUARIO_EXTERNO);
 					session.setAttribute(Constantes.USUARIO, us);				
 					
 					Date date = new Date();
@@ -68,8 +68,8 @@ public class UsuarioService implements UserDetailsService {
 					Log audit = new Log();
 					audit.setFecha(new Timestamp(date.getTime()));
 					audit.setIpOrigen(this.getIpOrigen());
-					audit.setAccion("Ingreso");
-					audit.setDetalle("Acceso al sistema");
+					audit.setAccion(Constantes.OPCION_LOGIN);
+					audit.setDetalle(Constantes.OPCION_LOGIN);
 					audit.setIdEmpresa(us.getIdEmpresa());
 					audit.setIdUsuario(us.getIdUsuario());
 					audit.setNombreUsuario(us.getNombreUsuario());

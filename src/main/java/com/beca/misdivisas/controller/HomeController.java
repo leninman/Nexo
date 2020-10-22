@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,9 @@ public class HomeController {
 	
 	@Autowired
 	private MenuService menuService;
+	
+	@Value("${ldap.domain}")
+	private String dominio;
 
 	@GetMapping(value = "/")
 	public String home() {
@@ -51,17 +55,14 @@ public class HomeController {
 
 	@GetMapping("/login")
 	public String login(HttpServletRequest request) {
+		if(!dominio.equalsIgnoreCase(Constantes.DOMINIO))
+			request.setAttribute("dominio", 0);
 		return Constantes.LOGIN;
 	}
 
 	@PostMapping(value = "/login")
 	public String main() {
 		return Constantes.MAIN;
-	}
-	
-	@GetMapping("/cert")
-	public String cert(HttpServletRequest request) {
-		return "cert";
 	}
 
 	@PostMapping(value = "/mainBECA")
@@ -74,7 +75,7 @@ public class HomeController {
 		usuario.setEmpresa(empresaRepository.findById(login.getEmpresa().getIdEmpresa().intValue()));
 		usuario.setIdEmpresa(login.getEmpresa().getIdEmpresa());
 		usuario.setTipoUsuario(Constantes.USUARIO_INTERNO);
-		usuario.setContrasena1("local");
+		usuario.setContrasena1(Constantes.CLAVE_LOCAL);
 		Rol rol = new Rol();
 		rol.setRol(Constantes.ROL_ADMIN_BECA);
 		UsuarioRol urol = new UsuarioRol();
@@ -87,7 +88,7 @@ public class HomeController {
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		HttpSession session = factory.getObject();
-		logServ.registrarLog("Acceso al sistema", "Ingreso", Constantes.LOGIN, Util.getRemoteIp(request),
+		logServ.registrarLog(Constantes.OPCION_LOGIN, "Ingreso", Constantes.LOGIN, Util.getRemoteIp(request),
 				(Usuario) session.getAttribute(Constantes.USUARIO));
 
 		return Constantes.MAIN;
@@ -102,7 +103,7 @@ public class HomeController {
 			model.addAttribute(Constantes.MENUES, menuService.loadMenuByRolName(Constantes.ROL_ADMIN_BECA));
 		login.setEmpresas(empresaRepository.findAllOrderByName());
 		model.addAttribute(Constantes.LOGIN, login);
-		return "loginBECA";
+		return Constantes.LOGIN_BECA;
 		}else {
 			model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 			return Constantes.MAIN;
@@ -119,18 +120,13 @@ public class HomeController {
 		String detalle = MessageFormat.format(Constantes.TEXTO_CAMBIO_EMPRESA, usuario.getEmpresa().getEmpresa());
 		logServ.registrarLog(Constantes.CAMBIO_EMPRESA, detalle, Constantes.CAMBIO_EMPRESA, Util.getRemoteIp(request), usuario);
 
-		return "loginBECA";
+		return Constantes.LOGIN_BECA;
 	}
 
 	@GetMapping(value = "/grafico")
 	public String grafico(Model model) {
 
-		return "grafico";
-	}
-
-	@GetMapping("/index")
-	public String index() {
-		return "index";
+		return Constantes.GRAFICO;
 	}
 	
 }

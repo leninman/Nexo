@@ -27,8 +27,6 @@
 	<div id="wrapper">
 
 		<!-- Sidebar -->
-		
-		
 
 		<!-- End of Sidebar -->
 
@@ -41,6 +39,7 @@
 				<!-- Topbar -->
 				<th:block th:replace="fragments/header :: header" />
 				<th:block th:replace="fragments/menu :: menuSuperior" />
+
         		<!-- End of Topbar -->
 					<div th:if="${param.success}">
      						<div class="alert alert-info" th:text="#{msj.operacion.exitosa}" ></div>
@@ -51,14 +50,11 @@
 				
 				<!-- Begin Page Content -->
 				<div>
-					<!-- Page Heading -->
-				
+					<!-- Page Heading -->				
 						<center>
 							 <br/>
 							 <img width="30%" height="30%" th:src="@{/img/candado-y-simbolos.png}" alt="Principal" align="center" />
 						</center>
-						 
-
 				</div>
 				<!-- /.container-fluid -->
 
@@ -80,7 +76,6 @@
 		class="fas fa-angle-up"></i>
 	</a>
 
-
     <!-- Bootstrap core JavaScript-->
 	<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}" ></script>
 	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"  ></script>
@@ -90,7 +85,6 @@
 
 	<!-- Custom scripts for all pages-->
 	<script src="js/sb-admin-2.min.js"   th:src="@{/js/sb-admin-2.min.js}" ></script>
-
 
 </body>
 

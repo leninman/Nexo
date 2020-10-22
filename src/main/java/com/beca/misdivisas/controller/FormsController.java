@@ -1,5 +1,7 @@
 package com.beca.misdivisas.controller;
 
+import java.text.MessageFormat;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -41,10 +43,10 @@ public class FormsController {
 		modelo.addAttribute(Constantes.ID_EMPRESA, id);
 
 		HttpSession session = factory.getObject();
-		logServ.registrarLog("EnvioEfectivo", "Solicitud Envio de Efectivo", "Solicitud", Util.getRemoteIp(request),
+		logServ.registrarLog(Constantes.OP_ENV_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Envio"), Constantes.OP_SOLICITUD, Util.getRemoteIp(request),
 				(Usuario) session.getAttribute(Constantes.USUARIO));
 
-		return "EnvioEfectivo";
+		return Constantes.OP_ENV_EFECTIVO;
 	}
 
 	@GetMapping(value = "/TraspasoEfectivo")
@@ -57,10 +59,10 @@ public class FormsController {
 
 		modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
 		HttpSession session = factory.getObject();
-		logServ.registrarLog("TraspasoEfectivo", "Solicitud Traspaso de Efectivo", "Solicitud",
+		logServ.registrarLog(Constantes.OP_TRAS_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Traspaso"), Constantes.OP_SOLICITUD,
 				Util.getRemoteIp(request), (Usuario) session.getAttribute(Constantes.USUARIO));
 
-		return "TraspasoEfectivo";
+		return Constantes.OP_TRAS_EFECTIVO;
 	}
 
 	@GetMapping(value = "/RetiroEfectivo")
@@ -72,9 +74,9 @@ public class FormsController {
 
 		modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
 		HttpSession session = factory.getObject();
-		logServ.registrarLog("RetiroEfectivo", "Solicitud Retiro de Efectivo", "Solicitud ", Util.getRemoteIp(request),
+		logServ.registrarLog(Constantes.OP_RET_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Retiro"), Constantes.OP_SOLICITUD , Util.getRemoteIp(request),
 				(Usuario) session.getAttribute(Constantes.USUARIO));
 
-		return "RetiroEfectivo";
+		return Constantes.OP_RET_EFECTIVO;
 	}
 }

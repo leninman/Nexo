@@ -77,7 +77,7 @@ public class UserController {
 		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, Constantes.TEXTO_ADMINISTRAR_USUARIO,
 				Constantes.TEXTO_ADMINISTRAR_USUARIO, Util.getRemoteIp(request), usuario);
 
-		return "mainUsuarios";
+		return Constantes.USUARIO_MAIN;
 	}
 
 
@@ -88,7 +88,7 @@ public class UserController {
 		model.addAttribute(Constantes.USUARIOS, usuarioRepository.findByIdEmpresaAndEstadoIgnoreCase(idEmpresa, Constantes.ACTIVO));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-		return "mainUsuarios";
+		return Constantes.USUARIO_MAIN;
 	}
 
 	@GetMapping("resultadoCambio")
@@ -101,7 +101,7 @@ public class UserController {
 			usuarios = null;
 		model.addAttribute(Constantes.USUARIOS, usuarios);
 
-		return "verResultado";
+		return Constantes.VER_RESULTADO;
 
 	}
 	
@@ -126,7 +126,7 @@ public class UserController {
 		
 		usuarioN.setUsuarioRols(new ArrayList<UsuarioRol>());
 		
-		return "usuario/addUsuario";
+		return Constantes.USUARIO_ADD;
 	}
 	
 	@PostMapping("usuarioAgregar")
@@ -158,7 +158,7 @@ public class UserController {
 
 			model.addAttribute(Constantes.ROLES, roles);
 			model.addAttribute(Constantes.ROLES_SELECT, rolesSelect);
-			return "usuario/addUsuario";
+			return Constantes.USUARIO_ADD;
 		}
 
 		Date date = new Date();
@@ -185,9 +185,9 @@ public class UserController {
 				.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), Constantes.ACTIVO).getIdUsuario());
 		usuarioRolRepository.save(usuarioRol);
 
-		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_CREAR, usuario.getUsuario().getNombreUsuario(),
+		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OP_CREAR, usuario.getUsuario().getNombreUsuario(),
 				usuario.getUsuario().getIdUsuario());
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_CREAR,
+		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OP_CREAR,
 				Util.getRemoteIp(request), us);
 
 		return "redirect:usuarioListar?success";
@@ -294,9 +294,9 @@ public class UserController {
 			  usuarioRol = new UsuarioRol();			
 		}
 
-		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_EDICION, usuario.getNombreUsuario(),
+		String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OP_EDICION, usuario.getNombreUsuario(),
 				usuario.getIdUsuario());
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_EDICION,
+		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OP_EDICION,
 				Util.getRemoteIp(request), us);
 
 		return "redirect:/usuarioHome?success";
@@ -364,7 +364,7 @@ public class UserController {
 		factory.getObject().setAttribute(Constantes.USUARIO, usuario);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		factory.getObject().removeAttribute(Constantes.CAMBIO_C);
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, Constantes.CAMBIO_CLAVE, Constantes.OPERACION_EDICION,
+		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, Constantes.CAMBIO_CLAVE, Constantes.OP_EDICION,
 				Util.getRemoteIp(request), us);
 
 		return "redirect:/main?success";
@@ -388,11 +388,11 @@ public class UserController {
 
 			usuario.setEstado("I");
 			usuarioRepository.save(usuario);
-			String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OPERACION_EDICION, usuario.getNombreUsuario(),
+			String detalle = MessageFormat.format(Constantes.ACCION_USUARIO, Constantes.OP_EDICION, usuario.getNombreUsuario(),
 					usuario.getIdUsuario());
 
 			HttpSession session = factory.getObject();
-			logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OPERACION_BORRAR,
+			logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_USUARIO, detalle, Constantes.OP_BORRAR,
 					Util.getRemoteIp(request), (Usuario) session.getAttribute(Constantes.USUARIO));
 
 			return "redirect:/usuarioListar?success";

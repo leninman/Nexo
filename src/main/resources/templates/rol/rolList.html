@@ -27,7 +27,7 @@
 							<td style="width: 1%"></td>									
 							<td style="width: 25%">
 								<div class="subject-info-box-1" style="width: 100%">
-								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
+								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${success}">
 								    <option th:each="opcion : ${opciones}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
 								  </select>
 								</div>
@@ -40,7 +40,7 @@
 							</td>
 							<td style="width: 25%">
 								<div class="subject-info-box-2" id="DivlstBox2" th:style="${#fields.hasErrors('opciones')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
-								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" th:disabled="${result}=='success' ? 'true': 'false'">
+								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" th:disabled="${success}">
 								  	<option value="1" hidden="true"></option>
 								  	<option th:each="opcion : ${opcionesSelect}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
 								  </select>
@@ -49,7 +49,7 @@
 							<td colspan="2" style="width: 5%"></td>
 							<td style="width: 17%">
 								<div class="subject-info-box-1" style="width: 100%">
-								  <select multiple="multiple" id='lstBox3' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
+								  <select multiple="multiple" id='lstBox3' class="form-control"  style="height: 400px;" th:disabled="${success}">
 								    <option th:each ="usuario : ${Usuarios}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
 								  </select>
 								</div>										
@@ -62,7 +62,7 @@
 							</td>
 							<td style="width: 17%">
 								<div class="subject-info-box-2" id="DivlstBox4" th:style="${#fields.hasErrors('Usuarios')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
-								  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{usuarios}" th:disabled="${result}=='success' ? 'true': 'false'">
+								  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{usuarios}" th:disabled="${success}">
 									<option th:each ="usuario : ${usuariosSelect}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"></option>
 								  </select>
 								</div>										
@@ -251,9 +251,9 @@
 					</div>
 				</td>
 				<td style="width: 6%">
-					<div class="subject-info-arrows text-center">												  
-					  <input type='button' id='btnRight' value='->' class="btn btn-default" onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');"/><br />
-					  <input type='button' id='btnLeft' value='<-' class="btn btn-default" onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"/><br />												  
+					<div class="subject-info-arrows text-center">
+				  		<i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');" ></i><br />
+					 	<i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"></i><br />											  
 					</div>										
 				</td>
 				<td style="width: 45%">
@@ -297,7 +297,7 @@
 							<td style="width: 5%"></td>									
 							<td style="width: 40%">
 								<div class="subject-info-box-1" style="width: 100%">
-								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${result}=='success' ? 'true': 'false'">
+								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${success}">
 								    <option th:each="opcion : ${opciones}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
 								  </select>
 								</div>
@@ -310,7 +310,7 @@
 							</td>
 							<td style="width: 40%">
 								<div class="subject-info-box-2" id="DivlstBox2" th:style="${#fields.hasErrors('opciones')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
-								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" th:disabled="${result}=='success' ? 'true': 'false'">
+								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" th:disabled="${success}">
 								  	<option value="1" hidden="true"></option>
 								  	<option th:each="opcion : ${opcionesSelect}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" ></option>
 								  </select>
