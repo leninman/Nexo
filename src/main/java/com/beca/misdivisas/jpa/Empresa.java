@@ -2,6 +2,9 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -17,7 +20,9 @@ public class Empresa implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="\"id_empresa\"")
+	@SequenceGenerator(name = "\"ALMACEN\".\"seq_empresa_idEmpresa\"", sequenceName = "\"ALMACEN\".\"seq_empresa_idEmpresa\"", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "\"ALMACEN\".\"seq_empresa_idEmpresa\"")
+	@Column(name = "\"id_empresa\"", unique = true, nullable = false, columnDefinition = "serial")
 	private Integer idEmpresa;
 
 	@Column(name="\"caracter_rif\"")
@@ -25,6 +30,8 @@ public class Empresa implements Serializable {
 
 	private String direccion;
 
+	@NotNull(message = "requerido")
+	@NotBlank(message = "requerido")
 	private String empresa;
 
 	@Column(name="\"fecha_creacion\"")
@@ -35,12 +42,19 @@ public class Empresa implements Serializable {
 
 	@Column(name="\"id_estatus_empresa\"")
 	private Integer idEstatusEmpresa;
-
+	
+	@NotNull(message = "requerido")
 	@Column(name="\"id_municipio\"")
 	private Integer idMunicipio;
+	
+	@Column(name="\"id_empresa_coe\"")
+	private Integer idEmpresaCoe;
 
+	@NotNull(message = "requerido")
 	private Integer rif;
 	
+	@NotNull(message = "requerido")
+	@NotBlank(message = "requerido")
 	private String sigla;
 	
 	private byte[] logo;
@@ -176,4 +190,11 @@ public class Empresa implements Serializable {
 		this.logo = logo;
 	}
 
+	public Integer getIdEmpresaCoe() {
+		return idEmpresaCoe;
+	}
+
+	public void setIdEmpresaCoe(Integer idEmpresaCoe) {
+		this.idEmpresaCoe = idEmpresaCoe;
+	}
 }

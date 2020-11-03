@@ -135,16 +135,16 @@ public class ReportController {
 
 		modelo.addAttribute(Constantes.TOTAL_DOLARES, Util.formatMonto(String.valueOf(saldoTOT)));
 		modelo.addAttribute(Constantes.PENDIENTE_DOLARES, Util.formatMonto(montoPendienteDolar.toString()));
-		modelo.addAttribute("pendienteEntregaDolares", Util.formatMonto(montoPendienteEntregaDolar.toString()));
-		modelo.addAttribute("disponibleDolares", Util.formatMonto(String.valueOf(tmp)));
+		modelo.addAttribute(Constantes.PENDIENTE_ENTREGA_DOLARES, Util.formatMonto(montoPendienteEntregaDolar.toString()));
+		modelo.addAttribute(Constantes.DISPONIBLE_DOLARES, Util.formatMonto(String.valueOf(tmp)));
 		saldoTOT = remesaRepo.getTotalByEmpresaAndDate(id, Constantes.EUR, formato2.format(new Date()));
 
 		tmp = saldoTOT.subtract(montoPendienteEntregaEuro);
 
 		modelo.addAttribute(Constantes.TOTAL_EUROS, Util.formatMonto(String.valueOf(saldoTOT)));
 		modelo.addAttribute(Constantes.PENDIENTE_EUROS, Util.formatMonto(montoPendienteEuro.toString()));
-		modelo.addAttribute("pendienteEntregaEuros", Util.formatMonto(montoPendienteEntregaEuro.toString()));
-		modelo.addAttribute("disponibleEuros", Util.formatMonto(String.valueOf(tmp)));
+		modelo.addAttribute(Constantes.PENDIENTE_ENTREGA_EUROS, Util.formatMonto(montoPendienteEntregaEuro.toString()));
+		modelo.addAttribute(Constantes.DISPONIBLE_EUROS, Util.formatMonto(String.valueOf(tmp)));
 
 		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA,
 				Constantes.POSICION_CONSOLIDADA, Util.getRemoteIp(request), usuario);
@@ -251,7 +251,7 @@ public class ReportController {
 						&& remesaDetalle.getRemesa().getIdOperacion() != Constantes.DIFERENCIA_FALTANTE) {
 					rs = new ReporteSucursal();
 					rs.setFecha(formato1.format(remesaDetalle.getRemesa().getRemesaDetalles().get(0).getFecha()));
-					rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte() + "-BNA");
+					rs.setReferencia(remesaDetalle.getRemesa().getCartaPorte() + "-" + Constantes.STRING_BNA_AV);
 					rs.setDebito(Util.formatMonto(tmp.negate().toString()));
 					rs.setConcepto(
 							remesaDetalle.getRemesa().getOperacion().getOperacion() + " - " + Constantes.STRING_BNA);
@@ -555,7 +555,7 @@ public class ReportController {
 	@GetMapping(path = "/reporte/sucursalesG/{moneda}", produces = "application/json")
 	@ResponseBody
 	public DatosReporteMapa getMontosPorMes(@PathVariable int moneda) {
-		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy 00:00:00");
+		DateFormat formato = new SimpleDateFormat(Constantes.FORMATO_DDMMYYYY000);
 		String[] nombreMes = { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
 				"Octubre", "Noviembre", "Diciembre" };
 		BigDecimal[] montos = new BigDecimal[12];

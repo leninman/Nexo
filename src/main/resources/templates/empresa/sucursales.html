@@ -1,0 +1,196 @@
+<div th:if="${crear}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Creaci&oacute;n de Sucursal</h5>
+		<div class="card" style="width: 80%">
+			<div class="card-body" style="text-align: left; width: 170%">
+				<div class="col-md-10">
+					<form action="#" th:object="${sucursalModel}" method="post">
+						<script>
+							$('form').on('submit', function(e) {
+								e.preventDefault();
+								processSucursalForm("sucursalAgregar", this);
+							});
+						</script>
+						<div class="row">
+							<input type="hidden" name="idEmpresa" id="idEmpresa"
+								th:value="${sucursalModel.idEmpresa}" />
+							<div class="form-group col-md-8">
+								<label for="nombre" class="col-form-label">Nombre</label> <input
+									type="text" th:field="*{nombre}" class="form-control"
+									id="nombre" placeholder="Nombre" maxlength=100> <span
+									th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"
+									class="text-danger"></span>
+							</div>
+							<div class="latitud_longitud">
+								<div class="form-group col-md-6">
+									<label for="latitud" class="col-form-label">Latitud</label> <input
+										type="text" th:field="*{latitud}" class="form-control"
+										id="latitud" placeholder="Latitud" maxlength=100> <span
+										th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"
+										class="text-danger"></span>
+								</div>
+								<div class="form-group col-md-6">
+									<label for="longitud" class="col-form-label">Longitud</label> <input
+										type="text" th:field="*{longitud}" class="form-control"
+										id="longitud" placeholder="Longitud" maxlength=100> <span
+										th:if="${#fields.hasErrors('longitud')}"
+										th:errors="*{longitud}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="estado" class="col-form-label">Estado</label>
+								<div>
+									<select id="estado" th:field="*{idEstado}" class="form-control"
+										onchange="getSucursalMunicipios(event)">
+										<option value="-1">Seleccionar</option>
+										<option th:each="dropDownItem : ${estados}"
+											th:value="${dropDownItem.idEstado}"
+											th:text="${dropDownItem.estado}" />
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="municipio" class="col-form-label">Municipio</label>
+								<div>
+									<select th:field="*{idMunicipio}" id="idMunicipioSucursal"
+										class="form-control"><option th:if="${municipios}"
+											value=-1>Seleccionar</option>
+										<option th:each="dropDownItem : ${municipios}"
+											th:value="${dropDownItem.idMunicipio}"
+											th:text="${dropDownItem.municipio}" />
+									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
+										th:errors="*{idMunicipio}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-8" th:if="${permitirAcopio}">
+								<label for="acopio" class="col-form-label">Principal</label>
+								<div>
+									<input type="checkbox" name="acopio" id="acopio"
+										th:field="*{acopio}" onchange="getAcopio(this)"
+										th:checked="${acopio}" />
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idEstatusSucursal" class="col-form-label">Estatus</label>
+								<div>
+									<select th:field="*{idEstatusSucursal}" id="idEstatusSucursal"
+										class="form-control">
+										<option selected value="1">Activa</option>
+										<option value="2">Inactiva</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group col-md-8" style="text-align: center;">
+								<input type="submit" class="btn btn-primary" value="Guardar">
+								<input type="button" class="btn btn-secondary"
+									th:onclick="|sucursales('${sucursalModel.idEmpresa}')|"
+									value="Cancelar">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:if="${editar}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Actualizaci&oacute;n de Sucursal</h5>
+		<div class="card" style="width: 80%">
+			<div class="card-body" style="text-align: left; width: 170%">
+				<div class="col-md-10">
+					<form action="#" th:object="${sucursalModel}" method="post">
+						<script>
+							$('form').on(
+									'submit',
+									function(e) {
+										e.preventDefault();
+										processSucursalForm(
+												"sucursalActualizar", this);
+									});
+						</script>
+						<div class="row">
+							<input type="hidden" name="idSucursal" id="idSucursal"
+								th:value="${sucursalModel.idSucursal}" />
+							<div class="form-group col-md-8">
+								<label for="nombre" class="col-form-label">Nombre</label> <input
+									type="text" th:field="*{nombre}" class="form-control"
+									id="nombre" placeholder="Nombre" maxlength=100> <span
+									th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"
+									class="text-danger"></span>
+							</div>
+							<div class="latitud_longitud">
+								<div class="form-group col-md-6">
+									<label for="latitud" class="col-form-label">Latitud</label> <input
+										type="text" th:field="*{latitud}" class="form-control"
+										id="latitud" placeholder="Latitud" maxlength=100> <span
+										th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"
+										class="text-danger"></span>
+								</div>
+								<div class="form-group col-md-6">
+									<label for="longitud" class="col-form-label">Longitud</label> <input
+										type="text" th:field="*{longitud}" class="form-control"
+										id="longitud" placeholder="Longitud" maxlength=100> <span
+										th:if="${#fields.hasErrors('longitud')}"
+										th:errors="*{longitud}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="estado" class="col-form-label">Estado</label>
+								<div>
+									<select id="estado" th:field="*{idEstado}" class="form-control"
+										onchange="getSucursalMunicipios(event)">
+										<option value="-1">Seleccionar</option>
+										<option th:each="dropDownItem : ${estados}"
+											th:value="${dropDownItem.idEstado}"
+											th:text="${dropDownItem.estado}" />
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="municipio" class="col-form-label">Municipio</label>
+								<div>
+									<select th:field="*{idMunicipio}" id="idMunicipioSucursal"
+										class="form-control">
+										<option th:if="${municipios}" value=-1>Seleccionar</option>
+										<option th:each="dropDownItem : ${municipios}"
+											th:value="${dropDownItem.idMunicipio}"
+											th:text="${dropDownItem.municipio}" />
+									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
+										th:errors="*{idMunicipio}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-8"
+								th:if="${sucursalModel.acopio or permitirAcopio}">
+								<label for="acopio" class="col-form-label">Principal</label>
+								<div>
+									<input type="checkbox" name="acopio" id="acopio"
+										th:field="*{acopio}" onchange="getAcopio(this)"
+										th:checked="${acopio}" />
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idEstatusSucursal" class="col-form-label">Estatus</label>
+								<div>
+									<select th:field="*{idEstatusSucursal}" id="idEstatusSucursal"
+										class="form-control">
+										<option selected value="1">Activa</option>
+										<option value="2">Inactiva</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8" style="text-align: center;">
+								<input type="submit" class="btn btn-primary" value="Guardar">
+								<input type="button" class="btn btn-secondary"
+									th:onclick="|sucursales('${sucursalModel.idEmpresa}')|"
+									value="Cancelar">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

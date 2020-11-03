@@ -27,7 +27,7 @@ public final class Constantes {
 	//public static final int BILLETE_NO_APTO = 18;
 	//public static final int REMESA_FALTANTE = 19;
 	public static final int EMPRESA_ACTIVA = 1;
-	public static final int MENU_INICIO = 1;
+	public static final String MENU_INICIO = "1";
 
 	public static final String  SIMBOLO_DOLAR = "$";
 	public static final String  SIMBOLO_EURO = "€";
@@ -38,6 +38,7 @@ public final class Constantes {
 	
 	public static final String MAIN = "main";
 	public static final String STRING_BNA = "Billetes No Aptos";
+	public static final String STRING_BNA_AV = "BNA";
 	public static final String STRING_CANCELADA = "Remesa Cancelada";
 	public static final String CANCELADA = "Cancelada";
 	
@@ -50,6 +51,8 @@ public final class Constantes {
 	public static final String TEXTO_REMESAS_PENDIENTES = "Remesas Pendientes por Entrega";
 	public static final String TEXTO_REPORTE_SUCURSAL= "Reporte por sucursal";
 	public static final String CAMBIO_EMPRESA= "Cambio de Empresa";
+	public static final String TEXTO_ADMINISTRAR_EMPRESAS = "Administracion Empresas";
+	public static final String TEXTO_ADMINISTRAR_SUCURSALES = "Administracion Sucursales";
 	
 	
 	public static final String CONSULTA_POR_PARAMETROS = "Consulta: fecha inicio({0}); fecha fin({1}); moneda({2})";
@@ -60,6 +63,11 @@ public final class Constantes {
 	public static final String CONSULTA_PENDIENTE_ENTREGA = "Consulta de Remesas Pendiente por Entregar: IdEmpresa({0})";
 	public static final String CONSULTA_DETALLE_POR_SUCURSAL = "Consulta: fecha inicio({0}); fecha fin({1});sucursal({2}); moneda({3})";
 	public static final String TEXTO_CAMBIO_EMPRESA = "Cambio a Empresa: {0}";
+	public static final String SUCURSALES_EMPRESA = "Consulta: Obtiene la lista de las sucursales de la empresa";
+	public static final String ACCION_EMPRESA = "{0} Empresa : NombreEmpresa({1});  idUsuario({2});";
+	public static final String ACCION_SUCURSAL = "{0} Sucursal : NombreSucursal({1});  idUsuario({2});";
+
+	
 	
 	public static final String OP_CONSULTA = "Consulta";
 	public static final String OP_EDICION = "Edicion";
@@ -87,6 +95,11 @@ public final class Constantes {
 	public static final String ROL = "rol";
 	public static final String ROLES = "roles";
 	public static final String ROLES_SELECT = "rolesSelect";
+	public static final String GESTIONAR_ROLES = "gestionarRoles";
+	public static final String NOMBRE_ROL = "nombreRol";
+	public static final String EMPRESAS = "Empresas";
+	public static final String EMPRESA_MODEL = "empresaModel";
+	public static final String SUCURSAL_MODEL = "sucursalModel";
 
 	public static final String ROL_ADMIN_BECA = "ADMIN_BECA";
 	public static final String ROL_CONSULTOR = "CONSULTOR";
@@ -102,6 +115,7 @@ public final class Constantes {
 	public static final String SUCURSALES = "sucursales";	
 	public static final String MAPA = "mapa";
 	
+	public static final String INGRESO = "Ingreso";
 	public static final String LOGIN = "login";
 	public static final String LOGIN_BECA = "loginBECA";
 	public static final String CLAVE_LOCAL = "local";
@@ -109,9 +123,13 @@ public final class Constantes {
 	public static final String MENUES = "menues";
 	public static final String CLIENTE = "cliente";
 	public static final String TOTAL_DOLARES = "totalDolares";
+	public static final String DISPONIBLE_DOLARES = "disponibleDolares";
 	public static final String PENDIENTE_DOLARES = "pendienteDolares";
+	public static final String PENDIENTE_ENTREGA_DOLARES = "pendienteEntregaDolares";
 	public static final String TOTAL_EUROS = "totalEuros";
+	public static final String DISPONIBLE_EUROS = "disponibleEuros";
 	public static final String PENDIENTE_EUROS = "pendienteEuros";
+	public static final String PENDIENTE_ENTREGA_EUROS = "pendienteEntregaEuros";
 	public static final String FECHA_CORTE = "fechaCorte";
 	public static final String REPORTE = "reportes/reporte";	
 	public static final String REPORTE_NA = "reportes/reporteNoAptos";
@@ -136,10 +154,20 @@ public final class Constantes {
 	public static final String FORMATO_FECHA_DDMMYYYY = "dd/MM/yyyy";	
 	public static final String FORMATO_HORA_0 = " 00:00:00";
 	public static final String FORMATO_HORA_235959 = " 23:59:59";
+	public static final String FORMATO_DDMMYYYY000 = "dd-MM-yyyy 00:00:00";
 	
 	public static final String MENSAJE_VAL_CONTRASENA_1 = "debe contener entre 8 y 20 caracteres";
 	public static final String MENSAJE_VAL_CONTRASENA_2 = "debe contener al menos una mayúscula, una minúscula, un número y un caracter especial ! @ # $ * . _";
 	public static final String MENSAJE_VAL_CONTRASENA_3 = "debe coincidir";
+	public static final String MENSAJE_VAL_CONTRASENA_4 = "no puede ser igual a las últimas 5 utilizadas";
+	public static final String MENSAJE_VAL_CONTRASENA_5 = "no coincide con la actual";
+
+	
+	public static final String MENSAJE_VAL_PERFIL = "Debes especificar un nombre para el nuevo Perfil";
+	public static final String MENSAJE_VAL_PERFIL_1 = "Debes seleccionar al menos una opción del Menú";
+	
+	public static final String MENSAJE_VAL_USUARIO = "ya esta siendo utilizado";
+	public static final String MENSAJE_VAL_USUARIO_1 = "caracteres especiales validos @ . _ -";
 	
 	public static final String USUARIO_INTERNO = "Interno";
 	public static final String USUARIO_EXTERNO = "Externo";

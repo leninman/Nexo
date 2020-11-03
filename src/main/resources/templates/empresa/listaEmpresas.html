@@ -1,0 +1,46 @@
+<th:block th:fragment="listaEmpresas">
+	<div th:if="${param.success}">
+		<div class="alert alert-info">Operaci&oacute;n Realizada Exitosamente</div>
+	</div>
+	<div th:if="${param.error}">
+		<div class="alert alert-danger">No se logr&oacute;,realizar la
+			Operaci&oacute;n</div>
+	</div>
+	<div class="container my-5">
+		<h5 align="center">Listado de Empresas</h5>
+		<div class="card">
+			<div class="card-body" align="center">
+				<div th:switch="${Empresas}" class="container my-5">
+					<p class="my-5">
+						<a id="boton_agregar" onclick="getRecords('crearEmpresa')"
+							class="btn btn-secondary" th:title="#{msj.empresa.crear}"
+							tabindex="-1"> <i class="fas fa-user-plus ml-2"></i></a>
+					</p>
+
+					<div class="col-md-10">
+						<h5 th:case="null">No Existen Empresas</h5>
+						<div th:case="*">
+							<table class="table table-striped table-responsive-md">
+								<thead>
+									<tr>
+										<th>RIF</th>
+										<th>Nombre</th>
+										<th>Estatus</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="Empresa : ${Empresas}" style="cursor: pointer"
+										th:onclick="|editarEmpresa('${Empresa.idEmpresa}')|">
+										<td th:text="${Empresa.caracterRif + Empresa.rif}"></td>
+										<td th:text="${Empresa.nombre}"></td>
+										<td th:text="${Empresa.estatus}"></td>
+									</tr>
+								</tbody>
+							</table>							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>

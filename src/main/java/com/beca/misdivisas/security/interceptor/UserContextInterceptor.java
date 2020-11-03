@@ -30,7 +30,10 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	private final List<String> FORM_PATHS = Arrays.asList("/EnvioEfectivo", "/TraspasoEfectivo", "/RetiroEfectivo");
 	private final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico", "/mainBECA",
 			"/changePassword", "/usuarioChange", "/403", "/404", "error", "/access-denied", "/errorPage");
-
+	private final List<String> EMPRESA_PATHS = Arrays.asList("/empresaHome", "/crearEmpresa", "/empresaListar",
+			"/empresaEditar", "/empresaAgregar", "/empresaActualizar", "/municipios");
+	private final List<String> SUCURSAL_PATHS = Arrays.asList("/sucursalHome", "/sucursalCrear", "/sucursalListar",
+			"/sucursalEditar", "/sucursalAgregar", "/sucursalActualizar");
 	private final List<String> ROL_PATHS = Arrays.asList("/roleHome", "/createRoleHome", "/createRole", "/editRoleHome", "/editRole", "/deleteRole", "/gestionarRoles");
 	
 	private final List<String> CHANGE_PASSWORD_PATHS = Arrays.asList("/EnvioEfectivo", "/TraspasoEfectivo",
@@ -102,6 +105,10 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			}
 			if (servletPath.equals("/main")
 					|| (servletPath.equals("/changeCompany") && usuario.hasAnyRol(Constantes.ROL_ADMIN_BECA))) {
+				return true;
+			}
+			if ((EMPRESA_PATHS.contains(servletPath) || SUCURSAL_PATHS.contains(servletPath))
+					&& usuario.hasAnyRol(Constantes.ROL_ADMIN_BECA)) {
 				return true;
 			}
 			if (OTROS_PATHS.contains(servletPath)) {

@@ -133,9 +133,9 @@ public class UserController {
 	public String addUsuario(@Valid com.beca.misdivisas.model.Usuario usuario, BindingResult result, Model model) {
 		Usuario us = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		if (usuarioRepository.findByNombreUsuarioIgnoreCaseAndEstadoIgnoreCase(usuario.getUsuario().getNombreUsuario(), Constantes.ACTIVO) != null)
-			result.rejectValue(Constantes.NOMBRE_USUARIO, "", "ya esta siendo utilizado");
+			result.rejectValue(Constantes.NOMBRE_USUARIO, "", Constantes.MENSAJE_VAL_USUARIO);
 		else if (!sonValidosCaracteres(usuario.getUsuario().getNombreUsuario()))
-			result.rejectValue(Constantes.NOMBRE_USUARIO, "", "caracteres especiales validos @ . _ -");
+			result.rejectValue(Constantes.NOMBRE_USUARIO, "", Constantes.MENSAJE_VAL_USUARIO_1);
 
 		if (usuario.getUsuario().getContrasena().length() < 8 || usuario.getUsuario().getContrasena().length() > 20)
 			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
@@ -249,7 +249,7 @@ public class UserController {
 		model.addAttribute(Constantes.U_SUARIO, usuarioRep);
 
 		if (!esValidaUltimasContrasenas(usuario))
-			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", "no puede ser igual a las últimas 5 utilizadas");
+			result.rejectValue(Constantes.USUARIO_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_4);
 
 		if (result.hasErrors()) {
 			List<Rol> roles = rolRepo.findByIdEmpresaAndEstado(((Usuario) factory.getObject().getAttribute(Constantes.USUARIO)).getIdEmpresa(), Constantes.ACTIVO);			
@@ -319,9 +319,9 @@ public class UserController {
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(us.getIdUsuario()));
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		if (!encoder.matches(usuarioRep.getContrasena(), usuario.getContrasena()))
-			result.rejectValue(Constantes.CONTRASENA, "", "no coincide con la actual");
+			result.rejectValue(Constantes.CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_5);
 		else if (!usuarioRep.getNuevaContrasena().equals(usuarioRep.getRepitaContrasena()))
-			result.rejectValue(Constantes.REPITA_CONTRASENA, "", "debe coincidir con la nueva");
+			result.rejectValue(Constantes.REPITA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_3);
 
 		if (usuarioRep.getNuevaContrasena().length() < 8 || usuarioRep.getNuevaContrasena().length() > 20)
 			result.rejectValue(Constantes.NUEVA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_1);
@@ -338,7 +338,7 @@ public class UserController {
 		usuarioRep.setIdUsuario(id);
 		model.addAttribute(Constantes.U_SUARIO, usuarioRep);
 		if (!esValidaUltimasContrasenas(usuario))
-			result.rejectValue(Constantes.NUEVA_CONTRASENA, "", "no puede ser igual a las últimas 5 utilizadas");
+			result.rejectValue(Constantes.NUEVA_CONTRASENA, "", Constantes.MENSAJE_VAL_CONTRASENA_4);
 
 		if (result.hasErrors()) {
 			return Constantes.CHANGE_PASSWORD;

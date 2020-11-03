@@ -62,7 +62,7 @@ public class ProfileController {
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
-		model.addAttribute("gestionarRoles", false);
+		model.addAttribute(Constantes.GESTIONAR_ROLES, false);
 		return Constantes.ROL_MAIN;
 	}
 	
@@ -73,7 +73,7 @@ public class ProfileController {
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario())); 
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaNullAndEstado(Constantes.ACTIVO));
-		model.addAttribute("gestionarRoles", true);
+		model.addAttribute(Constantes.GESTIONAR_ROLES, true);
 		
 		return Constantes.ROL_MAIN;
 	}
@@ -89,8 +89,8 @@ public class ProfileController {
 		model.addAttribute(Constantes.USUARIOS, usuarios);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
-		model.addAttribute("edit",false);
-		model.addAttribute("gestionarRoles", gestionarRoles);
+		model.addAttribute(Constantes.EDIT,false);
+		model.addAttribute(Constantes.GESTIONAR_ROLES, gestionarRoles);
 		
 		Rol rol = new Rol();
 		model.addAttribute(Constantes.ROL, rol);
@@ -110,11 +110,11 @@ public class ProfileController {
 		
 		
 		if(rol.getNombreRol().isEmpty())
-			result.rejectValue("nombreRol", "", "Debes especificar un nombre para el nuevo Rol");
+			result.rejectValue(Constantes.NOMBRE_ROL, "", Constantes.MENSAJE_VAL_PERFIL);
 		
 		
 		if(rol.getOpciones() == null || rol.getOpciones().length <=  1) {
-			result.rejectValue(Constantes.OPCIONES, "", "Debes seleccionar al menos una opción del Menú");
+			result.rejectValue(Constantes.OPCIONES, "", Constantes.MENSAJE_VAL_PERFIL_1);
 			
 		}
 		
@@ -181,7 +181,7 @@ public class ProfileController {
 		}
 		if(esUsuarioInterno) {			
 			model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaNullAndEstado(Constantes.ACTIVO));
-			model.addAttribute("gestionarRoles", true);
+			model.addAttribute(Constantes.GESTIONAR_ROLES, true);
 		}else {
 			model.addAttribute(Constantes.ROLES, rolRepo.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), Constantes.ACTIVO));
 		}
@@ -222,7 +222,7 @@ public class ProfileController {
 		model.addAttribute(Constantes.USUARIOS, usuarios);
 		model.addAttribute(Constantes.USUARIO_SELECT, usuariosSelect);
 		
-		model.addAttribute("gestionarRoles", gestionarRoles);
+		model.addAttribute(Constantes.GESTIONAR_ROLES, gestionarRoles);
 		
 		return Constantes.ROL_HOME;
 	}
@@ -238,7 +238,7 @@ public class ProfileController {
 		List<Menu> menues =  menuService.loadMenuByUserIdAndLevel(usuario.getIdUsuario(), 2);
 		
 		if(rol.getOpciones() == null || rol.getOpciones().length <=  1) {
-			result.rejectValue(Constantes.OPCIONES, "", "Debes seleccionar al menos una opción del Menú");
+			result.rejectValue(Constantes.OPCIONES, "", Constantes.MENSAJE_VAL_PERFIL_1);
 			
 		}
 		
@@ -324,7 +324,7 @@ public class ProfileController {
 		List<Menu> menuList = new ArrayList<Menu>();
 		
 		for (int i = 0; i < mr.length; i++) {
-			if(!mr[i].equalsIgnoreCase("1")) {
+			if(!mr[i].equalsIgnoreCase(Constantes.MENU_INICIO)) {
 				com.beca.misdivisas.jpa.Menu menu = menuRepo.findById(Integer.parseInt(mr[i]));
 				menuList.add(menuService.getMenu(menu));
 			}

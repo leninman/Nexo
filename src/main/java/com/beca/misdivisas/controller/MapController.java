@@ -99,8 +99,8 @@ public class MapController {
 				locaciones.add(locacion);
 			}
 		}
-		String Detalle = "Consulta: Obtiene la lista de las sucursales de la empresa";
-		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Detalle, Constantes.TEXTO_REPORTE_MAPA, Util.getRemoteIp(request),
+		
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.SUCURSALES_EMPRESA, Constantes.TEXTO_REPORTE_MAPA, Util.getRemoteIp(request),
 				usuario);
 
 		return locaciones;

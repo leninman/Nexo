@@ -88,7 +88,7 @@ public class HomeController {
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
 		HttpSession session = factory.getObject();
-		logServ.registrarLog(Constantes.OPCION_LOGIN, "Ingreso", Constantes.LOGIN, Util.getRemoteIp(request),
+		logServ.registrarLog(Constantes.OPCION_LOGIN, Constantes.INGRESO, Constantes.LOGIN, Util.getRemoteIp(request),
 				(Usuario) session.getAttribute(Constantes.USUARIO));
 
 		return Constantes.MAIN;

@@ -18,5 +18,8 @@ public interface ISucursalRepo extends JpaRepository<Sucursal, Integer> {
 	
 	@Query("SELECT s FROM Empresa e, Sucursal s  WHERE e.idEmpresa = s.idEmpresa and e.idEmpresa = ?1")
 	public List<Sucursal> findSucursalByEmpId(int id);
+	
+	@Query("SELECT s FROM Sucursal s  WHERE s.idEmpresa = ?1 and s.acopio = ?2")
+	public List<Sucursal> findSucursalByEmpIdAndAcopio(int idEmpresa, boolean acopio);
 
 }

@@ -1,0 +1,259 @@
+<div th:if="${crear}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Creaci&oacute;n de Empresa</h5>
+		<div class="card" style="width: 50%">
+			<div class="card-body" style="text-align: left; width: 170%">
+				<div class="col-md-10">
+					<form action="#" th:object="${empresaModel}" method="post"
+						enctype="multipart/form-data">
+						<script>
+							$('form').on('submit', function(e) {
+								e.preventDefault();
+								processEmpresaForm("empresaAgregar", this);
+							});
+						</script>
+						<div class="row">
+
+							<div class="form-group col-md-8">
+								<label for="rif" class="col-form-label">Rif</label>
+								<div class="rif_row">
+									<select th:field="*{caracterRif}" id="caracterRif"
+										class="form-control caracter">
+										<option selected value="J">J</option>
+										<option value="G">G</option>
+										<option value="P">P</option>
+										<option value="V">V</option>
+										<option value="E">E</option>
+									</select> <input type="text" th:field="*{rif}" class="form-control rif"
+										id="rif" placeholder="Rif" maxlength="9">
+								</div>
+								<span th:if="${#fields.hasErrors('rif')}" th:errors="*{rif}"
+									class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="nombre" class="col-form-label">Nombre</label> <input
+									type="text" th:field="*{nombre}" class="form-control"
+									id="nombre" placeholder="Nombre Empresa" maxlength=100>
+								<span th:if="${#fields.hasErrors('nombre')}"
+									th:errors="*{nombre}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="direccion" class="col-form-label">Direccion</label>
+								<input type="text" th:field="*{direccion}" class="form-control"
+									id="direccion" placeholder="Direccion" maxlength=100> <span
+									th:if="${#fields.hasErrors('direccion')}"
+									th:errors="*{direccion}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="estado" class="col-form-label">Estado</label>
+								<div>
+									<select id="estado" th:field="*{idEstado}" class="form-control"
+										onchange="getMunicipios(event)">
+										<option value="-1">Seleccionar</option>
+										<option th:each="dropDownItem : ${estados}"
+											th:value="${dropDownItem.idEstado}"
+											th:text="${dropDownItem.estado}" />
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idMunicipio" class="col-form-label">Municipio</label>
+								<div>
+									<select th:field="*{idMunicipio}" id="idMunicipio"
+										class="form-control">
+										<option th:if="${municipios}" value=-1>Seleccionar</option>
+										<option th:each="dropDownItem : ${municipios}"
+											th:value="${dropDownItem.idMunicipio}"
+											th:text="${dropDownItem.municipio}" />
+									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
+										th:errors="*{idMunicipio}" class="text-danger"></span>
+								</div>
+
+							</div>
+							<div class="form-group col-md-8">
+								<label for="sigla" class="col-form-label">Sigla</label> <input
+									type="text" th:field="*{sigla}" class="form-control" id="sigla"
+									placeholder="Sigla" maxlength=3> <span
+									th:if="${#fields.hasErrors('sigla')}" th:errors="*{sigla}"
+									class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idEmpresaCoe" class="col-form-label">ID COE</label>
+								<input type="number" th:field="*{idEmpresaCoe}"
+									class="form-control" id="idEmpresaCoe" placeholder="ID COE">
+								<span th:if="${#fields.hasErrors('idEmpresaCoe')}"
+									th:errors="*{idEmpresaCoe}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idEstatusEmpresa" class="col-form-label">Estatus</label>
+								<div>
+									<select th:field="*{idEstatusEmpresa}" id="idEstatusEmpresa"
+										class="form-control">
+										<option selected value="1">Activa</option>
+										<option value="2">Inactiva</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8 logo-row">
+								<div class="logo-selector">
+									<label for="logo" class="col-form-label">Logo</label>
+									<div>
+										<input type="button" class="btn btn-primary"
+											onclick="document.getElementById('logo').click()"
+											value="Examinar"> <input type="file"
+											th:field="*{logo}" class="form-control" style="display: none"
+											id="logo" onchange="loadLogo(event)"> <input
+											type="hidden" th:field="*{logoEmpresa}" id="logoEmpresa">
+										<span th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"
+											class="text-danger"></span>
+									</div>
+								</div>
+								<div class="logo-container" id="logoContainer">
+									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo"
+										class="logo-image"
+										th:src="|data:image/jpg;base64,${empresaModel.imagenLogo}|">
+								</div>
+							</div>
+							<div class="form-group col-md-8" style="text-align: center;">
+								<input type="submit" class="btn btn-primary" value="Guardar">
+								<a class="btn btn-secondary" href="./empresaHome">Cancelar</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:if="${editar}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Actualizaci&oacute;n de Empresa</h5>
+		<div class="card" style="width: 50%">
+			<div class="card-body" style="text-align: left; width: 170%">
+				<div class="col-md-10">
+					<form action="#" th:object="${empresaModel}" method="post"
+						id="actualizarEmpresa" enctype="multipart/form-data">
+						<script>
+							$('form').on('submit', function(e) {
+								e.preventDefault();
+								processEmpresaForm("empresaActualizar", this);
+							});
+						</script>
+						<div class="row">
+							<input type="hidden" name="idEmpresa" id="idEmpresa"
+								th:value="${empresaModel.idEmpresa}" />
+							<div class="form-group col-md-8">
+								<label for="rif" class="col-form-label">Rif</label>
+								<div class="rif_row">
+									<select th:field="*{caracterRif}" id="caracterRif"
+										class="form-control caracter">
+										<option selected value="J">J</option>
+										<option value="G">G</option>
+										<option value="P">P</option>
+										<option value="V">V</option>
+										<option value="E">E</option>
+									</select> <input type="text" th:field="*{rif}" class="form-control rif"
+										id="rif" placeholder="Rif" maxlength="9">
+								</div>
+								<span th:if="${#fields.hasErrors('rif')}" th:errors="*{rif}"
+									class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="nombre" class="col-form-label">Nombre</label> <input
+									type="text" th:field="*{nombre}" class="form-control"
+									id="nombre" placeholder="Nombre Empresa" maxlength=100>
+								<span th:if="${#fields.hasErrors('nombre')}"
+									th:errors="*{nombre}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="direccion" class="col-form-label">Direccion</label>
+								<input type="text" th:field="*{direccion}" class="form-control"
+									id="direccion" placeholder="Direccion" maxlength=100> <span
+									th:if="${#fields.hasErrors('direccion')}"
+									th:errors="*{direccion}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="estado" class="col-form-label">Estado</label>
+								<div>
+									<select id="estado" th:field="*{idEstado}" class="form-control"
+										onchange="getMunicipios(event)">
+										<option value="-1">Seleccionar</option>
+										<option th:each="dropDownItem : ${estados}"
+											th:value="${dropDownItem.idEstado}"
+											th:text="${dropDownItem.estado}" />
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="municipio" class="col-form-label">Municipio</label>
+								<div>
+									<select th:field="*{idMunicipio}" id="idMunicipio"
+										class="form-control">
+										<option th:if="${municipios}" value=-1>Seleccionar</option>
+										<option th:each="dropDownItem : ${municipios}"
+											th:value="${dropDownItem.idMunicipio}"
+											th:text="${dropDownItem.municipio}" />
+									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
+										th:errors="*{idMunicipio}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="sigla" class="col-form-label">Sigla</label> <input
+									type="text" th:field="*{sigla}" class="form-control" id="sigla"
+									placeholder="Sigla" maxlength=3 readonly> <span
+									th:if="${#fields.hasErrors('sigla')}" th:errors="*{sigla}"
+									class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idEmpresaCoe" class="col-form-label">ID COE</label>
+								<input type="number" th:field="*{idEmpresaCoe}"
+									class="form-control" id="idEmpresaCoe" placeholder="ID COE">
+								<span th:if="${#fields.hasErrors('idEmpresaCoe')}"
+									th:errors="*{idEmpresaCoe}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="idEstatusEmpresa" class="col-form-label">Estatus</label>
+								<div>
+									<select th:field="*{idEstatusEmpresa}" id="idEstatusEmpresa"
+										class="form-control">
+										<option value="1">Activa</option>
+										<option value="2">Inactiva</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8 logo-row">
+								<div class="logo-selector">
+									<label for="logo" class="col-form-label">Logo</label>
+									<div>
+										<input type="button" class="btn btn-primary"
+											onclick="document.getElementById('logo').click()"
+											value="Examinar"> <input type="file"
+											th:field="*{logo}" class="form-control" style="display: none"
+											id="logo" onchange="loadLogo(event)"> <input
+											type="hidden" th:field="*{logoEmpresa}" id="logoEmpresa">
+										<span th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"
+											class="text-danger"></span>
+									</div>
+								</div>
+								<div class="logo-container" id="logoContainer">
+									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo"
+										class="logo-image"
+										th:src="|data:image/jpg;base64,${empresaModel.imagenLogo}|">
+								</div>
+							</div>
+
+							<div class="form-group col-md-8" style="text-align: center;">
+								<input type="submit" class="btn btn-primary" value="Guardar">
+								<input type="button" class="btn btn-light"
+									th:onclick="|sucursales('${empresaModel.idEmpresa}')|"
+									value="Sucursales"> <a class="btn btn-secondary"
+									href="./empresaHome">Cancelar</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
