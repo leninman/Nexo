@@ -16,7 +16,7 @@ public class Rol implements Serializable, Comparable<Rol> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name="\"SEGURIDAD\".\"seq_rol_idRol\"", sequenceName = "\"SEGURIDAD\".\"seq_rol_idRol\"", allocationSize = 1)
+	@SequenceGenerator(name="\"SEGURIDAD\".\"seq_rol_idRol\"", sequenceName ="\"SEGURIDAD\".\"seq_rol_idRol\"", allocationSize = 1)
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="\"SEGURIDAD\".\"seq_rol_idRol\"")
 	@Column(name="\"id_rol\"", unique = true, nullable = false, columnDefinition = "serial")
 	private Integer idRol;
@@ -24,29 +24,24 @@ public class Rol implements Serializable, Comparable<Rol> {
 	@Column(name="rol")
 	private String rol;
 	
-	@Column(name="\"id_empresa\"")
-	private Integer idEmpresa;
+	@Column(name="\"tipo_usuario\"")
+	private String tipoUsuario;
 	
-	@Column(name="estado")
-	private String estado;
+	//bi-directional many-to-one association to Menu
+	@OneToMany(mappedBy="rol")
+	private List<Menu> menus;
 
 	//bi-directional many-to-one association to UsuarioRol
 	@OneToMany(mappedBy="rol")
 	private List<UsuarioRol> usuarioRols;
-	
-	//bi-directional many-to-one association to MenuRol
-	@OneToMany(mappedBy="rol")
-	private List<MenuRol> menuRols;
-	
-	//bi-directional many-to-one association to Empresa
-	@ManyToOne
-	@JoinColumns({@JoinColumn(name = "\"id_empresa\"", insertable = false, updatable = false)
-	})
-	private Empresa empresa;
 
 	public Rol() {
 	}
 
+	public Rol(Integer idRol) {
+		this.idRol = idRol;
+	}
+	
 	public Integer getIdRol() {
 		return this.idRol;
 	}
@@ -63,20 +58,34 @@ public class Rol implements Serializable, Comparable<Rol> {
 		this.rol = rol;
 	}
 	
-	public Integer getIdEmpresa() {
-		return this.idEmpresa;
+	public String getTipoUsuario() {
+		return this.tipoUsuario;
 	}
 
-	public void setIdEmpresa(Integer idEmpresa) {
-		this.idEmpresa = idEmpresa;
-	}
-	
-	public Empresa getEmpresa() {
-		return this.empresa;
+	public void setTipoUsuario(String tipoUsuario) {
+		this.tipoUsuario = tipoUsuario;
 	}
 
-	public void setEmpresa(Empresa empresa) {
-		this.empresa = empresa;
+	public List<Menu> getMenus() {
+		return this.menus;
+	}
+
+	public void setMenus(List<Menu> menus) {
+		this.menus = menus;
+	}
+
+	public Menu addMenus(Menu menus) {
+		getMenus().add(menus);
+		menus.setRol(this);
+
+		return menus;
+	}
+
+	public Menu removeMenus(Menu menus) {
+		getMenus().remove(menus);
+		menus.setRol(null);
+
+		return menus;
 	}
 	
 	public List<UsuarioRol> getUsuarioRols() {
@@ -99,36 +108,6 @@ public class Rol implements Serializable, Comparable<Rol> {
 		usuarioRol.setRol(null);
 
 		return usuarioRol;
-	}
-	
-	public List<MenuRol> getMenuRols() {
-		return this.menuRols;
-	}
-
-	public void setMenuRols(List<MenuRol> menuRols) {
-		this.menuRols = menuRols;
-	}
-
-	public MenuRol addMenuRol(MenuRol menuRol) {
-		getMenuRols().add(menuRol);
-		menuRol.setRol(this);
-
-		return menuRol;
-	}
-
-	public MenuRol removeMenuRol(MenuRol menuRol) {
-		getMenuRols().remove(menuRol);
-		menuRol.setRol(null);
-
-		return menuRol;
-	}
-
-	public String getEstado() {
-		return estado;
-	}
-
-	public void setEstado(String estado) {
-		this.estado = estado;
 	}
 
 	@Override

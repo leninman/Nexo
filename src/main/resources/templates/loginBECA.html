@@ -27,7 +27,6 @@
     <div class="row justify-content-center">
 
       <div class="col-xl-10 col-lg-14 col-md-9">
-
         <div class="card o-hidden border-0 shadow-lg my-5">
           <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
@@ -36,46 +35,40 @@
               <div class="col-lg-6">
                 <div class="p-5">
                   <br/>
-                  <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4" th:text="#{etq.login.beca.cambiar}"></h1>
-                  </div>
                   <br/>
                   <br/>
-                  <form id="login_form" class="user" th:action="@{/mainBECA}" method="post" th:object="${login}">
-                       <div class="form-group">
-                    		                        
+                   <form id="login_form" class="user" th:action="@{/mainBECA}" method="post" th:object="${login}">
+					<div class="form-group col-md-8">
+						<label for="vista" class="col-form-label" th:text="#{etq.vista}"></label>
+						<select th:field="*{vista}" class="form-control" id="select">
+						  <option value="G" selected="selected">General</option> 
+						  <option value="E" >Por Empresa</option>
+						</select>
+					</div>
+					<br/>
+                    <div id="vistaEmpresa" class="form-group" style="display: none;">
+                    <label for="empresa" class="col-form-label" th:text="#{etq.login.beca.cambiar}"></label>                   		                        
 			           	<select th:field="*{empresa.idEmpresa}" class="form-control">
 					    	<option th:each="empresa : *{empresas}"
 					        	th:value="${empresa.idEmpresa}"
 					            th:utext="${empresa.empresa}"/>
 					    </select>
-			                
-			                  
                     </div>
-                    <br/>
-                    <a href="javascript:;" onclick="document.getElementById('login_form').submit();" class="btn btn-dark btn-user btn-block" th:text="#{bot.login}"></a>
-                    <br/>
-                    <br/>
-                    <div th:if="${param.error}">
-				      <p class="text-danger" th:text="#{msj.credenciales.incorrectas}"></p>
-				  
-				    </div>
-				    <div th:if="${param.logout}">
-				      <p class="text-primary" th:text="#{msj.sesion.finalizada}"></p>
-				    </div>
+                    <br/>                    
+                    <div class="form-group" Style="text-align: center;">
+                    	<input type="submit" class="btn btn-dark btn-user btn-block" th:value="#{bot.login}">                        	
+                    </div>
                     <br/>  
-                    </form>                
+                 </form>                
                 </div>
               </div>
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
-
   </div>
+<th:block th:replace="fragments/modals :: sessionModal" />
 
   <!-- Bootstrap core JavaScript-->
   <script src="vendor/jquery/jquery.min.js"></script>
@@ -83,9 +76,19 @@
 
   <!-- Core plugin JavaScript-->
   <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
+	<script src="js/sessionCheck.js"></script>
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
+  <script type="text/javascript">
+  $("select" ).change(function() {
+	  var seleccion=$("select" ).val();
+	 	if(seleccion =="G"){
+	 		$('#vistaEmpresa').hide();	 		
+	 	}else{
+	 		$("#vistaEmpresa").css("display", "block");
+	 	}
+	});
+  </script>
 
 </body>
 

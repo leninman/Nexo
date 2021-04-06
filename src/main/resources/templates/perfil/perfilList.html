@@ -1,0 +1,425 @@
+<th:block th:fragment=perfilesCrearEditar>
+	<div class="container my-5">
+		<h5 align="center"><span th:text="${editar} ? #{etq.perfiles.editar} : #{etq.perfiles.crear}" ></span></h5>
+		<div class="card">
+			<div class="card-body" >
+				<form  th:action="${editar} ? 'editarPerfil' : 'crearPerfil'"  th:object="${perfil}" method="post">
+					<table>
+						<tr>
+							<td colspan="8">
+							<div class="form-group col-md-8" style="text-align: left;">
+                                <label for="nombrePerfil" class="col-form-label" th:text="#{etq.nombre}"></label> 
+                                <input type="text" maxlength="50" class="form-control" id="nombrePerfil" th:field="*{nombrePerfil}" th:disabled="${revisarPerfiles} ? 'true' : 'false'">
+                                <input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+                                <input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+                                <span th:if="${#fields.hasErrors('nombrePerfil')}" th:errors="*{nombrePerfil}" class="text-danger"></span>
+                            </div>
+							</td>
+							<td colspan="2">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="10"><br/></td>
+						</tr>
+						<tr>
+							<td colspan="5"><h5 align="center" th:text="#{etq.menu.opciones}"></h5></td>
+							<td colspan="5"><h5 align="center" th:text="#{etq.usuarios}"></h5>	</td>
+						</tr>
+						<tr>
+							<td colspan="2.5" align="center" th:text="#{etq.disponibles}"></td>
+							<td colspan="2.5" align="center" th:text="#{etq.asignados}"></td>
+							<td colspan="2" align="center" ></td>
+							<td colspan="2.5" align="center" th:text="#{etq.disponibles}"></td>
+							<td colspan="2.5" align="center" th:text="#{etq.asignados}"></td>
+						</tr>
+						<tr>
+							<td style="width: 1%"></td>									
+							<td style="width: 25%">
+								<div class="subject-info-box-1" style="width: 100%" >
+								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" th:disabled="${revisarPerfiles}">
+								    <option th:each="opcion : ${opciones}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" th:title="${opcion.nombreOpcion}" style="cursor: pointer;"></option>
+								  </select>
+								</div>
+							</td>
+							<td>
+								<div class="subject-info-arrows text-center" style="width: 100%; cursor: pointer;">												  
+								  	<i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');" data-toggle="tooltip" title="Agregar Opcion"></i><br />
+								 	<i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"></i><br />													  
+								</div>										
+							</td>
+							<td style="width: 25%">
+								<div class="subject-info-box-2" id="DivlstBox2" th:style="${#fields.hasErrors('opciones')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}">
+								  	<option value="1" hidden="true"></option>
+								  	<option th:each="opcion : ${opcionesSelect}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" th:title="${opcion.nombreOpcion}" style="cursor: pointer;" ></option>
+								  </select>
+								</div>										
+							</td>
+							<td colspan="2" style="width: 5%"></td>
+							<td style="width: 17%">
+								<div class="subject-info-box-1" style="width: 100%">
+								  <select multiple="multiple" id='lstBox3' class="form-control"  style="height: 400px;" th:disabled="${revisarPerfiles}">
+								    <option th:each ="usuario : ${Usuarios}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}" th:title="${usuario.nombreUsuario}" style="cursor: pointer;"></option>
+								  </select>
+								</div>										
+							</td>
+							<td >
+								<div class="subject-info-arrows text-center" style="width: 100%; cursor: pointer;">												  
+								  	<i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox3', 'lstBox4');" ></i><br />
+								 	<i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox4', 'lstBox3');"></i><br />													  
+								</div>										
+							</td>
+							<td style="width: 17%">
+								<div class="subject-info-box-2" id="DivlstBox4" th:style="${#fields.hasErrors('Usuarios')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+								  <select multiple="multiple" id='lstBox4' class="form-control" style="height: 400px;"  th:field="*{usuarios}">
+									<option th:each ="usuario : ${usuariosSelect}" th:value="${usuario.idUsuario}" th:text="${usuario.nombreUsuario}"  th:title="${usuario.nombreUsuario}" style="cursor: pointer;"></option>
+								  </select>
+								</div>										
+							</td>
+							<td style="width: 1%"></td>
+						</tr>
+						<tr>
+						<td colspan="5" align="center">
+						<span th:if="${#fields.hasErrors('opciones')}" th:errors="*{opciones}" class="text-danger"></span>
+						</td>
+						<td colspan="5" align="center">
+						<span th:if="${#fields.hasErrors('Usuarios')}" th:errors="*{Usuarios}" class="text-danger"></span>
+						</td>											
+						</tr>
+						<tr>
+							<td colspan="10">
+								<br/>
+					            <div th:if="!${revisarPerfiles}" class="form-group" style="text-align: center; flex: 0 0 100% !important;">
+	                            	<button class="btn btn-primary" th:text="#{bot.guardar}" onclick="seleccionarTodos();" type="submit"></button>	
+	                            	<a class="btn btn-secondary" href="./perfilHome" th:text="#{bot.cancelar}"></a>
+	                            </div>
+	                            <div th:if="${revisarPerfiles}" class="form-group" style="text-align: center; flex: 0 0 100% !important;">
+	                            	<a class="btn btn-secondary" href="./perfilHome" th:text="#{bot.aceptar}"></a>	                            	
+	                            </div>									
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</th:block>
+
+<th:block th:fragment=listadoPerfiles>
+	<div class="container my-5" style="width: 70%">
+		<h5 align="center" th:text="#{etq.perfiles.listado}"></h5>
+		<div class="card">
+			<div class="card-body" align="center">
+				<div th:switch="${Perfiles}" class="container my-5">
+				<div th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Externo'">					 
+					<p class="my-5"> 
+						<form method="POST" th:action="@{crearPerfilHome}" >													
+							<input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+				           <button  type="submit" name="crearPerfil"  class="btn btn-secondary btn-sm" th:title="#{tooltip.crear.perfil}">
+				            	<i class="fas fa-plus-circle"></i>
+				            </button>										           										            
+				        </form>
+					</p>
+				</div>
+					<div class="col-md-10">
+						<h5 th:case="null"  th:text="#{msj.perfiles.inexistentes}"></h5>
+						<div th:case="*">
+							<table class="table table-striped table-responsive-md table-hover">
+								<thead>
+									<tr>
+										<th th:text="#{etq.nombre}"></th>
+										<th th:if="${session.Usuario.getTipoUsuario()}=='Externo'"></th>
+										<th th:if="${session.Usuario.getTipoUsuario()}=='Externo'"></th>
+									</tr>
+								</thead>
+								
+								<tbody>
+								<div th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Externo'">
+									<tr th:each="perfil : ${Perfiles}" th:style="${perfil.editable}? 'cursor: pointer;':''" data-field="name" class="tool-tip" title="Clic para editar">
+										<td th:text="${perfil.perfil}">
+										</td>
+											<td>
+												<form method="POST" th:action="@{editarPerfilHome}" th:attr="id='form'+${perfil.idPerfil}">
+													<input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+													<input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+													<input type="hidden" name="revisarPerfiles" id="revisarPerfiles" th:value="${revisarPerfiles}" />
+										            <button th:if="${perfil.editable}" type="submit" name="submit"  th:title="#{tooltip.editar.perfil}" class="btn btn-secondary btn-sm">										            	
+										            	<i class="fas fa-pen"></i>
+										            </button>										           										            
+										        </form>
+											</td>											
+											<td>
+											<div  th:if="${perfil.editable}" >
+												<button type="button" th:title="#{tooltip.eliminar.perfil}" class="btn btn-danger btn-sm" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${perfil.idPerfil}">
+													<i class="fas fa-trash"></i>
+												</button>
+										        <!-- Logout Modal-->
+												<div class="modal fade" th:attr="id='recordDeleteModal'+${perfil.idPerfil}" tabindex="-1" role="dialog"
+													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered" role="document">
+														<div class="modal-content">														
+															<div class="modal-header" style="text-align: right;">
+																<h5 class="modal-title" id="recordDeleteModalLabel"  th:text="#{msj.perfiles.confirma.eliminar}"></h5>
+																<button class="close" type="button" data-dismiss="modal"
+																	aria-label="Close">
+																	<i class="far fa-times-circle"></i>
+																</button>
+															</div>
+															<div class="modal-body"></div>
+																<form method="POST" th:action="@{eliminarPerfil}" th:attr="id='form'+${perfil.idPerfil}">
+																	<div style="text-align: center;">
+																		<button class="btn btn-secondary" type="button" data-dismiss="modal" style="height:40px;width:100px" th:text="#{msj.no}">
+																		</button>
+																		<input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+											            				<button type="submit" name="submit"  class="btn btn-primary" style="height:40px;width:100px" th:text="#{msj.si}">
+											            				</button>
+										            				</div>										           										            
+										        				</form>															
+															<br/>
+														</div>
+													</div>
+											    </div>
+											</div>
+										    </td>
+										</div>										
+										<div th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Interno'">
+										<tr th:each="perfil : ${Perfiles}" style="cursor: pointer;" data-field="name" class="tool-tip" title="Clic para revisar"
+										th:onclick="'document.getElementById(\'form'+${perfil.idPerfil}+'\').submit();'">
+											<td>
+												<form method="POST" th:action="@{editarPerfilHome}" th:attr="id='form'+${perfil.idPerfil}">
+													<input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+													<input type="hidden" name="revisarPerfiles" id="revisarPerfiles" value="true" />
+													<input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+										            <a th:text="${perfil.perfil}"></a>										           										            
+										        </form>										
+											</td>
+										</tr>									
+										</div>									
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+
+<th:block th:fragment="listadoPerfilesUsuario">
+	<div class="card-body" align="center">
+		<table>
+			<tr>
+				<td colspan="5"><h5 align="center" th:text="#{etq.perfiles}"></h5></td>
+			</tr>
+			<tr>
+				<td colspan="2.5" align="center" th:text="#{etq.disponibles}"></td>
+				<td colspan="2.5" align="center" th:text="#{etq.asignados}"></td>
+			</tr>
+			<tr>
+				<td style="width: 2%"></td>					
+				<td style="width: 45%">
+					<div class="subject-info-box-1">
+					  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 200px;" >
+					    <option th:each="perfil : ${Perfiles}" th:value="${perfil.idPerfil}" th:text="${perfil.perfil}"></option>
+					  </select>
+					</div>
+				</td>
+				<td style="width: 6%">
+					<div class="subject-info-arrows text-center">
+				  		<i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');" ></i><br />
+					 	<i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"></i><br />											  
+					</div>										
+				</td>
+				<td style="width: 45%">
+					<div class="subject-info-box-2" >
+					  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 200px;"  th:field="*{perfiles}">					  
+					  	<option th:each="perfil : ${usuario.perfiles}" th:value="${perfil.idPerfil}" th:text="${perfil.perfil}"></option>					  	
+					  </select>
+					</div>										
+				</td>
+				<td style="width: 2%"></td>
+			</tr>
+		</table>
+	</div>
+</th:block>
+
+<th:block th:fragment=perfilesCrearEditarInterno>
+	<div class="container my-5" align="center">
+		<h5 align="center"><span th:text="${editar} ? #{etq.perfiles.editar} : #{etq.perfiles.crear}" ></span></h5>
+		<div class="card">
+			<div class="card-body" >
+				<form  th:action="${editar} ? 'editarPerfil' : 'crearPerfil'"  th:object="${perfil}" method="post">
+					<table>
+						<tr>
+							<td colspan="10">
+							<br/>
+								<table>
+									<tr>
+										<td>
+											<label for="vista" class="col-form-label" th:text="#{etq.tipo.vista}+':  '"></label>
+										</td>
+										<td>
+											<select  th:field="*{tipoVista}" class="form-control" id="vista" onchange="getData()">
+											  <option value="G" th:selected="*{tipoVista}=='G'">General</option> 
+											  <option value="E" th:selected="*{tipoVista}=='E'">Por Empresa</option>
+											</select>											
+										</td>
+									</tr>
+									<tr>
+										<td><br/></td>
+									</tr>
+									<tr>
+										<td >
+											<label for="nombrePerfil" class="col-form-label" th:text="#{etq.nombre}+':  '"></label>
+										</td>
+										<td>			                                 
+			                                <input type="text"  class="form-control" id="nombrePerfil" th:field="*{nombrePerfil}" size="30">
+			                                <input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+			                                <input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+			                                <span th:if="${#fields.hasErrors('nombrePerfil')}" th:errors="*{nombrePerfil}" class="text-danger"></span>
+										</td>
+									</tr>
+								</table>
+								<br/>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="7"><h5 align="center" th:text="#{etq.menu.opciones}"></h5></td>
+						</tr>
+						<tr>
+							<td style="width: 5%"  colspan="2"></td>									
+							<td style="width: 40%">
+								<div class="subject-info-box-1" style="width: 100%">
+								  <select  multiple="multiple" id='lstBox1' class="form-control"  style="height: 400px;" >
+								    <option th:each="opcion : ${opciones}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" th:title="${opcion.nombreOpcion}" style="cursor: pointer;"></option>
+								  </select>
+								</div>
+							</td>
+							<td>
+								<div class="subject-info-arrows text-center" style="width: 100%; cursor: pointer;">												  
+								  	<i class='fas fa-arrow-circle-right' onclick="pasarLista1_Lista2('lstBox1', 'lstBox2');" ></i><br />
+								 	<i class='fas fa-arrow-circle-left' onclick="pasarLista1_Lista2('lstBox2', 'lstBox1');"></i><br />													  
+								</div>										
+							</td>
+							<td style="width: 40%">
+								<div class="subject-info-box-2" id="DivlstBox2" th:style="${#fields.hasErrors('opciones')} ? 'border: 1px solid red; width: 100%;' : 'width: 100%'">
+								  <select multiple="multiple" id='lstBox2' class="form-control" style="height: 400px;"  th:field="*{opciones}" >
+								  	<option value="1" hidden="true"></option>
+								  	<option th:each="opcion : ${opcionesSelect}" th:value="${opcion.idMenu}" th:text="${opcion.nombreOpcion}" th:title="${opcion.nombreOpcion}" style="cursor: pointer;"></option>
+								  </select>
+								</div>										
+							</td>
+							<td style="width: 5%" colspan="2"></td>
+						</tr>
+						<tr>
+							<td colspan="7" align="center">
+								<span th:if="${#fields.hasErrors('opciones')}" th:errors="*{opciones}" class="text-danger"></span>
+							</td>											
+						</tr>
+						<tr>
+							<td colspan="7">
+								<br/>
+					            <div class="form-group" style="text-align: center; flex: 0 0 100% !important;">
+	                            	<button class="btn btn-primary" th:text="#{bot.guardar}" onclick="seleccionarTodos();"></button>	
+	                            	<a class="btn btn-secondary" href="./gestionarPerfiles" th:text="#{bot.cancelar}"></a>
+	                            </div>										
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</th:block>
+
+<th:block th:fragment=listadoPerfilesInternos>
+	<div class="container my-5" style="width: 70%">
+		<h5 align="center" th:text="#{etq.perfiles.listado}"></h5>
+		<div class="card">
+			<div class="card-body" align="center">
+				<div th:switch="${Perfiles}" class="container my-5">
+				<div th:if="${session.Usuario.getAdmin()}">					 
+					<p class="my-5"> 
+						<form method="POST" th:action="@{crearPerfilHome}" >													
+							<input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+				            <button  type="submit" name="crearPerfil"  class="btn btn-secondary btn-sm" th:title="#{tooltip.crear.perfil}">
+				            	<i class="fas fa-plus-circle"></i>
+				            </button>										           										            
+				        </form>
+					</p>
+				</div>
+					<div class="col-md-10">
+						<h5 th:case="null"  th:text="#{msj.perfiles.inexistentes}"></h5>
+						<div th:case="*">
+							<table class="table table-striped table-responsive-md">
+								<thead>
+									<tr>
+										<th th:text="#{etq.nombre}"></th>
+										<th th:text="#{etq.tipo.vista}"></th>
+										<th></th>
+										<th></th>
+									</tr>
+								</thead>
+								
+								<tbody>
+									<tr th:each="perfil : ${Perfiles}">
+										<td th:text="${perfil.perfil}">
+										</td>
+										<td>
+										<div th:if="${perfil.editable}" th:text="${perfil.tipoVista} == 'G' ? 'General':'Por Empresa'"></div>
+										</td>
+										<div th:if="${session.Usuario.getAdmin()}">
+											<td>
+												<form method="POST" th:action="@{editarPerfilHome}" th:attr="id='form'+${perfil.idPerfil}">
+													<input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+													<input type="hidden" name="gestionarPerfiles" id="gestionarPerfiles" th:value="${gestionarPerfiles}" />
+													<input type="hidden" name="revisarPerfiles" id="revisarPerfiles" th:value="${revisarPerfiles}" />
+										            <button th:if="${perfil.editable}" type="submit" name="submit"  th:title="#{tooltip.editar.perfil}" class="btn btn-secondary btn-sm">										            	
+										            	<i class="fas fa-pen"></i>
+										            </button>										           										            
+										        </form>
+											</td>											
+											<td>
+											<div>
+												<button th:if="${perfil.editable}" type="button" th:title="#{tooltip.eliminar.perfil}" class="btn btn-danger btn-sm" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${perfil.idPerfil}">
+													<i class="fas fa-trash"></i>
+												</button>
+										        <!-- Modal eliminar-->
+												<div class="modal fade" th:attr="id='recordDeleteModal'+${perfil.idPerfil}" tabindex="-1" role="dialog"
+													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered" role="document">
+														<div class="modal-content">														
+															<div class="modal-header" style="text-align: right;">
+																<h5 class="modal-title" id="recordDeleteModalLabel"  th:text="#{msj.perfiles.confirma.eliminar}"></h5>
+																<button class="close" type="button" data-dismiss="modal"
+																	aria-label="Close">
+																	<i class="far fa-times-circle"></i>
+																</button>
+															</div>
+															<div class="modal-body"></div>
+																<form method="POST" th:action="@{eliminarPerfil}" th:attr="id='form'+${perfil.idPerfil}">
+																	<div style="text-align: center;">
+																		<button class="btn btn-secondary" type="button" data-dismiss="modal" style="height:40px;width:100px" th:text="#{msj.no}">
+																		</button>
+																		<input type="hidden" name="idPerfil" id="idPerfil" th:value="${perfil.idPerfil}" />
+											            				<button type="submit" name="submit"  class="btn btn-primary" style="height:40px;width:100px" th:text="#{msj.si}">
+											            				</button>
+										            				</div>										           										            
+										        				</form>															
+															<br/>
+														</div>
+													</div>
+											    </div>
+											</div>
+										  </td>
+										</div>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>

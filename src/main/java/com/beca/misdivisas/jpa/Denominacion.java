@@ -3,6 +3,9 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 
@@ -23,6 +26,7 @@ public class Denominacion implements Serializable {
 	private Integer denominacion;
 
 	//bi-directional many-to-one association to Pieza
+	@JsonBackReference
 	@OneToMany(mappedBy="denominacion")
 	private List<Pieza> piezas;
 

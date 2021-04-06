@@ -3,19 +3,23 @@ window.onload = function() {
 }
 
 var sessionExpiry;
+var timeElapsed = false;
 
 function checkSession() {
     sessionExpiry = Math.abs(getCookie('sessionExpiry'));
     var localTime = (new Date()).getTime();
-    if (localTime > (sessionExpiry - 20000)) {
+    if (localTime > (sessionExpiry - 20000) && localTime < sessionExpiry) {
+		$('#spinnerModal').modal('hide');
 		$('#sessionModal').modal('show');
-    } else {
-	    setTimeout('checkSession()', 1000);
-    }
+    } 
+	if (localTime > sessionExpiry) {
+		location.href = 'logout';
+	}
+	setTimeout('checkSession()', 1000);    
 }
 
 function extendSession() {
-	$.ajax({ 
+	jQuery.ajax({ 
 		url: 'activateSession',
 		type: 'POST',
 		success: function() {

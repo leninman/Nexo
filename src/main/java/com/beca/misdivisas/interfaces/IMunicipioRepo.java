@@ -9,6 +9,6 @@ import com.beca.misdivisas.jpa.Municipio;
 
 public interface IMunicipioRepo extends JpaRepository<Municipio, Integer> {
 	
-	@Query("SELECT m FROM Municipio m WHERE m.idEstado = ?1")
+	@Query("SELECT m FROM Municipio m WHERE m.idEstado = ?1 order by m.municipio asc")
 	public List<Municipio> findAllByIdEstado(int idEstado);
 }

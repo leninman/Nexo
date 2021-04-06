@@ -15,10 +15,10 @@ import javax.naming.OperationNotSupportedException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.Rdn;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.support.DefaultDirObjectFactory;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.security.authentication.AccountExpiredException;
@@ -27,6 +27,7 @@ import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,11 +38,8 @@ import org.springframework.util.StringUtils;
 
 import com.beca.misdivisas.util.Constantes;
 
-@SuppressWarnings("deprecation")
 public final class CustomActiveDirectoryLdapAuthenticationProvider extends AbstractLdapAuthenticationProvider {
 	
-	
-
 	private static final Pattern SUB_ERROR_CODE = Pattern.compile(".*data\\s([0-9a-f]{3,4}).*");
 
 	private static final int PASSWORD_EXPIRED = 0x532;
@@ -55,7 +53,9 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private boolean convertSubErrorCodesToExceptions;
 	private String searchFilter = "(&(objectClass=user)(sAMAccountName={0}))";
 
-
+	private String ipOrigen;
+	private Boolean peticionInterna;
+	
 	ContextFactory contextFactory = new ContextFactory();
 
 	public CustomActiveDirectoryLdapAuthenticationProvider(String domain, String url, String rootDn) {
@@ -71,10 +71,23 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		this.url = url;
 		rootDn = this.domain == null ? null : rootDnFromDomain(this.domain);
 	}
+	
+
+	@Override
+	public Authentication authenticate(Authentication authentication) {		
+			CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) authentication.getDetails();
+	        setIpOrigen(details.getIpOrigen());
+	        peticionInterna = details.isPeticionInterna();
+	        
+	        if (peticionInterna)
+	        	return super.authenticate(authentication);
+	        else
+	        	throw badCredentials();
+	}
 
 	@Override
 	protected DirContextOperations doAuthentication(UsernamePasswordAuthenticationToken auth) {
-		String username = auth.getName();
+		String username = auth.getName().toUpperCase();
 		String password = (String) auth.getCredentials();
 		
 		DirContext ctx = bindAsUser(username, password);
@@ -239,24 +252,55 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	}
 	
 	private List<GrantedAuthority> createGrantedAuthoritiesFromLdapGroups(String[] groups) {
-		
+	List<String> privileges = new ArrayList<>();		
 	List<String> groupNames = new ArrayList<>(groups.length);
+	
 	for (String group : groups) {
-		String groupName = new DistinguishedName(group).removeLast().getValue();
-		groupNames.add(groupName);
+
+		for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
+            if (rdn.getType().equalsIgnoreCase("CN")) {
+            	groupNames.add((String) rdn.getValue());
+    			String role = getRole((String) rdn.getValue());
+    			if(!role.isEmpty())
+    			privileges.add(role);
+            }
+        }
 	}
 
-	//I use Active Directory groups that user which tries to login has and get all application privileges for them from database.
-	//You can map privileges or roles form database to application roles and easily use them in application for example in @Secured annotation
-	List<String> privileges = new ArrayList<>();
-	if(groupNames.contains("GSEG-Nexo-Divisas_ADMIN"))
-		privileges.add(Constantes.ROL_ADMIN_BECA);
-	//Your roles/privileges in database need to have 'ROLE_' prefix or you need to append it here.
-	String DEFAULT_ROLE_PREFIX = "ROLE_";
+
+	String DEFAULT_ROLE_PREFIX = Constantes.ROL_PRE;
 	
 	return privileges.stream()
 			.map(privilege -> org.apache.commons.lang3.StringUtils.appendIfMissing(DEFAULT_ROLE_PREFIX, privilege))
 			.map(privilege -> new SimpleGrantedAuthority(privilege)).collect(Collectors.toList());
+	}
+	
+	private static String getRole(String groupName) {
+		String roleName = "";
+		String aux = "";
+		String subGroup[] = null;
+		
+		int index = groupName.lastIndexOf("GSEG-Nexo-Divisas_");
+		if(index != -1) {
+			aux = groupName.replaceAll("GSEG-Nexo-Divisas_", "");
+			subGroup = aux.split("_");			
+			if(subGroup.length == 1) { 
+				  roleName = subGroup[0]; 
+			}else if(subGroup.length == 2){
+				roleName = subGroup[1];
+			}else if(subGroup.length > 2) {
+				roleName = subGroup[1]+"_"+subGroup[2];
+			}
+		}		
+		return roleName;
+	}
+
+	public String getIpOrigen() {
+		return ipOrigen;
+	}
+
+	public void setIpOrigen(String ipOrigen) {
+		this.ipOrigen = ipOrigen;
 	}
 	
 }

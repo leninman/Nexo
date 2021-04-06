@@ -1,0 +1,319 @@
+<div class="row">
+	<div class="container my-5" align="center">
+		<div class="card" style="width: 80%">
+			<div class="card-body" style="text-align: left; width: 100%">
+				<div class="col-md-12">
+					<div class="row">
+						<table style="width: 100%; border: 0px;">
+							<tbody>
+								<tr>
+									<td colspan="2" width="46%" style="text-align: Right;"><b>Empresa:</b></td>
+									<td width="8%"></td>
+									<td colspan="2" width="46%" th:text="${solicitudRetiro.nombreEmpresa}" align="left"></td>
+								</tr>
+								<tr>
+									<td width="23%" style="text-align: left;"><b>Fecha Actualizaci&oacute;n:</b></td>
+									<td width="23%" align="right" th:text="${traza.fecha}"></td>
+									<td width="8%"></td>
+									<td width="23%" style="text-align: left;"><b>Estatus Actual:</b></td>
+									<td width="23%" th:text="${traza.estatus}" align="right"></td>
+								</tr>
+								<tr>
+									<td style="text-align: left;"><b>&Uacute;ltimo Usuario:</b></td>
+									<td align="right" th:text="${traza.nombreUsuario}"></td>
+									<td></td>
+									<td align="left"><b>Tipo Billete:</b></td>
+									<td align="right" th:text="${solicitudRetiro.tipoBillete}"></td>
+								</tr>
+								<tr>
+									<td style="text-align: left;"><b>Fecha Estimada:</b></td>
+									<td align="right" th:text="${solicitudRetiro.fechaEstimada}"></td>
+									<td></td>
+									<td style="text-align: left;"><b>Agencia:</b></td>
+									<td align="right"
+										th:text="${#numbers.formatInteger(solicitudRetiro.agencia.numeroAgencia, 3) + ' - ' + solicitudRetiro.agencia.agencia}"></td>
+								</tr>
+								<tr>
+									<td style="text-align: left;"><b>Moneda:</b></td>
+									<td align="right" th:text="${solicitudRetiro.moneda.moneda}"></td>
+									<td></td>
+									<td style="text-align: left;"><b>Monto:</b></td>
+									<td align="right"
+										th:text="${#numbers.formatDecimal(solicitudRetiro.monto, 0, 'POINT', 2, 'COMMA')}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<br>
+					<div th:switch="${tipoAutorizacion}">
+						<div th:case="'2'" class="row">
+							<table style="width: 100%; border: 0px;">
+								<tbody>
+									<tr>
+										<td width="23%" style="text-align: left;"><b>Tipo
+												Autorizado:</b></td>
+										<td width="54%" colspan="3"
+											th:text="${solicitudRetiro.autorizado.tipoAutorizado.tipoAutorizado}"
+											align="left"></td>
+										<td width="23%">&nbsp;</td>
+
+									</tr>
+									<tr>
+										<td colspan="5">&nbsp;</td>
+									</tr>
+									<tr>
+										<td swidth="23%" tyle="text-align: left;"><b>Documento
+												Autorizado:</b></td>
+										<td width="23%" align="right"
+											th:text="${autorizado.tipoDocumentoAutorizado + autorizado.documentoAutorizado}"></td>
+										<td width="8%"></td>
+										<td align="left"><b>Tel&eacute;fono:</b></td>
+										<td align="right"
+											th:text="${autorizado.prefijoTelefono + autorizado.telefono}"></td>
+									</tr>
+									<tr>
+										<td style="text-align: left;"><b>Nombre Autorizado:</b></td>
+										<td align="right" th:text="${autorizado.nombreAutorizado}"></td>
+										<td></td>
+										<td width="23%" style="text-align: left;"><b>Cargo:</b></td>
+										<td width="23%" th:text="${autorizado.cargo}" align="right"></td>
+
+									</tr>
+									<tr>
+										<td style="text-align: left;">&nbsp;</td>
+										<td align="right">
+											<div class="logo-container">
+												<img th:if="${autorizado.imagenDocumento}" class="logo-image"
+													th:src="|data:image/jpg+gif+png;base64,${autorizado.imagenDocumento}|">
+											</div>
+										</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td align="right">
+											<div class="logo-container">
+												<img th:if="${autorizado.imagenDocumentoAdicional}" class="logo-image"
+													th:src="|data:image/jpg+gif+png;base64,${autorizado.imagenDocumentoAdicional}|">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left;"><b>RIF Empresa:</b></td>
+										<td align="right"
+											th:text="${autorizado.caracterRifEmpresa + autorizado.rifEmpresa}"></td>
+										<td></td>
+										<td style="text-align: left;"><b>Email:</b></td>
+										<td align="right" th:text="${autorizado.email}"></td>
+									</tr>
+									<tr>
+										<td style="text-align: left;"><b>Nombre Empresa:</b></td>
+										<td align="right" th:text="${autorizado.nombreEmpresa}"></td>
+										<td></td>
+										<td style="text-align: left;"><b>Marca, modelo y
+												color:</b></td>
+										<td align="right" th:text="${autorizado.marcaModeloColor}"></td>
+									</tr>
+									<tr>
+										<td style="text-align: left;">&nbsp;</td>
+										<td align="right">
+											<div class="logo-container">
+												<img th:if="${autorizado.imagenDocumentoRif}" class="logo-image"
+													th:src="|data:image/jpg+gif+png;base64,${autorizado.imagenDocumentoRif}|">
+											</div>
+										</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+									</tr>
+									<tr>
+										<td style="text-align: left;"><b>Placa:</b></td>
+										<td align="right" th:text="${autorizado.placa}"></td>
+										<td colspan="3"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div th:case="'1'" class="row">
+							<!-- NATURAL -->
+							<table style="width: 100%; border: 0px;">
+								<tbody>
+									<tr>
+										<td width="23%" style="text-align: left;"><b>Tipo
+												Autorizado:</b></td>
+										<td width="54%" colspan="3"
+											th:text="${solicitudRetiro.autorizado.tipoAutorizado.tipoAutorizado}"
+											align="left"></td>
+										<td width="23%">&nbsp;</td>
+									</tr>
+									<tr>
+										<td colspan="5">&nbsp;</td>
+									</tr>
+									<tr>
+										<td swidth="23%" tyle="text-align: left;"><b>Documento
+												Autorizado:</b></td>
+										<td width="23%" align="right"
+											th:text="${autorizado.tipoDocumentoAutorizado + autorizado.documentoAutorizado}"></td>
+										<td width="8%"></td>
+										<td align="left"><b>Tel&eacute;fono:</b></td>
+										<td align="right"
+											th:text="${autorizado.prefijoTelefono + autorizado.telefono}"></td>
+									</tr>
+									<tr>
+										<td style="text-align: left;"><b>Nombre Autorizado:</b></td>
+										<td align="right" th:text="${autorizado.nombreAutorizado}"></td>
+										<td></td>
+										<td style="text-align: left;"><b>Email:</b></td>
+										<td align="right" th:text="${autorizado.email}"></td>
+									</tr>
+									<tr>
+										<td style="text-align: left;">&nbsp;</td>
+										<td align="right">
+											<div class="logo-container">
+												<img th:if="${autorizado.imagenDocumento}" class="logo-image"
+													th:src="|data:image/jpg+gif+png;base64,${autorizado.imagenDocumento}|">
+											</div>
+										</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+									</tr>
+									<tr>
+										<td style="text-align: left;"><b>Placa:</b></td>
+										<td align="right" th:text="${autorizado.placa}"></td>
+										<td></td>
+										<td style="text-align: left;"><b>Marca, modelo y
+												color:</b></td>
+										<td align="right" th:text="${autorizado.marcaModeloColor}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div th:case="'3'" class="row">
+							<!-- EMPRESA TRANSPORTE -->
+							<table style="width: 100%; border: 0px;">
+								<tbody>
+									<tr>
+										<td width="23%" style="text-align: left;"><b>Tipo
+												Autorizado:</b></td>
+										<td width="54%" colspan="3"
+											th:text="${solicitudRetiro.autorizado.tipoAutorizado.tipoAutorizado}"
+											align="left"></td>
+										<td width="23%">&nbsp;</td>
+									</tr>
+									<tr>
+										<td colspan="5">&nbsp;</td>
+									</tr>
+									<tr>
+										<td swidth="23%" tyle="text-align: left;"><b>RIF
+												Autorizado:</b></td>
+										<td width="23%" align="right"
+											th:text="${autorizado.caracterRifAutorizado + autorizado.rifAutorizado}"></td>
+										<td width="8%"></td>
+										<td align="left"><b>Nombre Autorizado:</b></td>
+										<td align="right" th:text="${autorizado.nombreAutorizado}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<br>
+					<div>
+					<table style="width: 100%; text-align:center;">
+						<tr>
+							<td>
+								<input type="button" class="btn btn-primary" data-toggle="modal"
+									th:attr="data-target='#recordAprobarModal'+${solicitudRetiro.idSolicitud}"
+									value="Procesar">
+								<div class="modal fade"
+									th:attr="id='recordAprobarModal'+${solicitudRetiro.idSolicitud}"
+									tabindex="-1" role="dialog"
+									aria-labelledby="recordAprobarModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered" role="document">
+										<div class="modal-content">
+											<div class="modal-header" style="text-align: right;">
+												<h5 class="modal-title" id="recordAprobarModalLabel"
+													th:text="#{msj.confirm.procesar.solicitud.retiro}"></h5>
+												<button class="close" type="button" data-dismiss="modal"
+													aria-label="Close">
+													<i class="far fa-times-circle"></i>
+												</button>
+											</div>
+											<div class="modal-body"></div>
+											<form method="POST" th:action="@{procesarSolicitudRetiro}"
+												th:attr="id='formAprobar'+${solicitudRetiro.idSolicitud}">
+												<div style="text-align: center;">
+													<button class="btn btn-secondary" type="button"
+														data-dismiss="modal" style="height: 40px; width: 100px"
+														th:text="#{msj.no}"></button>
+													<input type="hidden" name="idSolicitud"
+														id="idSolicitud"
+														th:value="${solicitudRetiro.idSolicitud}" />
+													<button type="submit" name="submit" class="btn btn-primary"
+														style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+												</div>
+											</form>
+											<br />
+										</div>
+									</div>
+								</div>
+							</td>
+							<td>
+								<input type="button" class="btn btn-danger" data-toggle="modal"
+									th:attr="data-target='#recordDeleteModal'+${solicitudRetiro.idSolicitud}"
+									value="Rechazar">
+								<div class="modal fade"
+									th:attr="id='recordDeleteModal'+${solicitudRetiro.idSolicitud}"
+									tabindex="-1" role="dialog"
+									aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered" role="document">
+										<div class="modal-content">
+											<div class="modal-header" style="text-align: right;">
+												<h5 class="modal-title" id="recordDeleteModalLabel"
+													th:text="#{msj.confirm.rechazar.solicitud.retiro}"></h5>
+												<button class="close" type="button" data-dismiss="modal"
+													aria-label="Close">
+													<i class="far fa-times-circle"></i>
+												</button>
+											</div>
+											<div class="modal-body"></div>
+											<form method="POST" th:action="@{rechazarSolicitudRetiro}"
+												th:attr="id='form'+${solicitudRetiro.idSolicitud}">
+												<div style="text-align: center;">
+													<div>
+														<label for="motivo" class="col-form-label">Motivo</label>
+														<div style="width: 80%; margin-left: 10%;">
+															<select id="idMotivo"name="idMotivo" class="form-control">
+																<option th:each="motivos : ${motivosRechazo}"
+																	th:value="${motivos.idMotivoRechazo}"
+																	th:text="${motivos.motivo}" />
+															</select>
+														</div>
+													</div>
+													<br>
+													<input type="hidden" name="idSolicitud" id="idSolicitud"
+														th:value="${solicitudRetiro.idSolicitud}" /><input
+														type="hidden" name="accionFrom" id="accionFrom"
+														value="RetiroEfectivo/Procesamiento" />												
+														<button class="btn btn-secondary" type="button"
+														data-dismiss="modal" style="height: 40px; width: 100px"
+														th:text="#{msj.no}"></button>
+													
+													<button type="submit" name="submit" class="btn btn-primary"
+														style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+												</div>
+											</form>
+											<br />
+										</div>
+									</div>
+								</div>
+							</td>
+						<td>
+							<a class="btn btn-secondary" href="./solicitudesRetiroProcesar" th:text="#{bot.cancelar}"></a>
+						</td>
+					</tr>
+				</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+</div>

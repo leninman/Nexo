@@ -2,6 +2,9 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 
@@ -20,8 +23,20 @@ public class Transportista implements Serializable {
 	private Integer idTransportista;
 
 	private String transportista;
+	
+	private String rif;
+
+
+	public String getRif() {
+		return rif;
+	}
+
+	public void setRif(String rif) {
+		this.rif = rif;
+	}
 
 	//bi-directional many-to-one association to Remesa
+	@JsonBackReference
 	@OneToMany(mappedBy="transportista")
 	private List<Remesa> remesas;
 

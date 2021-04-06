@@ -2,8 +2,10 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
@@ -29,14 +31,12 @@ public class Municipio implements Serializable {
 	private String municipio;
 
 	//bi-directional many-to-one association to Estado
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_estado\"", insertable = false, updatable = false)
 		})
 	private Estado estado;
 
-	//bi-directional many-to-one association to Sucursal
-	@OneToMany(mappedBy="municipio")
-	private List<Sucursal> sucursals;
 
 	public Municipio() {
 	}
@@ -79,28 +79,6 @@ public class Municipio implements Serializable {
 
 	public void setEstado(Estado estado) {
 		this.estado = estado;
-	}
-
-	public List<Sucursal> getSucursals() {
-		return this.sucursals;
-	}
-
-	public void setSucursals(List<Sucursal> sucursals) {
-		this.sucursals = sucursals;
-	}
-
-	public Sucursal addSucursal(Sucursal sucursal) {
-		getSucursals().add(sucursal);
-		sucursal.setMunicipio(this);
-
-		return sucursal;
-	}
-
-	public Sucursal removeSucursal(Sucursal sucursal) {
-		getSucursals().remove(sucursal);
-		sucursal.setMunicipio(null);
-
-		return sucursal;
 	}
 
 }

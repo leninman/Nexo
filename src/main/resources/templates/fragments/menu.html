@@ -1,27 +1,41 @@
 
 <th:block th:fragment="menuSuperior">	    
-		<nav class="navbar navbar-expand-sm navbar-dark bg-dark"  style="height: 37px; width: 100%; font-size: 16px !important">
-			<!-- Sidebar Toggle (Topbar) -->
-
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-    			<span class="navbar-toggler-icon"></span>
-  			</button>
-		  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-		    <ul class="navbar-nav mr-auto">
-			  <li th:each="menu : ${menues}" th:class="${#lists.size(menu.subMenu)>0} ? 'nav-item dropdown' : 'nav-item'" >
-		       <a th:class="${menu.accion}!=NULL ? 'nav-link' : 'nav-link dropdown-toggle'" th:href="${menu.accion}!=NULL ? ${menu.accion} : '#'" th:id="${menu.accion} !=NULL ? ${menu.accion} + 'l' : 'navbarDropdown'" 
-		       th:role="${menu.accion}!=NULL ? '' : 'button'" th:data-toggle="${menu.accion}!=NULL ? '' : 'dropdown'" th:aria-haspopup="${menu.accion}!=NULL ? 'false' : 'true'">
-		         <i th:class="${menu.icono}"></i>
-		         <span th:text="${menu.nombreOpcion}"></span>
-		       </a>
-		       <div class="dropdown-menu" aria-labelledby="navbarDropdown" th:if="${#lists.size(menu.subMenu)>0}">
-		          <a  th:each="submenu : ${menu.subMenu}" class="dropdown-item" th:href="${submenu.accion}" th:id="${submenu.accion}+'l'">
-		          	<i th:class="${submenu.icono}"></i>&nbsp;
-		          	<span th:text="${submenu.nombreOpcion}"></span>
-		          </a>
-		        </div>
-		      </li>			    
-		    </ul>
-		  </div>
-		</nav>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark" id="main_navbar" style="height: 37px; width: 100%; font-size: 16px !important">
+	<!-- Sidebar Toggle (Topbar) -->
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  			<span class="navbar-toggler-icon"></span>
+			</button>
+ 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+	  <li th:each="menu : ${menues}"  th:if="${menu.tipoMenu}=='S'" th:class="${#lists.size(menu.subMenu)>0} ? 'nav-item dropdown' : 'nav-item'" >
+	       <a th:class="${menu.accion}!=NULL ? 'nav-link' : 'nav-link dropdown-toggle'" th:href="${menu.accion}!=NULL ? ${menu.accion} : '#'" th:id="'navbarDropdown' + ${menu.idMenu}" 
+	       th:role="${menu.accion}!=NULL ? '' : 'button'" th:data-toggle="${menu.accion}!=NULL ? '' : 'dropdown'" th:aria-haspopup="${menu.accion}!=NULL ? 'false' : 'true'" th:aria-expanded="${menu.accion}!=NULL ? 'true' : 'false'">
+	         <i th:class="${menu.icono}"></i>
+	         <span th:text="${menu.nombreOpcion}"></span>
+	       </a>
+	       	<div th:if="${#lists.size(menu.subMenu)>0}">
+	       	<ul class="dropdown-menu" th:aria-labelledby="'navbarDropdown' + ${menu.idMenu}">
+				<li th:each="submenu : ${menu.subMenu}" th:class="${#lists.size(submenu.subMenu)>0} ? 'nav-item dropdown' : ''">
+					<a th:class="${#lists.size(submenu.subMenu)>0} ? 'dropdown-item dropdown-toggle':'dropdown-item'" th:href="${submenu.accion}!=NULL ? ${submenu.accion} : '#'" th:id="'navbarDropdown'+ ${submenu.idMenu}" 
+					th:role="${menu.accion}!=NULL ? '' : 'button'" th:data-toggle="${menu.accion}!=NULL ?  'dropdown' : ''" th:aria-haspopup="${menu.accion}!=NULL ? 'true' : 'false'" th:aria-expanded="${menu.accion}!=NULL ? 'true' : 'false'">
+						<i th:class="${submenu.icono}"></i>&nbsp;
+						<span th:text="${submenu.nombreOpcion}"></span>
+					</a>
+      				<div  th:if="${#lists.size(submenu.subMenu)>0}">
+			       	<ul class="dropdown-menu" th:aria-labelledby="'navbarDropdown'+ ${submenu.idMenu}" >								
+						<li th:each="submenu1 : ${submenu.subMenu}" th:if="${submenu1.accion}!=NULL and ${submenu1.accion} != ''" >
+							<a class="dropdown-item" th:href="${submenu1.accion}" >
+						  		<i th:class="${submenu1.icono}"></i>&nbsp;
+						  		<span th:text="${submenu1.nombreOpcion}"></span>
+							</a>
+						</li>								
+			       	</ul>
+					</div>
+				</li>
+	       	</ul>
+		</div>
+     </li>			    
+  </ul>
+  </div>
+</nav>	
 </th:block>

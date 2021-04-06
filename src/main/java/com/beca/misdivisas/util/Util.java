@@ -1,5 +1,11 @@
 package com.beca.misdivisas.util;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -8,12 +14,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
+import org.imgscalr.Scalr;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
+
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -127,25 +140,6 @@ public class Util {
 		return result;
 	}
 	
-	public List<Date> obtenerFeriados(String prop){
-		DateFormat formato = new SimpleDateFormat("dd-MM-yyyy");
-		String bancarios = prop;
-		List<Date> fechas = new ArrayList<>();
-		
-		if(bancarios!=null && !bancarios.isEmpty()) {
-			String [] bancariosSplit = bancarios.split(",");		
-	
-			for(int i =  0; i< bancariosSplit.length; i++) {
-				try {				
-					fechas.add(formato.parse(bancariosSplit[i]));
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return fechas;
-	}
-	
 	public static String getRemoteIp(HttpServletRequest request) {
 		String ip="";
 		if(request.getHeader("x-forwarded-for")!= null)
@@ -161,5 +155,153 @@ public class Util {
 		Timestamp ahora = Timestamp.from(instante);
 	    long diffInMillies = ahora.getTime() - date1.getTime();
 	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+	}
+	
+	public static Timestamp getTimestamp() {		
+		return new Timestamp(new Date().getTime());		
+	}
+	
+	public static String generarCartaPorte() {
+		String numbers = "0123456789";
+		Random rndmMethod = new Random();
+		int length = 3;
+		char[] randomNumber = new char[length];
+		for (int i = 0; i < length; i++) {
+			randomNumber[i] = numbers.charAt(rndmMethod.nextInt(numbers.length()));
+		}
+		
+		Date date = new Date();  
+		DateFormat dateFormat = new SimpleDateFormat("YYMMddHHmmss");
+		String stringDate = dateFormat.format(date);
+		return stringDate.concat(String.valueOf(randomNumber));
+	}
+	
+	public static BufferedImage simpleResizeImage(BufferedImage originalImage, int targetWidth) throws Exception {
+		return Scalr.resize(originalImage, targetWidth);
+	}
+	public static String getNombreArchivo(char pre) {
+		Date date = new Date();  
+		DateFormat dateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
+		String nombre = dateFormat.format(date);
+		nombre = pre + nombre+ String.valueOf(generaCincoDigitos()) + ".jpeg";
+
+		return nombre;
+	}
+	
+	public static int generaCincoDigitos() {
+	    Random r = new Random( System.currentTimeMillis() );
+	    return ((1 + r.nextInt(2)) * 10000 + r.nextInt(10000));
+	}
+	
+	public static String salvaArchivo(String archivo, String rutaImg, char tipoDoc, int tamanio) throws IOException, Exception {		
+		String nombreArchivo = getNombreArchivo(tipoDoc); 
+		try {
+			File file = new File(rutaImg+ nombreArchivo);
+			BufferedImage image = null;
+			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(archivo.getBytes()));
+			image= Util.simpleResizeImage(ImageIO.read(bais),tamanio);
+			ImageIO.write(image, "jpeg", file);
+		} catch (IOException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+		
+		return nombreArchivo;
+	}
+	
+	public static String obtenerArchivoStr(String ruta, String archivo) throws IOException {
+		byte[] bytes;
+		String respuesta="";
+		 try {
+			File file = ResourceUtils.getFile(ruta);
+			if(file!=null) {
+				bytes = Files.readAllBytes(file.toPath());
+				respuesta=Base64.getEncoder().encodeToString(bytes);
+			}
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
+		}
+		return respuesta;		
+	}
+	
+	public static boolean eliminarArchivo(String ruta, String archivo) throws IOException {
+		 File file;
+		 boolean retorno=false;
+		try {
+			file = ResourceUtils.getFile(ruta+archivo);
+			retorno = file.delete();
+		} catch (FileNotFoundException e) {
+			return false;
+		}         
+	     return retorno; 
+	}
+	
+	public static String formatRif(String caracterRif, int numeroRif) {
+	        String nrif=String.valueOf(numeroRif);   
+	        nrif = StringUtils.leftPad(nrif, 9, "0");
+	        String rif = caracterRif.concat("-" + nrif.substring(0, nrif.length()-1) + '-' + nrif.charAt(nrif.length()-1));
+	        return rif;
+	    }
+	   
+	public static BufferedImage convertFile(byte[] archivo, char tipoDoc) throws IOException, Exception {
+			int ancho = 0; //Ancho maximo permitido para la imagen
+			int limite=0; //Tamaño maximo permitido para mantener el original en KB
+			if(tipoDoc=='l') {
+				ancho = 200;
+				limite=50;
+			}else {
+				ancho = 400;
+				limite=100;
+			}
+
+			BufferedImage image = null;
+			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(archivo));
+			image = ImageIO.read(bais);
+			if (archivo.length > limite * 1024) {
+				int width = image.getWidth();
+				width = width > ancho ? ancho : width;
+				image= Util.simpleResizeImage(image, width);
+			}
+			return image;
+	}
+		
+	public static String saveFile(BufferedImage archivo, char tipoDoc, String extension, String pathDestination) throws IOException, Exception {
+        String nombreArchivo = Util.getNombreArchivo(tipoDoc);
+        if(tipoDoc!='l') {
+            ImageIO.write(archivo, extension, new File(pathDestination + nombreArchivo));	               
+        }
+        	return nombreArchivo;
+    }
+	
+	public static MockMultipartFile convertFiletoMultiPart(String ruta, String archivo) {
+        try {
+        	File file = ResourceUtils.getFile(ruta);
+			if(file!=null) {
+				MockMultipartFile multipartFile = new MockMultipartFile(archivo, file.getName(), "image/jpg+gif+png;base64",
+	            		Files.readAllBytes(file.toPath()));
+	            return multipartFile;
+			}            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+	
+	public static String formatoDocumentoIdentidad(String documento) {
+		String resp = "";
+		if(documento != null && ! documento.isEmpty())
+			resp =  String.format("%09d",Integer.parseInt(documento));
+		return resp;
+	}
+	
+	public static String formatoDocumentoCompleto(String documento) {
+		String resp = "";
+		if (documento.length()>1) {
+			 resp= documento.substring(0,1) + String.format("%09d",Integer.parseInt(documento.substring(1,documento.length())));
+		}
+		return resp;
 	}
 }

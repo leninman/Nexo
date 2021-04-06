@@ -2,6 +2,9 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 
@@ -22,6 +25,7 @@ public class Region implements Serializable {
 	private String region;
 
 	//bi-directional many-to-one association to Estado
+	@JsonBackReference
 	@OneToMany(mappedBy="region")
 	private List<Estado> estados;
 

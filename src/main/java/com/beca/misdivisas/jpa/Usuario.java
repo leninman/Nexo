@@ -2,16 +2,11 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
-import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
 import java.sql.Timestamp;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,12 +15,11 @@ import java.util.concurrent.TimeUnit;
  * The persistent class for the "USUARIO" database table.
  * 
  */
-
 @Entity
 @Table(name="\"USUARIO\"", schema ="\"SEGURIDAD\"")
 @NamedQuery(name="Usuario.findAll", query="SELECT u FROM Usuario u")
 public class Usuario implements Serializable {
-	private static final long serialVersionUID = 1L;     
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@SequenceGenerator(name="\"SEGURIDAD\".\"seq_usuario_idUsuario\"", sequenceName ="\"SEGURIDAD\".\"seq_usuario_idUsuario\"", allocationSize = 1)
@@ -34,12 +28,11 @@ public class Usuario implements Serializable {
 
 	private Integer idUsuario;
 
-	@NotNull(message = "es requerida")
-	@NotBlank(message = "es requerida")
-	//@Size(min=8, max=20, message = "debe contener entre 8 y 20 caracteres") 
+	//@NotNull(message = "es requerida")
+	//@NotBlank(message = "es requerida") 
 	@Column(name="contrasena")
 	private String contrasena;
-	
+
 	@Column(name="contrasena_1")
 	private String contrasena1;
 
@@ -57,32 +50,35 @@ public class Usuario implements Serializable {
 
 	@NotNull(message = "requerido")
 	@NotBlank(message = "requerido")
-    @Email(message = "formato inválido")
+    @Email(message = "formato inv\u00E1lido")
 	@Column(name="email")
 	private String email;
 
 	@Column(name="\"fecha_actualizacion_contrasena\"")
 	private Timestamp fechaActualizacionContrasena;
 
-	//@NotNull(message = "Es requerido")
 	private Boolean habilitado;
 
 	@Column(name="\"id_empresa\"")
 	private Integer idEmpresa;
 	
-	@NotNull(message = "requerido")
-	@NotBlank(message = "requerido")
+	//@NotNull(message = "requerido")
+	//@NotBlank(message = "requerido")
 	@Column(name="\"nombre_completo\"")
-	@Size(max=255, message = "no debe contener mas de 255 caracteres") 
+	//@Size(max=255, message = "no debe contener mas de 255 caracteres") 
 	private String nombreCompleto;
 
 	@NotNull(message = "requerido")
 	@NotBlank(message = "requerido")
 	@Column(name="\"nombre_usuario\"")
-	@Size(min=8, max=20, message = Constantes.MENSAJE_VAL_CONTRASENA_1)
+	//@Size(min=8, max=20, message = Constantes.MENSAJE_VAL_CONTRASENA_1)
 	private String nombreUsuario;
 	
 	private String estado;
+
+	//bi-directional many-to-one association to PerfilUsuario
+	@OneToMany(mappedBy="usuario")
+	private List<PerfilUsuario> perfilUsuarios;
 
 	//bi-directional many-to-one association to UsuarioRol
 	@OneToMany(mappedBy="usuario")
@@ -238,12 +234,21 @@ public class Usuario implements Serializable {
 		
 	}
 
+	/*
+	 * public Boolean getAdmin() { this.admin = false; for (Iterator<UsuarioRol>
+	 * iterator = usuarioRols.iterator(); iterator.hasNext();) { UsuarioRol
+	 * usuarioRol = iterator.next(); if
+	 * (usuarioRol.getRol().getRol().equals("ADMIN")) this.admin = true; } return
+	 * admin; }
+	 */
+	
 	public Boolean getAdmin() {
 		this.admin = false;
-		for (Iterator<UsuarioRol> iterator = usuarioRols.iterator(); iterator.hasNext();) {
-			UsuarioRol usuarioRol = iterator.next();
-			if (usuarioRol.getRol().getRol().equals("ADMIN"))
-				this.admin = true;
+		if(perfilUsuarios != null) {
+			for (PerfilUsuario perfilUsuario : perfilUsuarios) {
+				if (perfilUsuario.getPerfil().getPerfil().equals("ADMIN"))
+					this.admin = true;
+			}
 		}
 		return admin;
 	}
@@ -276,6 +281,29 @@ public class Usuario implements Serializable {
 		this.tipoUsuario = tipoUsuario;
 	}
 
+	public List<PerfilUsuario> getPerfilUsuarios() {
+		return this.perfilUsuarios;
+	}
+
+	public void setPerfilUsuarios(List<PerfilUsuario> perfilUsuarios) {
+		this.perfilUsuarios = perfilUsuarios;
+	}
+
+	public PerfilUsuario addPerfilUsuario(PerfilUsuario perfilUsuario) {
+		getPerfilUsuarios().add(perfilUsuario);
+		perfilUsuario.setUsuario(this);
+
+		return perfilUsuario;
+	}
+
+	public PerfilUsuario removePerfilUsuario(PerfilUsuario perfilUsuario) {
+		getPerfilUsuarios().remove(perfilUsuario);
+		perfilUsuario.setUsuario(null);
+
+		return perfilUsuario;
+	}
+
+
 	public UsuarioRol addUsuarioRol(UsuarioRol usuarioRol) {
 		getUsuarioRols().add(usuarioRol);
 		usuarioRol.setUsuario(this);
@@ -290,18 +318,29 @@ public class Usuario implements Serializable {
 		return usuarioRol;
 	}
 	
-	public Boolean hasAnyRol(String... nombreRol) {
+	/*
+	 * public Boolean hasAnyRol(String... nombreRol) { boolean result = false;
+	 * 
+	 * for (String rol : nombreRol) { for (Iterator<UsuarioRol> iterator =
+	 * usuarioRols.iterator(); iterator.hasNext();) { UsuarioRol usuarioRol =
+	 * iterator.next(); if (usuarioRol.getRol().getRol().equals(rol)) result = true;
+	 * } }
+	 * 
+	 * return result; }
+	 */
+	
+	public Boolean hasAnyPerfil(String... nombrePerfil) {
 		boolean result = false;
 		
-		for (String rol : nombreRol) {
-			for (Iterator<UsuarioRol> iterator = usuarioRols.iterator(); iterator.hasNext();) {
-				UsuarioRol usuarioRol = iterator.next();
-				if (usuarioRol.getRol().getRol().equals(rol))
-					result = true;
-			}
+		for (String perfil : nombrePerfil) {
+			for (PerfilUsuario pu : this.perfilUsuarios) {
+				if(pu.getPerfil().getPerfil().equalsIgnoreCase(perfil)) {
+					result=true;
+					break;
+				}
+			}			
 		}
-
-		return result;
+		return result;		
 	}
 	
 	public boolean esClaveVencida(long dias) {

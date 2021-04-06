@@ -1,0 +1,329 @@
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>
+<div th:if="${crear}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Nuevo Autorizado</h5>
+		<div class="card col-md-12" style="width: 100%">
+			<div class="card-body" style="text-align: left; width: 100%">
+				<div class="col-md-12">
+					<form action="#" th:object="${autorizadoPersonaNatural}" method="post" enctype="multipart/form-data">
+						<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
+						<script>
+							$('form').on(
+									'submit',
+									function(e) {
+										e.preventDefault();
+										processPostForm(
+												"agregarAutorizadoPersonaNatural",
+												this);
+									});
+							
+							function cleanImg() {
+								document.getElementById('documentoImg').value = '';
+								document.getElementById('imgDocumentoAutorizado').value = '';
+								if (document.getElementById('imagenDocumento'))
+									document.getElementById("imagenDocumento").remove();
+							}
+
+							function loadImg(event) {
+								// define reader as a new instance of FileReader
+								if (validarImagen()) {
+									var reader = new FileReader();
+									reader.readAsDataURL(event.target.files[0]);
+									// Handle progress, success, and errors
+									reader.onload = function() {
+										var container = document.getElementById('logoContainer');
+										container.innerHTML = '';
+										var imageNode = document.createElement('img');
+										imageNode.className = 'logo-image';
+										imageNode.id = 'imagenDocumento';
+										imageNode.src = reader.result;
+										document.getElementById('imgDocumentoAutorizado').value = reader.result.substring(reader.result.indexOf(",") + 1);
+										container.appendChild(imageNode);
+									};
+								}
+							}
+						</script>
+						<div class="row">
+							<input type="hidden" name="idTipoAutorizado"
+								id="idTipoAutorizado"
+								th:value="${autorizadoPersonaNatural.idTipoAutorizado}" />
+							<div class="form-group col-md-6">
+								<label for="nombre" class="col-form-label">Tipo de
+									Autorizado</label> <input type="text"
+									value="Autorizado - Persona Natural" class="form-control"
+									id="nombre" maxlength=100 readonly>
+							</div>
+							<div class="form-group col-md-12">
+								<label for="nombre" class="col-form-label"><b>Datos
+									B&aacute;sicos</b></label>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="tipoDocumentoAutorizado" class="col-form-label">Documento
+									del Autorizado</label>
+								<div class="rif_row">
+									<select th:field="*{tipoDocumentoAutorizado}" id="tipoDocumentoAutorizado"
+										class="form-control caracter">
+			   							<option selected value="V">V</option>
+										<option value="E">E</option>
+										<option value="P">P</option>										
+									</select> <input type="text"
+										th:field="*{documentoAutorizado}" class="form-control rif"
+										id="documentoAutorizado" placeholder="Numero de documento"
+										maxlength="9" oninput="soloNumeros(this)"/>
+								</div>
+								<span th:if="${#fields.hasErrors('documentoAutorizado')}"
+									th:errors="*{documentoAutorizado}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="nombreAutorizado" class="col-form-label">Nombre
+									Autorizado </label> <input type="text" th:field="*{nombreAutorizado}"
+									class="form-control" id="nombreAutorizado" maxlength=100>
+									<span th:if="${#fields.hasErrors('nombreAutorizado')}"
+									th:errors="*{nombreAutorizado}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="telefono" class="col-form-label">Tel&eacute;fono
+									M&oacute;vil</label>
+								<div class="rif_row">
+									<select th:field="*{prefijoTelefono}" id="prefijoTelefono"
+										class="form-control caracter">
+			   							<option selected value="0412">0412</option>
+										<option value="0414">0414</option>
+										<option value="0424">0424</option>	
+										<option value="0416">0416</option>										
+										<option value="0426">0426</option>
+									</select> 
+									<input type="text" th:field="*{telefono}" oninput="soloNumeros(this)"
+									class="form-control rif" placeholder="Numero de telefono" id="telefono" maxlength=7>
+								</div>	
+									<span th:if="${#fields.hasErrors('telefono')}"
+									th:errors="*{telefono}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="email" class="col-form-label">Correo
+									electr&oacute;nico</label> <input type="text" th:field="*{email}"
+									class="form-control" id="text" maxlength=150>
+									<span th:if="${#fields.hasErrors('email')}"
+									th:errors="*{email}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6 logo-row">
+								<div class="logo-selector">
+									<label for="documentoImg" class="col-form-label">Documento
+										de Identidad (JPG, GIF o PNG)</label>
+								    <div>
+										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoImg').click()" value="Examinar"> 
+										<input type="button" class="btn btn-primary" onclick="cleanImg('documentoImg','imgDocumentoAutorizado', 'imagenDocumento' )" value="Limpiar">
+										<input type="file" th:field="*{documentoImg}" class="form-control" style="display: none" id="documentoImg" onchange="loadImage(event, 'documentoImgContainer', 'imagenDocumento', 'imgDocumentoAutorizado', 'documentoImgErrorServer', 'documentoImgErrorClient')">										
+										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 
+										<span id="documentoImgErrorServer" th:if="${#fields.hasErrors('documentoImg')}" th:errors="*{documentoImg}"	class="text-danger"></span> 
+										<span id="documentoImgErrorClient"	style="display: none" class="text-danger"></span>
+									</div>
+								</div>								
+							</div>
+							<div class="logo-container col-md-12" id="documentoImgContainer">
+									<img th:if="${autorizadoPersonaNatural.imagenDocumento}"
+										id="imagenDocumento" class="logo-image"
+										th:src="|data:image/jpg+gif+png;base64,${autorizadoPersonaNatural.imagenDocumento}|">
+								</div>
+							<div class="form-group col-md-12">
+								<label for="nombre" class="col-form-label"><b>Datos del
+									Veh&iacute;culo</b></label>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="placa" class="col-form-label">Placa</label> <input
+									type="text" th:field="*{placa}" class="form-control" id="placa"
+									maxlength=10>
+									<span th:if="${#fields.hasErrors('placa')}"
+									th:errors="*{placa}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="marcaModeloColor" class="col-form-label">Marca,
+									Modelo y Color </label> <input type="text"
+									th:field="*{marcaModeloColor}" class="form-control"
+									id="marcaModeloColor" maxlength=100>
+									<span th:if="${#fields.hasErrors('marcaModeloColor')}"
+									th:errors="*{marcaModeloColor}" class="text-danger"></span>
+							</div>
+
+							<div class="form-group col-md-12" style="text-align: center;">
+								<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}">
+								<a class="btn btn-secondary" href="./autorizados" th:text="#{bot.cancelar}"></a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:if="!${crear}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Actualizar Autorizado</h5>
+		<div class="card col-md-12" style="width: 100%">
+			<div class="card-body" style="text-align: left; width: 100%">
+				<div class="col-md-12">
+					<form action="#" th:object="${autorizadoPersonaNatural}" method="post" enctype="multipart/form-data">
+						<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
+						<script>
+							$('form').on('submit',function(e) {
+								e.preventDefault();
+								processPostForm("agregarAutorizadoPersonaNatural",this);
+							});
+							
+
+							function cleanImg() {
+								document.getElementById('documentoImg').value = '';
+								document.getElementById('imgDocumentoAutorizado').value = '';
+								if (document.getElementById('imagenDocumento'))
+									document.getElementById("imagenDocumento").remove();
+							}
+
+							function loadImg(event) {
+								// define reader as a new instance of FileReader
+								if (validarImagen()) {
+									var reader = new FileReader();
+									reader.readAsDataURL(event.target.files[0]);
+									// Handle progress, success, and errors
+									reader.onload = function() {
+										var container = document.getElementById('logoContainer');
+										container.innerHTML = '';
+										var imageNode = document.createElement('img');
+										imageNode.className = 'logo-image';
+										imageNode.id = 'imagenDocumento';
+										imageNode.src = reader.result;
+										document.getElementById('imgDocumentoAutorizado').value = reader.result.substring(reader.result.indexOf(",") + 1);
+										container.appendChild(imageNode);
+									};
+								}
+							}
+						</script>
+						<div class="row">
+							<input type="hidden" name="idTipoAutorizado"
+								id="idTipoAutorizado"
+								th:value="${autorizadoPersonaNatural.idTipoAutorizado}" />
+							<input type="hidden" name="idAutorizado" id="idAutorizado"
+								th:value="${autorizadoPersonaNatural.idAutorizado}" />
+							<div class="form-group col-md-6">
+								<label for="nombre" class="col-form-label">Tipo de
+									Autorizado</label> <input type="text"
+									value="Autorizado - Persona Natural" class="form-control"
+									id="nombre" maxlength=100 readonly>
+
+							</div>
+							<div class="form-group col-md-12">
+								<label for="nombre" class="col-form-label"><b>Datos
+									B&aacute;sicos</b></label>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="tipoDocumentoAutorizado" class="col-form-label">Documento
+									del Autorizado</label>
+								<div class="rif_row">
+									<select th:field="*{tipoDocumentoAutorizado}" id="tipoDocumentoAutorizado"
+										class="form-control caracter" readonly>
+			   							<option selected value="V">V</option>
+										<option value="E">E</option>
+										<option value="P">P</option>										
+									</select> 
+									<input type="text"
+										th:field="*{documentoAutorizado}" class="form-control rif"
+										id="documentoAutorizado" placeholder="Numero de documento"
+										maxlength="9" oninput="soloNumeros(this)" readonly/>
+								</div>
+								<span th:if="${#fields.hasErrors('documentoAutorizado')}"
+									th:errors="*{documentoAutorizado}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="nombreAutorizado" class="col-form-label">Nombre
+									Autorizado </label> <input type="text" th:field="*{nombreAutorizado}"
+									class="form-control" id="nombreAutorizado" maxlength=100>
+									<span th:if="${#fields.hasErrors('nombreAutorizado')}"
+									th:errors="*{nombreAutorizado}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="telefono" class="col-form-label">Tel&eacute;fono
+									M&oacute;vil</label> 
+								<div class="rif_row">
+									<select th:field="*{prefijoTelefono}" id="prefijoTelefono"
+										class="form-control caracter">
+			   							<option selected value="0412">0412</option>
+										<option value="0414">0414</option>
+										<option value="0424">0424</option>	
+										<option value="0416">0416</option>										
+										<option value="0426">0426</option>
+									</select> 
+									<input type="text" th:field="*{telefono}" oninput="soloNumeros(this)"
+									class="form-control rif" placeholder="Numero de telefono" id="telefono" maxlength=7>
+								</div>									
+									<span th:if="${#fields.hasErrors('telefono')}"
+									th:errors="*{telefono}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="text" class="col-form-label">Correo
+									electr&oacute;nico</label> <input type="text" th:field="*{email}"
+									class="form-control" id="email" maxlength=150>
+									<span th:if="${#fields.hasErrors('email')}"
+									th:errors="*{email}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6 logo-row">
+								<div class="logo-selector">
+									<label for="documentoImg" class="col-form-label">Documento
+										de Identidad (JPG, GIF o PNG)</label>
+								    <div>
+										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoImg').click()" value="Examinar"> 
+										<input type="button" class="btn btn-primary" onclick="cleanImg('documentoImg','imgDocumentoAutorizado', 'imagenDocumento' )" value="Limpiar">
+										<input type="file" th:field="*{documentoImg}" class="form-control" style="display: none" id="documentoImg" onchange="loadImage(event, 'documentoImgContainer', 'imagenDocumento', 'imgDocumentoAutorizado', 'documentoImgErrorServer', 'documentoImgErrorClient')">										
+										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 
+										<span id="documentoImgErrorServer" th:if="${#fields.hasErrors('documentoImg')}" th:errors="*{documentoImg}"	class="text-danger"></span> 
+										<span id="documentoImgErrorClient"	style="display: none" class="text-danger"></span>
+									</div>
+								</div>
+								<div class="logo-container" id="documentoImgContainer">
+									<img th:if="${autorizadoPersonaNatural.imagenDocumento}"
+										id="imagenDocumento" class="logo-image"
+										th:src="|data:image/jpg+gif+png;base64,${autorizadoPersonaNatural.imagenDocumento}|">
+								</div>
+							</div>							
+							<div class="form-group col-md-12">
+								<label for="placa" class="col-form-label"><b>Datos del
+									Veh&iacute;culo</b></label>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="placa" class="col-form-label">Placa</label> <input
+									type="text" th:field="*{placa}" class="form-control" id="placa"
+									maxlength=10>
+									<span th:if="${#fields.hasErrors('placa')}"
+									th:errors="*{placa}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
+								<label for="marcaModeloColor" class="col-form-label">Marca,
+									Modelo y Color </label> <input type="text"
+									th:field="*{marcaModeloColor}" class="form-control"
+									id="marcaModeloColor" maxlength=100>
+									<span th:if="${#fields.hasErrors('marcaModeloColor')}"
+									th:errors="*{marcaModeloColor}" class="text-danger"></span>
+							</div>
+						</div>
+						<div class="form-group col-md-12" style="text-align: center;">
+								<input type="submit" class="btn btn-primary" value="Actualizar">
+								<a class="btn btn-secondary" href="./autorizados">Cancelar</a>
+							</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

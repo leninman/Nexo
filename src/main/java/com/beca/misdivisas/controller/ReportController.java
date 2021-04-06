@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +46,7 @@ import com.beca.misdivisas.model.ReporteIrregularidades;
 import com.beca.misdivisas.model.ReporteRemesa;
 import com.beca.misdivisas.model.ReporteSucursal;
 import com.beca.misdivisas.model.ReporteSucursalMapa;
-import com.beca.misdivisas.services.MenuService;
+import com.beca.misdivisas.services.FeriadosService;
 import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
@@ -55,8 +54,8 @@ import com.beca.misdivisas.util.Util;
 @Controller
 public class ReportController {
 
-	@Value("${bancarios}")
-	private String bancarios;
+	@Autowired
+	private FeriadosService feriadoServ;
 
 	@Autowired
 	private IRemesaRepo remesaRepo;
@@ -84,20 +83,19 @@ public class ReportController {
 
 	@Autowired
 	private LogService logServ;
-	
-	@Autowired
-	private MenuService menuService;
 
 	@GetMapping("/reporteG")
 	public String reporte() {
 		return Constantes.REPORTE_GRAFICO;
 	}
 
-	@GetMapping(value = "reporte")
+	@GetMapping(value = "/reporte")
 	public String reporte(Model modelo) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		int id = usuario.getIdEmpresa();
 		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
 		BigDecimal montoPendienteDolar = remesaRepo.getLastRemesaByStatus(id, Constantes.USD,
@@ -110,7 +108,7 @@ public class ReportController {
 				Constantes.ESTATUS_PENDIENTE_ENTREGA);
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute(Constantes.CLIENTE,
-				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
 
 		BigDecimal saldoTOT;
 		BigDecimal tmp;
@@ -127,8 +125,7 @@ public class ReportController {
 		if (montoPendienteEntregaEuro == null) {
 			montoPendienteEntregaEuro = BigDecimal.valueOf(0.00);
 		}
-		Util u = new Util();
-		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+		List<Date> fechas = feriadoServ.obtenerFeriados();
 		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 
 		tmp = saldoTOT.subtract(montoPendienteEntregaDolar);
@@ -147,7 +144,7 @@ public class ReportController {
 		modelo.addAttribute(Constantes.DISPONIBLE_EUROS, Util.formatMonto(String.valueOf(tmp)));
 
 		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, Constantes.POSICION_CONSOLIDADA,
-				Constantes.POSICION_CONSOLIDADA, Util.getRemoteIp(request), usuario);
+				Constantes.POSICION_CONSOLIDADA, true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.REPORTE;
 	}
@@ -262,11 +259,12 @@ public class ReportController {
 			}
 
 		} catch (ParseException e) {
-			logger.error(e.getLocalizedMessage());
+			logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, e.getLocalizedMessage(), Constantes.POSICION_CONSOLIDADA,
+					false, Util.getRemoteIp(request), usuario);
 		}
 		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_PARAMETROS, fechaI, fechaF, moneda);
 		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, detalle, Constantes.POSICION_CONSOLIDADA,
-				Util.getRemoteIp(request), usuario);
+				true, Util.getRemoteIp(request), usuario);
 
 		return reportes;
 	}
@@ -274,9 +272,10 @@ public class ReportController {
 	@GetMapping(value = "/reporteNoAptos")
 	public String reporteNoAptos(Model modelo) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		int id = usuario.getIdEmpresa();
 		List<Remesa> remesasDolar = remesaRepo.getLasRemesaByMoneda(id, Constantes.USD);
 		List<Remesa> remesasEuro = remesaRepo.getLasRemesaByMoneda(id, Constantes.EUR);
@@ -319,10 +318,9 @@ public class ReportController {
 
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute(Constantes.CLIENTE,
-				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
 
-		Util u = new Util();
-		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+		List<Date> fechas = feriadoServ.obtenerFeriados();
 		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 
 		if (!remesasDolar.isEmpty()) {
@@ -339,7 +337,7 @@ public class ReportController {
 			modelo.addAttribute(Constantes.TOTAL_EUROS, "0,00");
 		}
 		logServ.registrarLog(Constantes.POSICION_BNA, Constantes.POSICION_BNA, Constantes.POSICION_BNA,
-				Util.getRemoteIp(request), usuario);
+				true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.REPORTE_NA;
 	}
@@ -397,8 +395,8 @@ public class ReportController {
 		}
 
 		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_PARAMETROS, fechaI, fechaF, moneda);
-		logServ.registrarLog(Constantes.POSICION_BNA, detalle, Constantes.POSICION_BNA, Util.getRemoteIp(request),
-				usuario);
+		logServ.registrarLog(Constantes.POSICION_BNA, detalle, Constantes.POSICION_BNA, true,
+				Util.getRemoteIp(request), usuario);
 		Collections.sort(reportes);
 		return reportes;
 	}
@@ -437,11 +435,12 @@ public class ReportController {
 				}
 			}
 		} catch (NumberFormatException e) {
-			logger.error(e.getLocalizedMessage());
+			logServ.registrarLog(Constantes.POSICION_BNA, "ERROR: "+e.getLocalizedMessage(), Constantes.POSICION_BNA, false,
+					Util.getRemoteIp(request), usuario);
 		}
 		String detalle = MessageFormat.format(Constantes.CONSULTA_IRREGULARIDADES, cartaPorte);
-		logServ.registrarLog(Constantes.POSICION_BNA, detalle, Constantes.POSICION_BNA, Util.getRemoteIp(request),
-				usuario);
+		logServ.registrarLog(Constantes.POSICION_BNA, detalle, Constantes.POSICION_BNA, true,
+				Util.getRemoteIp(request), usuario);
 
 		return irregularidades;
 	}
@@ -449,13 +448,15 @@ public class ReportController {
 	@GetMapping(value = "/trackingRemesas")
 	public String trackingRemesas(Model modelo) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		int id = usuario.getIdEmpresa();
 
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute(Constantes.CLIENTE,
-				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
 
 		return Constantes.REPORTE_TRACK;
 	}
@@ -472,6 +473,7 @@ public class ReportController {
 		List<Remesa> remesas = null;
 		Date d1, d2;
 		ReporteRemesa reprem = null;
+		String detalle = null;
 
 		try {
 			d1 = formato2.parse(fechaI + Constantes.FORMATO_HORA_0);
@@ -500,14 +502,14 @@ public class ReportController {
 					}
 				}
 			}
+			detalle = MessageFormat.format(Constantes.CONSULTA_POR_CARTAPORTE, fechaI, fechaF, cartaPorte);
 
-		} catch (NumberFormatException | ParseException e) {
-			logger.error(e.getLocalizedMessage());
+		} catch (Exception e) {
+			logServ.registrarLog(Constantes.TRACKING_REMESAS, "ERROR: "+e.getLocalizedMessage(), Constantes.TRACKING_REMESAS,
+					false, Util.getRemoteIp(request), usuario);
 		}
 
-		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_CARTAPORTE, fechaI, fechaF, cartaPorte);
-		logServ.registrarLog(Constantes.TRACKING_REMESAS, detalle, Constantes.TRACKING_REMESAS,
-				Util.getRemoteIp(request), usuario);
+		logServ.registrarLog(Constantes.TRACKING_REMESAS, detalle, Constantes.TRACKING_REMESAS, true, Util.getRemoteIp(request), usuario);
 
 		return rem;
 	}
@@ -518,13 +520,15 @@ public class ReportController {
 		factory.getObject().removeAttribute(Constantes.ID_SUCURSAL);
 		factory.getObject().setAttribute(Constantes.ID_SUCURSAL, idSucursal);
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 
 		int id = usuario.getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute(Constantes.CLIENTE,
-				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
+				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
 
 		Optional<Sucursal> sucursal = sucursalRepo.findById(idSucursal);
 		if (sucursal.isPresent())
@@ -545,8 +549,8 @@ public class ReportController {
 		String detalle = "Consulta: idSucursal (" + idSucursal + "); ";
 
 		HttpSession session = factory.getObject();
-		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, detalle, Constantes.TEXTO_REPORTE_MAPA, Util.getRemoteIp(request),
-				(Usuario) session.getAttribute(Constantes.USUARIO));
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, detalle, Constantes.TEXTO_REPORTE_MAPA, true,
+				Util.getRemoteIp(request), (Usuario) session.getAttribute(Constantes.USUARIO));
 
 		return Constantes.REPORTE_GRAFICO;
 
@@ -598,8 +602,8 @@ public class ReportController {
 			logger.error(e.getLocalizedMessage());
 		}
 		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_SUCURSAL, idSucursal, moneda);
-		logServ.registrarLog(Constantes.TEXTO_REPORTE_GRAFICO, detalle, Constantes.TEXTO_REPORTE_GRAFICO, Util.getRemoteIp(request),
-				usuario);
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_GRAFICO, detalle, Constantes.TEXTO_REPORTE_GRAFICO, true,
+				Util.getRemoteIp(request), usuario);
 
 		return rm;
 	}
@@ -665,16 +669,17 @@ public class ReportController {
 	public String remesasPendientes(Model modelo) {
 
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 
 		int id = usuario.getIdEmpresa();
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute(Constantes.CLIENTE,
-				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
-		Util u = new Util();
-		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
+
+		List<Date> fechas = feriadoServ.obtenerFeriados();
 		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 		response.setHeader("Set-Cookie", "key=value; HttpOnly; SameSite=strict");
 
@@ -710,8 +715,7 @@ public class ReportController {
 						cal.setTime(rd.getFecha());
 						cal2.setTime(new Date());
 
-						Util u = new Util();
-						List<Date> fechas = u.obtenerFeriados(this.bancarios);
+						List<Date> fechas = feriadoServ.obtenerFeriados();
 
 						int dias = Util.getDiasHabiles(cal, cal2, fechas);
 
@@ -747,7 +751,7 @@ public class ReportController {
 
 		String detalle = MessageFormat.format(Constantes.CONSULTA_PENDIENTE_ENTREGA, id);
 		logServ.registrarLog(Constantes.TEXTO_REMESAS_PENDIENTES, detalle, Constantes.TEXTO_REMESAS_PENDIENTES,
-				Util.getRemoteIp(request), usuario);
+				true, Util.getRemoteIp(request), usuario);
 
 		return rem;
 	}
@@ -755,17 +759,17 @@ public class ReportController {
 	@GetMapping(value = "/reporteSucursal")
 	public String reporteSucursal(Model modelo) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.U_SUARIO, usuario);
-		
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
-		
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		int id = usuario.getIdEmpresa();
 		Empresa empresa = empresaRepo.findById(id);
 
 		modelo.addAttribute(Constantes.CLIENTE,
-				empresa.getCaracterRif() + empresa.getRif() + " " + empresa.getEmpresa());
-		Util u = new Util();
-		List<Date> fechas = u.obtenerFeriados(this.bancarios);
+				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
+
+		List<Date> fechas = feriadoServ.obtenerFeriados();
 		modelo.addAttribute(Constantes.FECHA_CORTE, Util.diaHabilPrevio(fechas));
 
 		List<Sucursal> sucs = sucursalRepo.findSucursalByEmpId(id);
@@ -859,7 +863,7 @@ public class ReportController {
 		String detalle = MessageFormat.format(Constantes.CONSULTA_DETALLE_POR_SUCURSAL, fechaI, fechaF, sucursal,
 				moneda);
 		logServ.registrarLog(Constantes.TEXTO_REPORTE_SUCURSAL, detalle, Constantes.TEXTO_REPORTE_SUCURSAL,
-				Util.getRemoteIp(request), usuario);
+				true, Util.getRemoteIp(request), usuario);
 
 		return reportes;
 	}

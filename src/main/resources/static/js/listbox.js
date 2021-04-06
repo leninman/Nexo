@@ -8,9 +8,6 @@
 function pasarLista1_Lista2(idListBox1, idListBox2){
 	var idLB1 = idListBox1 + ' option:selected';
     var selectedOpts = $('#'+idLB1);
-    if (selectedOpts.length == 0) {
-        alert("Nada que agregar.");       
-    }
 
     $('#'+idListBox2).append($(selectedOpts).clone());
 
@@ -31,17 +28,17 @@ function validar(){
 	var muestra=0;
 	var mensaje ="";
 	
-	if($("#nombreRol").val() == ""){
-		$("#nombreRol").css("border", "1px solid red");
-		mensaje += "Debe ingresar el nombre del Rol. <br/>";
+	if($("#nombrePerfil").val() == ""){
+		$("#nombrePerfil").css("border", "1px solid red");
+		mensaje += "Debe ingresar el nombre del Perfil. <br/>";
 		muestra = 1;		
 	}else{
-		$("#nombreRol").css("border", "");
+		$("#nombrePerfil").css("border", "");
 	}
 	
 	if($('#lstBox2')){
 		$("#DivlstBox2").css("border", "1px solid red");
-		mensaje += "Debe seleccionar al menos una opcion del Menú. <br/>";
+		mensaje += "Debe seleccionar al menos una opcion del menú. <br/>";
 		muestra = 1;
 	}else{
 		$("#subject-info-box-2").css("border", "");
@@ -65,11 +62,13 @@ function validar(){
 
 function seleccionarTodos(){	
     $('#lstBox2 option').each(function() {
-        $(this).attr('selected','selected');
+        $(this).attr('selected',true);
+		$(this).prop("selected", true);
       });
     
     $('#lstBox4 option').each(function() {
-        $(this).attr('selected','selected');
+        $(this).attr('selected',true);
+		$(this).prop("selected", true);
       });
 }
 

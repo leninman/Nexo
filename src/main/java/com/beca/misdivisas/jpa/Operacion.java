@@ -2,6 +2,9 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 
@@ -25,12 +28,14 @@ public class Operacion implements Serializable {
 	private String operacion;
 
 	//bi-directional many-to-one association to TipoOperacion
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_tipo_operacion\"", insertable = false, updatable = false)
 		})
 	private TipoOperacion tipoOperacion;
 
 	//bi-directional many-to-one association to Remesa
+	@JsonBackReference
 	@OneToMany(mappedBy="operacion")
 	private List<Remesa> remesas;
 

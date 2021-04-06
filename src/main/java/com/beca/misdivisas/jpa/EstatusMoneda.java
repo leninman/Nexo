@@ -2,7 +2,6 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.List;
 
 
 /**
@@ -22,10 +21,6 @@ public class EstatusMoneda implements Serializable {
 	@Column(name="\"estatus_moneda\"")
 	private String estatusMoneda;
 
-	//bi-directional many-to-one association to Moneda
-	@OneToMany(mappedBy="estatusMoneda")
-	private List<Moneda> monedas;
-
 	public EstatusMoneda() {
 	}
 
@@ -44,27 +39,4 @@ public class EstatusMoneda implements Serializable {
 	public void setEstatusMoneda(String estatusMoneda) {
 		this.estatusMoneda = estatusMoneda;
 	}
-
-	public List<Moneda> getMonedas() {
-		return this.monedas;
-	}
-
-	public void setMonedas(List<Moneda> monedas) {
-		this.monedas = monedas;
-	}
-
-	public Moneda addMoneda(Moneda moneda) {
-		getMonedas().add(moneda);
-		moneda.setEstatusMoneda(this);
-
-		return moneda;
-	}
-
-	public Moneda removeMoneda(Moneda moneda) {
-		getMonedas().remove(moneda);
-		moneda.setEstatusMoneda(null);
-
-		return moneda;
-	}
-
 }

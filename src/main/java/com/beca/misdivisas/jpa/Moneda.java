@@ -3,7 +3,6 @@ package com.beca.misdivisas.jpa;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
@@ -41,9 +40,6 @@ public class Moneda implements Serializable {
 		})
 	private EstatusMoneda estatusMoneda;
 
-	//bi-directional many-to-one association to Pieza
-	@OneToMany(mappedBy="moneda")
-	private List<Pieza> piezas;
 
 	public Moneda() {
 	}
@@ -112,26 +108,5 @@ public class Moneda implements Serializable {
 		this.estatusMoneda = estatusMoneda;
 	}
 
-	public List<Pieza> getPiezas() {
-		return this.piezas;
-	}
-
-	public void setPiezas(List<Pieza> piezas) {
-		this.piezas = piezas;
-	}
-
-	public Pieza addPieza(Pieza pieza) {
-		getPiezas().add(pieza);
-		pieza.setMoneda(this);
-
-		return pieza;
-	}
-
-	public Pieza removePieza(Pieza pieza) {
-		getPiezas().remove(pieza);
-		pieza.setMoneda(null);
-
-		return pieza;
-	}
 
 }

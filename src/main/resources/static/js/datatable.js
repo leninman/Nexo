@@ -138,7 +138,6 @@ function tablaNoAptos(fechaInicio, fechaFin, moneda) {
 		      },
 		      {extend: 'csvHtml5'}, 
 		      {extend: 'pdf'}
-		      
 		      ],
 	        initComplete: function () {
 	            var btns = $('.dt-button');
@@ -195,7 +194,6 @@ function tablaIrregularidades(cartaporte) {
 				  { "mData": "concepto" },
 				  { "mData": "denominacion" },
 				  { "mData": "cantidad" },
-				  //{ "mData": "clasificacion" },
 				  { "mData": "moneda" },
 				  { "mData": "centro" }
 			],
@@ -278,7 +276,6 @@ function trackingRemesa(fechaInicio, fechaFin, cartaPorte) {
 	            var btns = $('.dt-button');
 	            btns.addClass('btn btn-info btn-sm');
 	            btns.removeClass('dt-button');
-
 	        },
             columnDefs: [	{ className: "text-right", "targets": [3]},
             				{ type:"date-eu", targets :[0]}]
@@ -451,9 +448,155 @@ function getTotalBySucursal(sucursal, moneda) {
 	    },
 	    async:false, 
 	    error: function() {
-	    	alert("error");
 	    }
 	  });
 
 	  return strReturn;
+}
+
+function tablaCargaMasiva() {
+	$('#tablaCargaMasiva').DataTable().destroy();
+	var accion = "Carga Masiva desade archivo";
+	var detalle = "Carga Masivamente las solicitudes de retiro desde un archivo";
+	var opcion = "CargasMasiva";
+	 var table = $('#tablaCargaMasiva').DataTable({
+	        processing: true,
+	        language: {			 
+	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',		        
+		        lengthMenu:    	"Mostrar _MENU_ elementos",
+		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
+		        zeroRecords:    "Solicitudes de Retiro",
+		        emptyTable:     "Solicitudes de Retiro",
+		        paginate: {
+		            first:      "Primero",
+		            previous:   "Previo",
+		            next:       "Siguiente",
+		            last:       "Ultimo"
+		        },
+		        aria: {
+		            sortAscending:  ": ordenar ascendente",
+		            sortDescending: ": ordenar descendente"
+		        }
+		    },
+			"sAjaxSource": "./solicitudesMasivas",
+			"sAjaxDataProp": "",
+			"aoColumns": [
+			      { "mData": "tipoBillete"},
+				  { "mData": "fechaEstimada" },
+				  { "mData": //"autorizado.tipoAutorizado.tipoAutorizado" },
+							function (data) {
+								if(data.autorizado !=null && data.autorizado.tipoAutorizado.tipoAutorizado != null)
+									return data.autorizado.tipoAutorizado.tipoAutorizado;
+								else
+									return '';
+					}},
+				  { "mData": //"autorizado.documentoIdentidad" },
+							function (data) {
+								if(data.autorizado !=null && data.autorizado.documentoIdentidad != null)
+									return data.autorizado.documentoIdentidad + " - " + data.autorizado.nombreCompleto;
+								else
+									return '';
+					}},
+				  { "mData": //"autorizado.rifEmpresa" },
+							function (data) {
+								if(data.autorizado !=null && data.autorizado.rifEmpresa != null)
+									return data.autorizado.rifEmpresa + " - " + data.autorizado.nombreEmpresa;
+								else
+									return '';
+					}},		
+				  { "mData": "agencia.agencia" },
+				  { "mData": "moneda.moneda" },
+				  { "mData": function (data) {					
+					return data.monto.toLocaleString('en-US', {minimumFractionDigits: 2}); }},
+                  { "mData": function (data) {
+                    return '<button type="button" name="editar" class="btn btn-secondary btn-sm" title="Editar solicitud" onClick="editarSolicitudRet(\''+ data.idSolicitud + '\')"><i class="fas fa-pen"></i></button>'+
+					'&nbsp;&nbsp;<button type="button" title="Eliminar solicitud" class="btn btn-danger btn-sm" data-toggle="modal" attr="data-target=\'#solicitudDeleteModal\'" onclick="eliminarSolicitud(\''+data.idSolicitud+'\')"> <i class="fas fa-trash"></i></button>';
+					}
+				  }	
+			],
+			bFilter: false,		    
+		    dom: 'Bfrtip',
+		    buttons: [],
+            columnDefs: [{ className: "text-right", "targets": [3,5]},
+            			{ className: "text-center", "targets": [0,4]},
+            			{ type:"date-eu", targets :[1]}]
+ 	 })
+}
+
+function tablaSolicitudesRetiro(fechaInicio, fechaFin, moneda, estatus) {
+	$('#tablaSolicitudesRetiro').DataTable().destroy();
+	var accion = "Descargar Solicitudes Retiro";
+	var detalle = "Descarga el reporte:  fecha inicio(";
+	var opcion = "Descarga";
+	detalle = detalle + ': fecha inicio('+fechaInicio+'); fecha fin('+fechaFin+'); moneda('+moneda+'); estatus('+estatus+')';
+	 var table = $('#tablaSolicitudesRetiro').DataTable({
+	        processing: true,
+	        language: {			 
+	        	processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',					        
+		        lengthMenu:    	"Mostrar _MENU_ elementos",
+		        info:           "Mostrando elemento _START_ al _END_ de _TOTAL_ elementos",		     
+		        zeroRecords:    "No hay solicitudes en el rango de fechas, estatus y moneda seleccionados",
+		        emptyTable:     "No hay solicitudes en el rango de fechas, estatus y moneda seleccionados",
+		        paginate: {
+		            first:      "Primero",
+		            previous:   "Previo",
+		            next:       "Siguiente",
+		            last:       "Ultimo"
+		        }
+		    },
+			sAjaxSource: "detalleSolicitudesRetiro/"+fechaInicio+"/"+fechaFin+"/"+moneda+"/"+estatus,
+			sAjaxDataProp: "",
+			columns: [
+			      { data: "fechaStatus"},
+				  { data: "estatus" },
+				  { data: "usuario" },
+				  { data: "cartaPorte" },
+				  { data: "tipoBillete" },
+				  { data: "fechaEstimada" },
+				  { data: "nombreAgencia" },
+				  { data: "tipoAutorizado" },
+				  { data: "nombreAutorizado" },
+				  { data: "nombreMoneda" },
+				  { data: "monto" }				  
+			],
+			bFilter: false,		    
+		    dom: 'Bfrtip',
+		    bSort : true,
+		    buttons: [{
+		        extend: 'excelHtml5',
+		        customize: function( xlsx ) {
+		            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+		            $('row c[r^="A"]', sheet).attr( 's', '0' );
+		            $('row:eq(0) c', sheet).attr( 's', '2' );
+		            $('row c[r^="D"]', sheet).attr( 's', '62' );
+		          },
+		      },
+		      {extend: 'csvHtml5'}, 
+		      {extend: 'pdf'}
+		      
+		      ],
+	        initComplete: function () {
+	            var btns = $('.dt-button');
+	            btns.addClass('btn btn-info btn-sm');
+	            btns.removeClass('dt-button');
+	        },
+            columnDefs: [
+            	{ className: "text-right", "targets": [10]},
+            	{ className: "text-center", "targets": [0,1,2,3,4,5,6,7,8,9]},
+            	{ type: "string", "targets": [1,2,3,4,6,7,8,9]},
+            	{ type:"date-eu", "targets" :[0,5]}
+            ],
+            pageLength:15,
+            
+	 })
+	 
+	 $(".buttons-excel").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+	 $(".buttons-csv").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
+	 $(".buttons-pdf").on('click', function(event){
+		 registrar(accion, detalle, opcion);
+		});
 }

@@ -7,13 +7,13 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.services.LogService;
-import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
@@ -29,53 +29,68 @@ public class FormsController {
 	@Autowired
 	private LogService logServ;
 	
-	@Autowired
-	private MenuService menuService;
+	@Value("${ldap.domain}")
+	private String dominio;
 
-	@GetMapping(value = "/EnvioEfectivo")
+	@GetMapping(value = "/envioEfectivo")
 	public String envioRemesa(Model modelo) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+
+		if (!dominio.equalsIgnoreCase(Constantes.DOMINIO_PROD))
+			request.setAttribute(Constantes.DOMINIO,0);
+		else
+			request.setAttribute(Constantes.DOMINIO,1);
+		
+		usuarioModel.setUsuario(usuario);
 		if (usuario.getContrasena1() != null)
-			modelo.addAttribute(Constantes.U_SUARIO, usuario);
+			modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
 
 		int id = usuario.getEmpresa().getRif();
 		modelo.addAttribute(Constantes.ID_EMPRESA, id);
 
-		HttpSession session = factory.getObject();
-		logServ.registrarLog(Constantes.OP_ENV_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Envio"), Constantes.OP_SOLICITUD, Util.getRemoteIp(request),
-				(Usuario) session.getAttribute(Constantes.USUARIO));
+		logServ.registrarLog(Constantes.OP_ENV_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Envio"), Constantes.OP_SOLICITUD, true,
+				Util.getRemoteIp(request), usuario);
 
 		return Constantes.OP_ENV_EFECTIVO;
 	}
 
-	@GetMapping(value = "/TraspasoEfectivo")
-	public String traspasoEfectivo(Model modelo) {
+	@GetMapping(value = "/traspasoEfectivo")
+	public String traspasoEfectivo(Model model) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.MENUES,menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		if (!dominio.equalsIgnoreCase(Constantes.DOMINIO_PROD))
+			request.setAttribute(Constantes.DOMINIO,0);
+		else
+			request.setAttribute(Constantes.DOMINIO,1);
+		usuarioModel.setUsuario(usuario);
+		model.addAttribute(Constantes.U_SUARIO, usuarioModel);	
 
-		if (usuario.getContrasena1() != null)
-			modelo.addAttribute(Constantes.U_SUARIO, usuario);
-
-		modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
-		HttpSession session = factory.getObject();
+		model.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
 		logServ.registrarLog(Constantes.OP_TRAS_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Traspaso"), Constantes.OP_SOLICITUD,
-				Util.getRemoteIp(request), (Usuario) session.getAttribute(Constantes.USUARIO));
+				true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.OP_TRAS_EFECTIVO;
 	}
 
-	@GetMapping(value = "/RetiroEfectivo")
+	@GetMapping(value = "/retiroEfectivo")
 	public String retiroEfectivo(Model modelo) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		modelo.addAttribute(Constantes.MENUES,menuService.getMenu(usuario.getIdUsuario()));
-		if (usuario.getContrasena1() != null)
-			modelo.addAttribute(Constantes.U_SUARIO, usuario);
-
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		if (!dominio.equalsIgnoreCase(Constantes.DOMINIO_PROD))
+			request.setAttribute(Constantes.DOMINIO,0);
+		else
+			request.setAttribute(Constantes.DOMINIO,1);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		
 		modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
-		HttpSession session = factory.getObject();
-		logServ.registrarLog(Constantes.OP_RET_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Retiro"), Constantes.OP_SOLICITUD , Util.getRemoteIp(request),
-				(Usuario) session.getAttribute(Constantes.USUARIO));
+
+		logServ.registrarLog(Constantes.OP_RET_EFECTIVO, MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Retiro"), Constantes.OP_SOLICITUD , true,
+				Util.getRemoteIp(request), usuario);
 
 		return Constantes.OP_RET_EFECTIVO;
 	}

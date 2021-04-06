@@ -4,6 +4,9 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class Estado implements Serializable {
 	private Integer idRegion;
 
 	//bi-directional many-to-one association to Region
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_region\"", insertable = false, updatable = false)
 		})

@@ -1,23 +1,26 @@
+
 package com.beca.misdivisas.controller;
 
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
 import com.beca.misdivisas.interfaces.IEstadoRepo;
 import com.beca.misdivisas.interfaces.IMunicipioRepo;
+import com.beca.misdivisas.interfaces.IPerfilRepo;
 import com.beca.misdivisas.interfaces.ISucursalRepo;
 import com.beca.misdivisas.jpa.Empresa;
 import com.beca.misdivisas.jpa.Estado;
@@ -38,17 +42,17 @@ import com.beca.misdivisas.model.EmpresaModel;
 import com.beca.misdivisas.model.MunicipioModel;
 import com.beca.misdivisas.model.SucursalModel;
 import com.beca.misdivisas.services.LogService;
-import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
+import com.beca.misdivisas.util.ValidationUtils;
 
 @Controller
 public class EmpresaController {
 
-	@Autowired
-	private ObjectFactory<HttpSession> factory;
-	private static final Pattern CARACTERES_ESPECIALES_PATTERN = Pattern.compile("[$&+:;=?@#|/{}\\\\]");
-
+	@Autowired 
+	private ObjectFactory<HttpSession> factory;   
+	//private static final Pattern CARACTERES_ESPECIALES_PATTERN = Pattern.compile("[\\^\\#\\$\\%\\*\\+\\/\\:\\;\\<\\=\\>\\¿\\?\\@\\[\\]\\_\\{\\|\\}\\\\]");
+	
 	@Autowired
 	private IEmpresaRepo empresaRepository;
 
@@ -68,12 +72,12 @@ public class EmpresaController {
 	private LogService logServ;
 	
 	@Autowired
-	private MenuService menuService;
+	private IPerfilRepo perfileRepo;
 
 	@GetMapping("/empresaHome")
 	public String getEmpresas(Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		final List<Empresa> empresas = empresaRepository.findAllOrderByName();
 		List<EmpresaModel> emoresasModel = empresas.stream().map((emp) -> convertirEmpresaListToEmpresaModel(emp))
@@ -81,8 +85,8 @@ public class EmpresaController {
 		if (emoresasModel.isEmpty())
 			emoresasModel = null;
 		model.addAttribute(Constantes.EMPRESAS, emoresasModel);
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_EMPRESAS, Constantes.TEXTO_ADMINISTRAR_EMPRESAS,
-				Constantes.TEXTO_ADMINISTRAR_EMPRESAS, Util.getRemoteIp(request), usuario);
+		logServ.registrarLog(Constantes.LISTAR_EMPRESA, Constantes.TEXTO_ADMINISTRAR_EMPRESAS,
+				Constantes.EMPRESAS, true, Util.getRemoteIp(request), usuario);
 
 		return "mainEmpresas";
 	}
@@ -91,30 +95,29 @@ public class EmpresaController {
 	public String crearEmpresaForm(Model model) {
 		EmpresaModel empresaModel = new EmpresaModel();
 		final List<Estado> estados = estadoRepository.findAll();
-		model.addAttribute("estados", estados);
-		model.addAttribute("crear", true);
+		model.addAttribute(Constantes.ESTADOS, estados);
+		model.addAttribute(Constantes.CREAR, true);
 		model.addAttribute(Constantes.EMPRESA_MODEL, empresaModel);
 		return "empresa/empresas";
 	}
 
+	@Transactional
 	@PostMapping("empresaAgregar")
 	public String addEmpresa(@Valid EmpresaModel empresaModel, BindingResult result, Model model) throws Exception {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		validarEmpresa(empresaModel, result);
 		if (result.hasErrors()) {
 			model.addAttribute(Constantes.U_SUARIO, usuario);
 			final List<Estado> estados = estadoRepository.findAll();
-			model.addAttribute("estados", estados);
-			if (empresaModel.getIdEstado() != null && empresaModel.getIdEstado() != -1) {
+			model.addAttribute(Constantes.ESTADOS, estados);
+			if (empresaModel.getIdEstado() != null && empresaModel.getIdEstado().intValue() != -1) {
 				final List<Municipio> municipios = municipioRepository.findAllByIdEstado(empresaModel.getIdEstado());
 				model.addAttribute("municipios", municipios);
 			}
-			model.addAttribute("crear", true);
+			model.addAttribute(Constantes.CREAR, true);
 			if (empresaModel.getLogoEmpresa() != null && !empresaModel.getLogoEmpresa().isEmpty()) {
 				empresaModel.setImagenLogo(empresaModel.getLogoEmpresa());
-				empresaModel.setLogo(new MockMultipartFile("logo",
-						Base64.getDecoder().decode(empresaModel.getLogoEmpresa().getBytes())));
 			}
 			model.addAttribute(Constantes.EMPRESA_MODEL, empresaModel);
 			return "empresa/empresas";
@@ -127,12 +130,31 @@ public class EmpresaController {
 
 		empresa.setFechaCreacion(ts);
 		empresa.setFechaEstatus(ts);
-		empresaRepository.save(empresa);
+		Empresa empresaNueva = empresaRepository.save(empresa);
+		
 
-		String detalle = MessageFormat.format(Constantes.ACCION_EMPRESA, Constantes.OP_CREAR,
-				empresa.getEmpresa(), usuario.getIdUsuario());
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_EMPRESAS, detalle, Constantes.OP_CREAR,
-				Util.getRemoteIp(request), usuario);
+		// Creo sucursal principal
+		Sucursal sucursal = new Sucursal();
+		sucursal.setAcopio(true);
+		sucursal.setIdEmpresa(empresaNueva.getIdEmpresa());
+		sucursal.setFechaCreacion(ts);
+		sucursal.setFechaEstatus(ts);
+		sucursal.setSucursal("Sucursal Principal");
+		sucursal.setIdEstatusSucursal(empresaNueva.getIdEstatusEmpresa());
+		sucursal.setLatitud("10.5060509");
+		sucursal.setLongitud("-66.9032145");
+		sucursal.setIdMunicipio(empresaNueva.getIdMunicipio());
+
+		sucursalRepository.save(sucursal);
+		
+		//Creo los perfiles por defecto para la nueva empresa
+		
+		perfileRepo.crearPerfilesNuevaEmpresa(empresaNueva.getIdEmpresa());
+
+		String detalle = MessageFormat.format(Constantes.ACCION_EMPRESA, Constantes.OP_CREAR, empresa.getEmpresa(),
+				empresaNueva.getIdEmpresa(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.CREAR_EMPRESA, detalle, Constantes.EMPRESAS,
+				true, Util.getRemoteIp(request), usuario);
 
 		return "redirect:empresaListar?success";
 	}
@@ -156,11 +178,11 @@ public class EmpresaController {
 		} else {
 			EmpresaModel empresaModel = convertirEmpresaToEmpresaModel(empresa);
 			final List<Estado> estados = estadoRepository.findAll();
-			model.addAttribute("estados", estados);
+			model.addAttribute(Constantes.ESTADOS, estados);
 			final List<Municipio> municipios = municipioRepository.findAllByIdEstado(empresaModel.getIdEstado());
-			model.addAttribute("municipios", municipios);
+			model.addAttribute(Constantes.MUNICIPIOS, municipios);
 			model.addAttribute(Constantes.EMPRESA_MODEL, empresaModel);
-			model.addAttribute("editar", true);
+			model.addAttribute(Constantes.EDITAR, true);
 			return "empresa/empresas";
 		}
 	}
@@ -169,18 +191,27 @@ public class EmpresaController {
 	public String actualizarEmpresa(@Valid EmpresaModel empresaModel, BindingResult result, Model model)
 			throws Exception {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		validarEmpresa(empresaModel, result);
 		if (result.hasErrors()) {
 			final List<Estado> estados = estadoRepository.findAll();
 			final List<Municipio> municipios = municipioRepository.findAllByIdEstado(empresaModel.getIdEstado());
-			model.addAttribute("municipios", municipios);
-			model.addAttribute("estados", estados);
-			model.addAttribute("editar", true);
+			model.addAttribute(Constantes.MUNICIPIOS, municipios);
+			model.addAttribute(Constantes.ESTADOS, estados);
+			model.addAttribute(Constantes.EDITAR, true);
 			if (empresaModel.getLogoEmpresa() != null && !empresaModel.getLogoEmpresa().isEmpty()) {
 				empresaModel.setImagenLogo(empresaModel.getLogoEmpresa());
-				empresaModel.setLogo(new MockMultipartFile("logo",
-						Base64.getDecoder().decode(empresaModel.getLogoEmpresa().getBytes())));
+	            Tika defaultTika = new Tika();
+	            String deteccion = defaultTika.detect(empresaModel.getLogoEmpresa().getBytes());
+	            String tipo = deteccion.split("/")[0];
+	            String extension = deteccion.split("/")[1];
+	           
+	            if(tipo.equalsIgnoreCase("image")) {
+	                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	                ImageIO.write(Util.convertFile(empresaModel.getLogoEmpresa().getBytes(), 'l'), extension, baos);
+	                empresaModel.setLogo(new MockMultipartFile("logo",Base64.getDecoder().decode(baos.toByteArray())));   
+	            }
+
 			}
 			model.addAttribute(Constantes.EMPRESA_MODEL, empresaModel);
 			return "empresa/empresas";
@@ -189,7 +220,7 @@ public class EmpresaController {
 		final Empresa empresaToUpdate = empresaRepository.findById(empresaModel.getIdEmpresa()).get();
 		Empresa empresa = convertirEmpresaModelToEmpresa(empresaModel);
 
-		if (empresa.getIdEstatusEmpresa() != empresaToUpdate.getIdEstatusEmpresa()) {
+		if (!empresa.getIdEstatusEmpresa().equals(empresaToUpdate.getIdEstatusEmpresa())) {
 			Date date = new Date();
 			long time = date.getTime();
 			Timestamp ts = new Timestamp(time);
@@ -198,17 +229,14 @@ public class EmpresaController {
 			empresa.setFechaEstatus(empresaToUpdate.getFechaEstatus());
 		}
 
-		if (empresa.getLogo().length == 0 && empresaToUpdate.getLogo().length > 0)
-			empresa.setLogo(empresaToUpdate.getLogo());
-
 		empresa.setFechaCreacion(empresaToUpdate.getFechaCreacion());
 
 		empresaRepository.save(empresa);
 
-		String detalle = MessageFormat.format(Constantes.ACCION_EMPRESA, Constantes.OP_EDICION,
-				empresa.getEmpresa(), usuario.getIdUsuario());
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_EMPRESAS, detalle, Constantes.OP_EDICION,
-				Util.getRemoteIp(request), usuario);
+		String detalle = MessageFormat.format(Constantes.ACCION_EMPRESA, Constantes.OP_EDICION, empresa.getEmpresa(),
+				empresa.getIdEmpresa(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.EDICION_EMPRESA, detalle, Constantes.EMPRESAS,
+				true, Util.getRemoteIp(request), usuario);
 		return "redirect:empresaListar?success";
 	}
 
@@ -217,7 +245,7 @@ public class EmpresaController {
 	@GetMapping(path = "/sucursalHome/{idEmpresa}")
 	public String getSucursales(@PathVariable("idEmpresa") int idEmpresa, Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		List<Sucursal> sucursales = sucursalRepository.findSucursalByEmpId(idEmpresa);
 		Empresa empresa = empresaRepository.findById(idEmpresa);
@@ -228,8 +256,8 @@ public class EmpresaController {
 		model.addAttribute(Constantes.SUCURSALES, sucursales);
 		model.addAttribute("listar", true);
 
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_SUCURSALES, Constantes.TEXTO_ADMINISTRAR_SUCURSALES,
-				Constantes.TEXTO_ADMINISTRAR_SUCURSALES, Util.getRemoteIp(request), usuario);
+		logServ.registrarLog(Constantes.LISTAR_SUCURSAL, Constantes.TEXTO_ADMINISTRAR_SUCURSALES,
+				Constantes.EMPRESAS, true, Util.getRemoteIp(request), usuario);
 
 		return "empresa/listaSucursales";
 	}
@@ -242,8 +270,8 @@ public class EmpresaController {
 		boolean permitirAcopio = sucursalesConAcopio.isEmpty();
 		model.addAttribute("permitirAcopio", permitirAcopio);
 		final List<Estado> estados = estadoRepository.findAll();
-		model.addAttribute("estados", estados);
-		model.addAttribute("crear", true);
+		model.addAttribute(Constantes.ESTADOS, estados);
+		model.addAttribute(Constantes.CREAR, true);
 		model.addAttribute(Constantes.SUCURSAL_MODEL, sucursalModel);
 
 		return "empresa/sucursales";
@@ -252,17 +280,18 @@ public class EmpresaController {
 	@PostMapping("sucursalAgregar")
 	public String addSucursal(@Valid SucursalModel sucursalModel, BindingResult result, Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		validarSucursal(sucursalModel, result);
 		if (result.hasErrors()) {
 			final List<Estado> estados = estadoRepository.findAll();
-			model.addAttribute("estados", estados);
-			if (sucursalModel.getIdEstado() != null && sucursalModel.getIdEstado() != -1) {
+			model.addAttribute(Constantes.ESTADOS, estados);
+			if (sucursalModel.getIdEstado() != null && sucursalModel.getIdEstado().intValue() != -1) {
 				final List<Municipio> municipios = municipioRepository.findAllByIdEstado(sucursalModel.getIdEstado());
-				model.addAttribute("municipios", municipios);
+				model.addAttribute(Constantes.MUNICIPIOS, municipios);
 			}
-			model.addAttribute("crear", true);
-			final List<Sucursal> sucursalesConAcopio = sucursalRepository.findSucursalByEmpIdAndAcopio(sucursalModel.getIdEmpresa(), true);
+			model.addAttribute(Constantes.CREAR, true);
+			final List<Sucursal> sucursalesConAcopio = sucursalRepository
+					.findSucursalByEmpIdAndAcopio(sucursalModel.getIdEmpresa(), true);
 			boolean permitirAcopio = sucursalesConAcopio.isEmpty();
 			model.addAttribute("permitirAcopio", permitirAcopio);
 			model.addAttribute(Constantes.SUCURSAL_MODEL, sucursalModel);
@@ -276,12 +305,12 @@ public class EmpresaController {
 
 		sucursal.setFechaCreacion(ts);
 		sucursal.setFechaEstatus(ts);
-		sucursalRepository.save(sucursal);
+		Sucursal nuevaSucursal = sucursalRepository.save(sucursal);
 
-		String detalle = MessageFormat.format(Constantes.ACCION_SUCURSAL, Constantes.OP_CREAR,
-				sucursal.getSucursal(), usuario.getIdUsuario());
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_SUCURSALES, detalle, Constantes.OP_CREAR,
-				Util.getRemoteIp(request), usuario);
+		String detalle = MessageFormat.format(Constantes.ACCION_SUCURSAL, Constantes.OP_CREAR, sucursal.getSucursal(),
+				nuevaSucursal.getIdSucursal(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.CREAR_SUCURSAL, detalle, Constantes.EMPRESAS,
+				true, Util.getRemoteIp(request), usuario);
 
 		return "redirect:sucursalListar/" + sucursal.getIdEmpresa() + "?success";
 	}
@@ -299,43 +328,45 @@ public class EmpresaController {
 
 	@GetMapping(path = "/sucursalEditar/{idSucursal}")
 	public String sucursalEditar(@PathVariable("idSucursal") int idSucursal, Model model) {
-		Sucursal sucursal = sucursalRepository.findById(idSucursal).orElse(null);
+		Sucursal sucursal = sucursalRepository.findById(idSucursal).orElse(new Sucursal());
 		SucursalModel sucursalModel = convertirSucursalToSucursalModel(sucursal);
 		final List<Sucursal> sucursalesConAcopio = sucursalRepository
 				.findSucursalByEmpIdAndAcopio(sucursal.getIdEmpresa(), true);
 		boolean permitirAcopio = sucursalesConAcopio.isEmpty();
 		model.addAttribute("permitirAcopio", permitirAcopio);
 		final List<Estado> estados = estadoRepository.findAll();
-		model.addAttribute("estados", estados);
+		model.addAttribute(Constantes.ESTADOS, estados);
 		final List<Municipio> municipios = municipioRepository.findAllByIdEstado(sucursalModel.getIdEstado());
-		model.addAttribute("municipios", municipios);
+		model.addAttribute(Constantes.MUNICIPIOS, municipios);
 		model.addAttribute(Constantes.SUCURSAL_MODEL, sucursalModel);
-		model.addAttribute("editar", true);
+		model.addAttribute(Constantes.EDITAR, true);
 		return "empresa/sucursales";
 	}
 
 	@PostMapping("sucursalActualizar")
 	public String actualizarSucursal(@Valid SucursalModel sucursalModel, BindingResult result, Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		validarSucursal(sucursalModel, result);
+		Sucursal sucursalToUpdate = sucursalRepository.findById(sucursalModel.getIdSucursal()).get();
+
 		if (result.hasErrors()) {
 			final List<Estado> estados = estadoRepository.findAll();
 			final List<Municipio> municipios = municipioRepository.findAllByIdEstado(sucursalModel.getIdEstado());
-			model.addAttribute("municipios", municipios);
-			model.addAttribute("estados", estados);
-			final List<Sucursal> sucursalesConAcopio = sucursalRepository.findSucursalByEmpIdAndAcopio(sucursalModel.getIdEmpresa(), true);
+			model.addAttribute(Constantes.MUNICIPIOS, municipios);
+			model.addAttribute(Constantes.ESTADOS, estados);
+			final List<Sucursal> sucursalesConAcopio = sucursalRepository
+					.findSucursalByEmpIdAndAcopio(sucursalToUpdate.getIdEmpresa(), true);
 			boolean permitirAcopio = sucursalesConAcopio.isEmpty();
 			model.addAttribute("permitirAcopio", permitirAcopio);
-			model.addAttribute("editar", true);
-			model.addAttribute(Constantes.EMPRESA_MODEL, sucursalModel);
+			model.addAttribute(Constantes.EDITAR, true);
+			model.addAttribute(Constantes.SUCURSAL_MODEL, sucursalModel);
 			return "empresa/sucursales";
 		}
 
-		Sucursal sucursalToUpdate = sucursalRepository.findById(sucursalModel.getIdSucursal()).get();
 		Sucursal sucursal = convertirSucursalModelToSucursal(sucursalModel);
 
-		if (sucursal.getIdEstatusSucursal() != sucursalToUpdate.getIdEstatusSucursal()) {
+		if (!sucursal.getIdEstatusSucursal().equals(sucursalToUpdate.getIdEstatusSucursal())) {
 			Date date = new Date();
 			long time = date.getTime();
 			Timestamp ts = new Timestamp(time);
@@ -348,10 +379,10 @@ public class EmpresaController {
 
 		sucursalRepository.save(sucursal);
 
-		String detalle = MessageFormat.format(Constantes.ACCION_SUCURSAL, Constantes.OP_EDICION,
-				sucursal.getSucursal(), usuario.getIdUsuario());
-		logServ.registrarLog(Constantes.TEXTO_ADMINISTRAR_SUCURSALES, detalle, Constantes.OP_EDICION,
-				Util.getRemoteIp(request), usuario);
+		String detalle = MessageFormat.format(Constantes.ACCION_SUCURSAL, Constantes.OP_EDICION, sucursal.getSucursal(),
+				sucursal.getIdSucursal(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.EDICION_SUCURSAL, detalle, Constantes.EMPRESAS,
+				true, Util.getRemoteIp(request), usuario);
 
 		return "redirect:sucursalListar/" + sucursal.getIdEmpresa() + "?success";
 	}
@@ -365,12 +396,31 @@ public class EmpresaController {
 				.collect(Collectors.toList());
 		return municipiosModel;
 	}
+	
+	/*@RequestMapping(value = "/validarRif", method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+	public String validarRif(String rif) {	
+	Integer rifInt=Integer.valueOf(rif);
+	String responseRif = null;
+		final List<Empresa> empresasByRifSearch = empresaRepository.findByRif(Integer.valueOf(rifInt));		
+		 
+		if(empresasByRifSearch.stream().anyMatch(emp -> emp.getRif().equals(rifInt)
+						&& !emp.getIdEmpresa().equals(rifInt))) 
+		{
+			responseRif = "V";
+		}else 
+		{
+			responseRif = "F";
+		}					
+				
+		return responseRif;
+	}*/
 
 	private EmpresaModel convertirEmpresaToEmpresaModel(Empresa empresa) {
-		String rif = empresa.getRif() > 0 ? StringUtils.leftPad(String.valueOf(empresa.getRif()), 9, "0") : null;
+		String rif = StringUtils.leftPad(String.valueOf(empresa.getRif()), 9, "0");
 		EmpresaModel empresaModel = new EmpresaModel(empresa.getIdEmpresa(), empresa.getCaracterRif(),
 				empresa.getDireccion(), empresa.getEmpresa(), empresa.getFechaCreacion(), empresa.getFechaEstatus(),
-				empresa.getIdEstatusEmpresa(), empresa.getIdMunicipio(), empresa.getIdEmpresaCoe(), rif,
+				empresa.getIdEstatusEmpresa(), empresa.getIdMunicipio(), (empresa.getIdEmpresaCoe()!=null ? empresa.getIdEmpresaCoe().toString() : null), rif,
 				empresa.getSigla(), empresa.getLogo());
 
 		int idEstado = municipioRepository.findById(empresa.getIdMunicipio()).get().getIdEstado();
@@ -383,14 +433,14 @@ public class EmpresaController {
 		String rif = StringUtils.leftPad(String.valueOf(empresa.getRif()), 9, "0");
 		EmpresaModel empresaModel = new EmpresaModel(empresa.getIdEmpresa(), empresa.getCaracterRif(),
 				empresa.getDireccion(), empresa.getEmpresa(), empresa.getFechaCreacion(), empresa.getFechaEstatus(),
-				empresa.getIdEstatusEmpresa(), empresa.getIdMunicipio(), empresa.getIdEmpresaCoe(), rif,
+				empresa.getIdEstatusEmpresa(), empresa.getIdMunicipio(), (empresa.getIdEmpresaCoe()!=null ? empresa.getIdEmpresaCoe().toString() : null), rif,
 				empresa.getSigla(), empresa.getLogo());
 
 		empresaModel.setEstatus(empresa.getEstatusEmpresa().getEstatusEmpresa());
 		return empresaModel;
 	}
 
-	private Empresa convertirEmpresaModelToEmpresa(EmpresaModel empresaModel) throws IOException {
+	private Empresa convertirEmpresaModelToEmpresa(EmpresaModel empresaModel) throws Exception {
 		Empresa empresa = new Empresa();
 		if (empresa.getIdEmpresa() != null)
 			empresa.setIdEmpresa(empresaModel.getIdEmpresa());
@@ -401,11 +451,27 @@ public class EmpresaController {
 		empresa.setEmpresa(empresaModel.getNombre());
 		empresa.setIdEstatusEmpresa(empresaModel.getIdEstatusEmpresa());
 		empresa.setIdMunicipio(empresaModel.getIdMunicipio());
-		empresa.setIdEmpresaCoe(empresaModel.getIdEmpresaCoe());
+		empresa.setIdEmpresaCoe(Integer.valueOf(empresaModel.getIdEmpresaCoe()));
 		empresa.setRif(Integer.valueOf(empresaModel.getRif()));
-		empresa.setSigla(empresaModel.getSigla());
-		if (empresaModel.getLogoEmpresa() != null)
-			empresa.setLogo(Base64.getDecoder().decode(empresaModel.getLogoEmpresa().getBytes()));
+		empresa.setSigla(empresaModel.getSigla().toUpperCase());
+		
+		if (empresaModel.getLogo().getOriginalFilename() != null && !empresaModel.getLogo().getOriginalFilename().isEmpty()) {
+            Tika defaultTika = new Tika();
+            String deteccion = defaultTika.detect(empresaModel.getLogo().getBytes());
+            String tipo = deteccion.split("/")[0];
+            String extension = deteccion.split("/")[1];
+           
+            if(tipo.equalsIgnoreCase("image")) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(Util.convertFile(empresaModel.getLogoEmpresa().getBytes(), 'l'), extension, baos);
+                empresa.setLogo(baos.toByteArray()); 
+            }
+		}else if (empresaModel.getIdEmpresa()!= null) {
+			empresa.setLogo(empresaRepository.getLogoByIdEmpresa(empresaModel.getIdEmpresa()));
+		}
+		else {
+			empresa.setLogo(null);
+		}
 
 		return empresa;
 	}
@@ -435,95 +501,195 @@ public class EmpresaController {
 		return sucursal;
 	}
 
+	
 	private void validarEmpresa(EmpresaModel empresaModel, BindingResult result) throws Exception {
-		if (empresaModel.getSigla() != null && !empresaModel.getSigla().isEmpty()) {
-			if (!empresaModel.getSigla().matches("[a-zA-Z]{3}")) {
-				result.rejectValue("sigla", "", "debe tener 3 carácteres");
-			} else {
-				final List<Empresa> empresasBySigla = empresaRepository.findBySigla(empresaModel.getSigla());
-				if (empresasBySigla != null
-						&& empresasBySigla.stream().anyMatch(emp -> emp.getSigla().equals(empresaModel.getSigla())
-								&& emp.getIdEmpresa() != empresaModel.getIdEmpresa())) {
-					result.rejectValue("sigla", "", "ya existe esta sigla");
-				}
-			}
-		}
-
-		if (empresaModel.getRif() != null && !empresaModel.getRif().isEmpty()) {
+		
+		if (empresaModel.getRif() != null && !empresaModel.getRif().trim().isEmpty()) {
+			
+			empresaModel.setRif(empresaModel.getRif().trim());
+			
 			if (!empresaModel.getRif().matches("[0-9]{9}")) {
-				result.rejectValue("rif", "", "debe tener 9 digitos");
+				result.rejectValue("rif", "", "debe tener 9 d\u00EDgitos");
+			} 
+			else if (!validaRif(empresaModel.getCaracterRif() + empresaModel.getRif().trim())) {
+				result.rejectValue("rif", "", "inv\u00E1lido");
+			} 
+			else {
+				final List<Empresa> empresasByRif = empresaRepository.findByCaracterRifAndRif(empresaModel.getCaracterRif(),Integer.valueOf(empresaModel.getRif().trim()));
+				if (empresasByRif != null && empresasByRif.size() > 0) { 
+					if (empresaModel.getIdEmpresa() == null) { // creando
+						result.rejectValue("rif", "", "ya existe una empresa con este RIF");
+					}
+					else if (!empresasByRif.get(0).getIdEmpresa().equals(empresaModel.getIdEmpresa())){ // actualizando
+						result.rejectValue("rif", "", "ya existe una empresa con este RIF");
+					}
+				}
+			}
+		}
+		
+		if (empresaModel.getNombre() != null && !empresaModel.getNombre().trim().isEmpty()) {
+			
+			empresaModel.setNombre(empresaModel.getNombre().trim());
+			
+			if (!empresaModel.getNombre().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
+				result.rejectValue("nombre", "", "contiene caracteres especiales no v\u00E1lidos");	
+			}
+			else if (empresaModel.getNombre().length() > 100) {
+				result.rejectValue("nombre", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
+			}
+		}		
+		
+		if (empresaModel.getDireccion() != null && !empresaModel.getDireccion().trim().isEmpty()) {
+			
+			empresaModel.setDireccion(empresaModel.getDireccion().trim());
+			
+			if (!empresaModel.getDireccion().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
+				result.rejectValue("direccion", "", "contiene caracteres especiales no v\u00E1lidos");	
+			}
+			else if (empresaModel.getDireccion().length() > 100) {
+				result.rejectValue("direccion", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
+			}
+		}
+		
+		if (empresaModel.getSigla() != null && !empresaModel.getSigla().trim().isEmpty()){
+			
+			empresaModel.setSigla(empresaModel.getSigla().trim().toUpperCase());
+			
+			if (!empresaModel.getSigla().matches("[a-zA-Z]{3}")) {
+				result.rejectValue("sigla", "", "debe tener 3 caracteres alfab\u00E9ticos");
+			}
+			else {
+				final List<Empresa> empresasBySigla = empresaRepository.findBySigla(empresaModel.getSigla());
+				if (empresasBySigla != null	&&  empresasBySigla.size() > 0) {
+					if(empresaModel.getIdEmpresa() == null) { // creando
+						result.rejectValue("sigla", "", "ya existe esta sigla para otra empresa");	
+					}
+					else if (!empresasBySigla.get(0).getIdEmpresa().equals(empresaModel.getIdEmpresa())){ //actualizando
+						result.rejectValue("sigla", "", "ya existe esta sigla para otra empresa");	
+					}
+				}
+			}
+		}
+		
+		if (empresaModel.getIdEmpresaCoe() != null && !empresaModel.getIdEmpresaCoe().trim().isEmpty()) {
+			
+			empresaModel.setIdEmpresaCoe(empresaModel.getIdEmpresaCoe().trim());
+			
+			if (!empresaModel.getIdEmpresaCoe().matches("[0-9]*")) {
+				result.rejectValue("idEmpresaCoe", "", "debe tener solo d\u00EDgitos");
 			} else {
-				final List<Empresa> empresasByRif = empresaRepository.findByRif(Integer.valueOf(empresaModel.getRif()));
-				if (empresasByRif != null
-						&& empresasByRif.stream().anyMatch(emp -> emp.getRif().equals(empresaModel.getRif())
-								&& emp.getIdEmpresa() != empresaModel.getIdEmpresa())) {
-					result.rejectValue("rif", "", "ya existe este rif");
+				final List<Empresa> empresasByCoe = empresaRepository.findByIdEmpresaCoe(Integer.valueOf(empresaModel.getIdEmpresaCoe()));
+				
+				if (empresasByCoe != null && empresasByCoe.size() > 0) {
+					if(empresaModel.getIdEmpresa() == null) { // creando
+						result.rejectValue("idEmpresaCoe", "", "ya existe este ID de COE para otra empresa");	
+					}
+					else if (!empresasByCoe.get(0).getIdEmpresa().equals(empresaModel.getIdEmpresa())){ //actualizando
+						result.rejectValue("idEmpresaCoe", "", "ya existe este ID de COE para otra empresa");
+					}
 				}
 			}
 		}
 
-		if (empresaModel.getNombre() != null && !empresaModel.getNombre().isEmpty()
-				&& (empresaModel.getNombre().length() > 100
-						|| CARACTERES_ESPECIALES_PATTERN.matcher(empresaModel.getNombre()).find())) {
-			result.rejectValue("nombre", "",
-					"debe tener una longitud máxima de 100 sin caracteres especiales como $&+,:;=?@#|/{}\\");
-		}
-
-		if (empresaModel.getDireccion() != null && !empresaModel.getDireccion().isEmpty()
-				&& (empresaModel.getDireccion().length() > 100
-						|| CARACTERES_ESPECIALES_PATTERN.matcher(empresaModel.getDireccion()).find())) {
-			result.rejectValue("direccion", "",
-					"debe tener una longitud máxima de 100 sin caracteres especiales como $&+,:;=?@#|/{}\\");
-		}
-
-		if (empresaModel.getIdEmpresaCoe() != null) {
-			if (!String.valueOf(empresaModel.getIdEmpresaCoe()).matches("[0-9]*")) {
-				result.rejectValue("idEmpresaCoe", "", "debe tener solo digitos");
-			} else {
-				final List<Empresa> empresasByCoe = empresaRepository
-						.findByIdEmpresaCoe(empresaModel.getIdEmpresaCoe());
-				if (empresasByCoe != null && empresasByCoe.stream()
-						.anyMatch(emp -> emp.getIdEmpresaCoe().equals(empresaModel.getIdEmpresaCoe())
-								&& emp.getIdEmpresa() != empresaModel.getIdEmpresa())) {
-					result.rejectValue("idEmpresaCoe", "", "ya existe este COE");
-				}
-			}
-		}
-
-		if (empresaModel.getIdMunicipio() != null && empresaModel.getIdMunicipio() == -1) {
+		if (empresaModel.getIdMunicipio() != null && empresaModel.getIdMunicipio().intValue() == -1) {
 			result.rejectValue("idMunicipio", "", "requerido");
 		}
-
-		if (empresaModel.getLogo() != null && empresaModel.getLogo().getBytes().length > 0) {
-			if (!empresaModel.getLogo().getContentType().toLowerCase().equals("image/jpg")
-					&& !empresaModel.getLogo().getContentType().toLowerCase().equals("image/jpeg")) {
-				result.rejectValue("logo", "", "debe tener el formato JPG");
-			} else if (empresaModel.getLogo().getSize() > 500000) {
-				result.rejectValue("logo", "", "no puede ser mayor a 500Kb");
+		
+		if (empresaModel.getLogo() != null && !empresaModel.getLogo().isEmpty() && empresaModel.getLogo().getBytes().length > 0) {
+			if (!ValidationUtils.isValidImageType(empresaModel.getLogo())) {
+				result.rejectValue("logo", "", "debe tener el formato JPG, GIF, BMP o PNG");
+			} else if (!ValidationUtils.isValidImageSize(empresaModel.getLogo())) {
+				result.rejectValue("logo", "", "no puede ser mayor a 1 MB");
 			}
-
 		}
+	
 	}
 
+
 	private void validarSucursal(SucursalModel sucursalModel, BindingResult result) {
-		if (sucursalModel.getNombre() != null && !sucursalModel.getNombre().isEmpty()
-				&& (sucursalModel.getNombre().length() > 100
-						|| CARACTERES_ESPECIALES_PATTERN.matcher(sucursalModel.getNombre()).find())) {
-			result.rejectValue("nombre", "",
-					"debe tener una longitud máxima de 100 sin caracteres especiales como $&+,:;=?@#|/{}\\");
-		}
-		if (sucursalModel.getIdMunicipio() != null && sucursalModel.getIdMunicipio() == -1) {
+		
+		
+		if (sucursalModel.getNombre() != null && !sucursalModel.getNombre().trim().isEmpty()) {
+			
+			sucursalModel.setNombre(sucursalModel.getNombre().trim());
+			
+			if (!sucursalModel.getNombre().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
+				result.rejectValue("nombre", "", "contiene caracteres especiales no v\u00E1lidos");	
+			}
+			else if (sucursalModel.getNombre().length() > 100) {
+				result.rejectValue("nombre", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
+			}
+		}	
+		
+		
+		if (sucursalModel.getIdMunicipio() != null && sucursalModel.getIdMunicipio().intValue() == -1) {
 			result.rejectValue("idMunicipio", "", "requerido");
 		}
-		if (sucursalModel.getLatitud() != null && !sucursalModel.getLatitud().isEmpty()
-				&& (Double.parseDouble(sucursalModel.getLatitud()) > 90
-						|| Double.parseDouble(sucursalModel.getLatitud()) < -90)) {
-			result.rejectValue("latitud", "", "invalida");
+		
+		if (sucursalModel.getLatitud() != null && !sucursalModel.getLatitud().trim().isEmpty()) {
+			
+			sucursalModel.setLatitud(sucursalModel.getLatitud().trim());
+			
+			if (!sucursalModel.getLatitud().matches("^[-]?\\d+[\\.]?\\d*$") || Double.parseDouble(sucursalModel.getLatitud()) > 90 || Double.parseDouble(sucursalModel.getLatitud()) < -90)
+				result.rejectValue("latitud", "", "invalida");
 		}
-		if (sucursalModel.getLongitud() != null && !sucursalModel.getLongitud().isEmpty()
-				&& (Double.parseDouble(sucursalModel.getLongitud()) > 180
-						|| Double.parseDouble(sucursalModel.getLongitud()) < -180)) {
-			result.rejectValue("longitud", "", "invalida");
+		
+		if (sucursalModel.getLongitud() != null && !sucursalModel.getLongitud().trim().isEmpty()) {
+			
+			sucursalModel.setLongitud(sucursalModel.getLongitud().trim());
+			
+			if (!sucursalModel.getLongitud().matches("^[-]?\\d+[\\.]?\\d*$") || Double.parseDouble(sucursalModel.getLongitud()) > 180 || Double.parseDouble(sucursalModel.getLongitud()) < -180)
+				result.rejectValue("longitud", "", "invalida");
 		}
+
+	}
+
+	private static boolean validaRif(String rif) {
+		boolean result = false;
+		int digito = -1;
+		int per = 0;
+		rif = rif.toUpperCase();
+		// Valido que la letra inicial sea correcta
+		try {
+			switch (rif.charAt(0)) {
+			case 'V':
+				per = 1;
+				break;
+			case 'E':
+				per = 2;
+				break;
+			case 'J':
+				per = 3;
+				break;
+			case 'C':
+				per = 4;
+				break;
+			case 'G':
+				per = 5;
+				break;
+			default:
+				return false;
+			}
+
+			if (per > 0) {
+				int suma = (per * 4) + (Integer.parseInt(rif.substring(1, 2)) * 3)
+						+ (Integer.parseInt(rif.substring(2, 3)) * 2) + (Integer.parseInt(rif.substring(3, 4)) * 7)
+						+ (Integer.parseInt(rif.substring(4, 5)) * 6) + (Integer.parseInt(rif.substring(5, 6)) * 5)
+						+ (Integer.parseInt(rif.substring(6, 7)) * 4) + (Integer.parseInt(rif.substring(7, 8)) * 3)
+						+ (Integer.parseInt(rif.substring(8, 9)) * 2);
+
+				int resto = suma % 11;
+
+				if (resto > 1) {
+					digito = 11 - resto;
+				} else {
+					digito = 0;
+				}
+			}
+
+		} catch (Throwable ignored) {
+		}
+		result = (digito == Integer.parseInt(rif.substring(9)));
+		return result;
 	}
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import com.beca.misdivisas.interfaces.ILogRepo;
 
 import com.beca.misdivisas.services.LogService;
+import com.beca.misdivisas.util.Constantes;
 
 @Component
 @Controller
@@ -27,9 +28,7 @@ private ILogRepo repo;
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
 		HttpSession sesion = request.getSession();
 		LogService log = new LogService();
-		log.registrar(sesion, request, repo);
-
-
+		log.registrar(sesion, request, repo, Constantes.LOGOUT, Constantes.LOGOUT);
 
 	}
 }

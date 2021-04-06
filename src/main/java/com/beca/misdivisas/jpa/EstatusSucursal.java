@@ -2,7 +2,6 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.List;
 
 
 /**
@@ -22,9 +21,6 @@ public class EstatusSucursal implements Serializable {
 	@Column(name="\"estatus_sucursal\"")
 	private String estatusSucursal;
 
-	//bi-directional many-to-one association to Sucursal
-	@OneToMany(mappedBy="estatusSucursal")
-	private List<Sucursal> sucursals;
 
 	public EstatusSucursal() {
 	}
@@ -45,26 +41,5 @@ public class EstatusSucursal implements Serializable {
 		this.estatusSucursal = estatusSucursal;
 	}
 
-	public List<Sucursal> getSucursals() {
-		return this.sucursals;
-	}
-
-	public void setSucursals(List<Sucursal> sucursals) {
-		this.sucursals = sucursals;
-	}
-
-	public Sucursal addSucursal(Sucursal sucursal) {
-		getSucursals().add(sucursal);
-		sucursal.setEstatusSucursal(this);
-
-		return sucursal;
-	}
-
-	public Sucursal removeSucursal(Sucursal sucursal) {
-		getSucursals().remove(sucursal);
-		sucursal.setEstatusSucursal(null);
-
-		return sucursal;
-	}
 
 }

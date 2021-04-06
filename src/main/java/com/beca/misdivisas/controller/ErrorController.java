@@ -16,7 +16,7 @@ import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
 @Controller
-public class ErrorController  {
+public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
 	@Autowired
 	private ObjectFactory<HttpSession> factory;
 	
@@ -28,19 +28,23 @@ public class ErrorController  {
 	}
 	
     @GetMapping("/error")
-    public String manejoDeError(HttpServletRequest request) {
+    public String manejoDeError(HttpServletRequest request, Model modelo) {
     	Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
 		Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		
 		String detalle = "Código" +status.toString();
-		logServ.registrarLog("Error de sistema", detalle, "ERROR", Util.getRemoteIp(request),usuario);
+		logServ.registrarLog("Error de sistema", detalle, "ERROR", true,Util.getRemoteIp(request), usuario);
 		return "redirect:errorPage";
     }
     
     @GetMapping("/errorPage")
-    public String showErrorPage(HttpServletRequest request, Model model) {
+    public String showErrorPage(HttpServletRequest request, Model modelo) {
+    	modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
     	Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		model.addAttribute(Constantes.U_SUARIO, usuario);		
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);		
 		return Constantes.ERROR;
     }
 }

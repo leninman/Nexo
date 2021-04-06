@@ -19,11 +19,12 @@ public interface IEmpresaRepo extends JpaRepository<Empresa, Integer> {
 	
 	@Query("SELECT e FROM Empresa e order by e.empresa asc")
 	public List<Empresa> findAllOrderByName();
-	
+    
+	public List<Empresa> findByCaracterRifAndRif(String caracterRif, Integer rif);
+
 	public List<Empresa> findByRif(Integer rif);
 	
 	public List<Empresa> findBySigla(String sigla);
 	
 	public List<Empresa> findByIdEmpresaCoe(int idEmpresaCoe);
-
 }

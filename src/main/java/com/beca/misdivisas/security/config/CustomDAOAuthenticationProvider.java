@@ -1,10 +1,9 @@
 package com.beca.misdivisas.security.config;
 
+
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-
 import com.beca.misdivisas.services.UsuarioService;
 
 
@@ -17,31 +16,16 @@ public final class CustomDAOAuthenticationProvider extends DaoAuthenticationProv
 		
 		UsuarioService service = (UsuarioService) this.getUserDetailsService();
 		try {
-			WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
-	        String userIp = details.getRemoteAddress();
-	        
-	        service.setIpOrigen(userIp);
-	        
+	        CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) authentication.getDetails();
+	        service.setIpOrigen(details.getIpOrigen());
 	        this.setUserDetailsService(service);
-	        
-	        Authentication result = super.authenticate(authentication);
+	        super.setHideUserNotFoundExceptions(false);//Con esto se sabe si el error se debio a que el usuario no existe en BD
+	        Authentication result = super.authenticate(authentication);	        
 			return result;
-		} catch (AuthenticationException e) {
-			
+		} catch (AuthenticationException e) {			
 			service.verificarIntentos();
 			
 			throw e;
-		}
-		
+		}		
 	}
-	
-
-	/*@Override
-	public boolean supports(Class<?> authentication) {
-		
-		return super.supports(authentication);
-	}
-*/
-
-	
 }

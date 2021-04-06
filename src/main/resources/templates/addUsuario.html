@@ -20,7 +20,7 @@
 	
 	<!-- Custom styles for this template-->
 	<link href="css/sb-admin-2.min.css" th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
-
+	<link rel="stylesheet" href="css/bootnavbar.css">
 </head>
 
 <body id="page-top">
@@ -77,6 +77,12 @@
 	<!-- Custom scripts for all pages-->
 	<script src="js/sb-admin-2.min.js"   th:src="@{/js/sb-admin-2.min.js}" ></script>
 	<script src="js/listbox.js" th:src="@{/js/listbox.js}"></script>
+	<script src="js/bootnavbar.js" ></script>
+	<script>
+		$(function () {
+			$('#main_navbar').bootnavbar();
+		});
+	</script>
 </body>
 
 </html>

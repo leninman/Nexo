@@ -1,9 +1,22 @@
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>
 <div th:if="${crear}" class="row">
 	<div class="container my-5" align="center">
 		<h5 align="center">Creaci&oacute;n de Empresa</h5>
-		<div class="card" style="width: 50%">
-			<div class="card-body" style="text-align: left; width: 170%">
-				<div class="col-md-10">
+		<div class="card col-md-12" style="width: 100%">
+			<div class="card-body" style="text-align: left; width: 100%">
+				<div class="col-md-12">
 					<form action="#" th:object="${empresaModel}" method="post"
 						enctype="multipart/form-data">
 						<script>
@@ -13,38 +26,37 @@
 							});
 						</script>
 						<div class="row">
-
-							<div class="form-group col-md-8">
-								<label for="rif" class="col-form-label">Rif</label>
+							<div class="form-group col-md-6">
+								<label for="rif" class="col-form-label">RIF</label>
 								<div class="rif_row">
 									<select th:field="*{caracterRif}" id="caracterRif"
 										class="form-control caracter">
 										<option selected value="J">J</option>
 										<option value="G">G</option>
-										<option value="P">P</option>
+										<option value="C">C</option>
 										<option value="V">V</option>
 										<option value="E">E</option>
 									</select> <input type="text" th:field="*{rif}" class="form-control rif"
-										id="rif" placeholder="Rif" maxlength="9">
+										id="rif" placeholder="RIF" maxlength="9">
 								</div>
 								<span th:if="${#fields.hasErrors('rif')}" th:errors="*{rif}"
 									class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="nombre" class="col-form-label">Nombre</label> <input
 									type="text" th:field="*{nombre}" class="form-control"
 									id="nombre" placeholder="Nombre Empresa" maxlength=100>
 								<span th:if="${#fields.hasErrors('nombre')}"
 									th:errors="*{nombre}" class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="direccion" class="col-form-label">Direccion</label>
 								<input type="text" th:field="*{direccion}" class="form-control"
 									id="direccion" placeholder="Direccion" maxlength=100> <span
 									th:if="${#fields.hasErrors('direccion')}"
 									th:errors="*{direccion}" class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="estado" class="col-form-label">Estado</label>
 								<div>
 									<select id="estado" th:field="*{idEstado}" class="form-control"
@@ -56,7 +68,14 @@
 									</select>
 								</div>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
+								<label for="sigla" class="col-form-label">Sigla</label> <input
+									type="text" th:field="*{sigla}" class="form-control" id="sigla"
+									placeholder="Sigla" maxlength=3> <span
+									th:if="${#fields.hasErrors('sigla')}" th:errors="*{sigla}"
+									class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
 								<label for="idMunicipio" class="col-form-label">Municipio</label>
 								<div>
 									<select th:field="*{idMunicipio}" id="idMunicipio"
@@ -70,21 +89,14 @@
 								</div>
 
 							</div>
-							<div class="form-group col-md-8">
-								<label for="sigla" class="col-form-label">Sigla</label> <input
-									type="text" th:field="*{sigla}" class="form-control" id="sigla"
-									placeholder="Sigla" maxlength=3> <span
-									th:if="${#fields.hasErrors('sigla')}" th:errors="*{sigla}"
-									class="text-danger"></span>
-							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="idEmpresaCoe" class="col-form-label">ID COE</label>
-								<input type="number" th:field="*{idEmpresaCoe}"
-									class="form-control" id="idEmpresaCoe" placeholder="ID COE">
+								<input type="text" th:field="*{idEmpresaCoe}"
+									class="form-control" id="idEmpresaCoe" placeholder="ID COE" maxlength="8">
 								<span th:if="${#fields.hasErrors('idEmpresaCoe')}"
 									th:errors="*{idEmpresaCoe}" class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="idEstatusEmpresa" class="col-form-label">Estatus</label>
 								<div>
 									<select th:field="*{idEstatusEmpresa}" id="idEstatusEmpresa"
@@ -94,31 +106,33 @@
 									</select>
 								</div>
 							</div>
-							<div class="form-group col-md-8 logo-row">
+							<div class="form-group col-md-12 logo-row">
 								<div class="logo-selector">
 									<label for="logo" class="col-form-label">Logo</label>
 									<div>
 										<input type="button" class="btn btn-primary"
 											onclick="document.getElementById('logo').click()"
-											value="Examinar"> <input type="file"
-											th:field="*{logo}" class="form-control" style="display: none"
-											id="logo" onchange="loadLogo(event)"> <input
-											type="hidden" th:field="*{logoEmpresa}" id="logoEmpresa">
-										<span th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"
-											class="text-danger"></span>
+											value="Examinar"> <input type="button"
+											class="btn btn-primary" onclick="cleanLogo()" value="Limpiar">
+										<input type="file" th:field="*{logo}" class="form-control"
+											style="display: none" id="logo" onchange="loadLogo(event)">
+										<input type="hidden" th:field="*{logoEmpresa}"
+											id="logoEmpresa"> <span id="logoErrorServer"
+											th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"
+											class="text-danger"></span> <span id="logoErrorClient"
+											style="display: none" class="text-danger"></span>
 									</div>
-								</div>
-								<div class="logo-container" id="logoContainer">
-									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo"
-										class="logo-image"
-										th:src="|data:image/jpg;base64,${empresaModel.imagenLogo}|">
-								</div>
+								</div>								
 							</div>
-							<div class="form-group col-md-8" style="text-align: center;">
+							<div class="logo-container col-md-12" id="logoContainer" style="text-align: center; padding : 2%;">
+									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo"	class="logo-image"
+										th:src="|data:image/jpg+gif+png+jpeg+bmp;base64,${empresaModel.imagenLogo}|">
+							</div>					
+						</div>
+						<div class="form-group col-md-12" style="text-align: center; padding : 0; margin-top: 2%;">
 								<input type="submit" class="btn btn-primary" value="Guardar">
 								<a class="btn btn-secondary" href="./empresaHome">Cancelar</a>
-							</div>
-						</div>
+						</div>	
 					</form>
 				</div>
 			</div>
@@ -129,9 +143,9 @@
 <div th:if="${editar}" class="row">
 	<div class="container my-5" align="center">
 		<h5 align="center">Actualizaci&oacute;n de Empresa</h5>
-		<div class="card" style="width: 50%">
-			<div class="card-body" style="text-align: left; width: 170%">
-				<div class="col-md-10">
+		<div class="card col-md-12" style="width: 100%">
+			<div class="card-body" style="text-align: left; width: 100%">
+				<div class="col-md-12">
 					<form action="#" th:object="${empresaModel}" method="post"
 						id="actualizarEmpresa" enctype="multipart/form-data">
 						<script>
@@ -143,37 +157,37 @@
 						<div class="row">
 							<input type="hidden" name="idEmpresa" id="idEmpresa"
 								th:value="${empresaModel.idEmpresa}" />
-							<div class="form-group col-md-8">
-								<label for="rif" class="col-form-label">Rif</label>
+							<div class="form-group col-md-6">
+								<label for="rif" class="col-form-label">RIF</label>
 								<div class="rif_row">
 									<select th:field="*{caracterRif}" id="caracterRif"
 										class="form-control caracter">
 										<option selected value="J">J</option>
 										<option value="G">G</option>
-										<option value="P">P</option>
+										<option value="C">C</option>
 										<option value="V">V</option>
 										<option value="E">E</option>
 									</select> <input type="text" th:field="*{rif}" class="form-control rif"
-										id="rif" placeholder="Rif" maxlength="9">
+										id="rif" placeholder="RIF" maxlength="9">
 								</div>
 								<span th:if="${#fields.hasErrors('rif')}" th:errors="*{rif}"
 									class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="nombre" class="col-form-label">Nombre</label> <input
 									type="text" th:field="*{nombre}" class="form-control"
 									id="nombre" placeholder="Nombre Empresa" maxlength=100>
 								<span th:if="${#fields.hasErrors('nombre')}"
 									th:errors="*{nombre}" class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="direccion" class="col-form-label">Direccion</label>
 								<input type="text" th:field="*{direccion}" class="form-control"
 									id="direccion" placeholder="Direccion" maxlength=100> <span
 									th:if="${#fields.hasErrors('direccion')}"
 									th:errors="*{direccion}" class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="estado" class="col-form-label">Estado</label>
 								<div>
 									<select id="estado" th:field="*{idEstado}" class="form-control"
@@ -185,7 +199,14 @@
 									</select>
 								</div>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
+								<label for="sigla" class="col-form-label">Sigla</label> <input
+									type="text" th:field="*{sigla}" class="form-control" id="sigla"
+									placeholder="Sigla" maxlength=3 readonly> <span
+									th:if="${#fields.hasErrors('sigla')}" th:errors="*{sigla}"
+									class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-6">
 								<label for="municipio" class="col-form-label">Municipio</label>
 								<div>
 									<select th:field="*{idMunicipio}" id="idMunicipio"
@@ -197,22 +218,15 @@
 									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
 										th:errors="*{idMunicipio}" class="text-danger"></span>
 								</div>
-							</div>
-							<div class="form-group col-md-8">
-								<label for="sigla" class="col-form-label">Sigla</label> <input
-									type="text" th:field="*{sigla}" class="form-control" id="sigla"
-									placeholder="Sigla" maxlength=3 readonly> <span
-									th:if="${#fields.hasErrors('sigla')}" th:errors="*{sigla}"
-									class="text-danger"></span>
-							</div>
-							<div class="form-group col-md-8">
+							</div>							
+							<div class="form-group col-md-6">
 								<label for="idEmpresaCoe" class="col-form-label">ID COE</label>
-								<input type="number" th:field="*{idEmpresaCoe}"
-									class="form-control" id="idEmpresaCoe" placeholder="ID COE">
+								<input type="text" th:field="*{idEmpresaCoe}"
+									class="form-control" id="idEmpresaCoe" placeholder="ID COE" maxlength="8">
 								<span th:if="${#fields.hasErrors('idEmpresaCoe')}"
 									th:errors="*{idEmpresaCoe}" class="text-danger"></span>
 							</div>
-							<div class="form-group col-md-8">
+							<div class="form-group col-md-6">
 								<label for="idEstatusEmpresa" class="col-form-label">Estatus</label>
 								<div>
 									<select th:field="*{idEstatusEmpresa}" id="idEstatusEmpresa"
@@ -222,34 +236,58 @@
 									</select>
 								</div>
 							</div>
-							<div class="form-group col-md-8 logo-row">
+							<div class="form-group col-md-12 logo-row">
 								<div class="logo-selector">
 									<label for="logo" class="col-form-label">Logo</label>
 									<div>
 										<input type="button" class="btn btn-primary"
 											onclick="document.getElementById('logo').click()"
-											value="Examinar"> <input type="file"
-											th:field="*{logo}" class="form-control" style="display: none"
-											id="logo" onchange="loadLogo(event)"> <input
-											type="hidden" th:field="*{logoEmpresa}" id="logoEmpresa">
-										<span th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"
-											class="text-danger"></span>
+											value="Examinar"> <input type="button"
+											class="btn btn-primary" onclick="cleanLogo()" value="Limpiar">
+										<input type="file" th:field="*{logo}" class="form-control"
+											style="display: none" id="logo" onchange="loadLogo(event)">
+										<input type="hidden" th:field="*{logoEmpresa}"
+											id="logoEmpresa"> <span id="logoErrorServer"
+											th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}"
+											class="text-danger"></span> <span id="logoErrorClient"
+											style="display: none" class="text-danger"></span>
 									</div>
-								</div>
-								<div class="logo-container" id="logoContainer">
-									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo"
-										class="logo-image"
-										th:src="|data:image/jpg;base64,${empresaModel.imagenLogo}|">
-								</div>
+								</div>								
 							</div>
-
-							<div class="form-group col-md-8" style="text-align: center;">
-								<input type="submit" class="btn btn-primary" value="Guardar">
-								<input type="button" class="btn btn-light"
-									th:onclick="|sucursales('${empresaModel.idEmpresa}')|"
-									value="Sucursales"> <a class="btn btn-secondary"
-									href="./empresaHome">Cancelar</a>
+							<div class="logo-container col-md-12" id="logoContainer" style="text-align: center; padding : 2%;">
+									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo"										class="logo-image"
+										th:src="|data:image/jpg+gif+png+jpeg+bmp;base64,${empresaModel.imagenLogo}|">
 							</div>
+<!-- 							<div class="form-group col-md-12 logo-row"> -->
+<!-- 								<div class="logo-selector"> -->
+<!-- 									<label for="logo" class="col-form-label">Logo</label> -->
+<!-- 									<div> -->
+<!-- 										<input type="button" class="btn btn-primary" -->
+<!-- 											onclick="document.getElementById('logo').click()" -->
+<!-- 											value="Examinar"> <input type="file" -->
+<!-- 											th:field="*{logo}" class="form-control" style="display: none" -->
+<!-- 											id="logo" onchange="loadLogo(event)"> <input -->
+<!-- 											type="hidden" th:field="*{logoEmpresa}" id="logoEmpresa"> -->
+<!-- 										<span th:if="${#fields.hasErrors('logo')}" th:errors="*{logo}" -->
+<!-- 											class="text-danger"></span> -->
+<!-- 									</div> -->
+<!-- 								</div> -->
+<!-- 								<div class="logo-container" id="logoContainer"> -->
+<!-- 									<img th:if="${empresaModel.imagenLogo}" id="imagenLogo" -->
+<!-- 										class="logo-image" -->
+<!-- 										th:src="|data:image/jpg+gif+png;base64,${empresaModel.imagenLogo}|"> -->
+<!-- 								</div> -->
+<!-- 							</div>						 -->
+						</div>
+						<div class="form-group col-md-12" style="text-align: center;">
+							<input type="button" class="btn btn-light"
+								th:onclick="|sucursales('${empresaModel.idEmpresa}')|"
+								value="Sucursales">
+						</div>
+						<div class="form-group col-md-12"
+							style="text-align: center; padding: 0; margin-top: 2%;">
+							<input type="submit" class="btn btn-primary" value="Guardar">
+							<a class="btn btn-secondary" href="./empresaHome">Cancelar</a>
 						</div>
 					</form>
 				</div>

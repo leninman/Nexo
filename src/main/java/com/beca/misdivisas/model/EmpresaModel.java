@@ -10,10 +10,15 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 public class EmpresaModel {
+	
 	private Integer idEmpresa;
 	private String caracterRif;
+	
+	@NotNull(message = "requerido")
+	@NotBlank(message = "requerido")
 	private String direccion;
-
+	
+	@NotNull(message = "requerido")
 	@NotBlank(message = "requerido")
 	private String nombre;
 
@@ -25,11 +30,16 @@ public class EmpresaModel {
 	private Integer idMunicipio;
 
 	private Integer idEstado;
-	private Integer idEmpresaCoe;
+	
+	@NotNull(message = "requerido")
+	@NotBlank(message = "requerido")
+	private String idEmpresaCoe;
 
+	@NotNull(message = "requerido")
 	@NotBlank(message = "requerido")
 	private String rif;
 	
+	@NotNull(message = "requerido")
 	@NotBlank(message = "requerido")
 	private String sigla;
 
@@ -51,7 +61,7 @@ public class EmpresaModel {
 	}
 
 	public EmpresaModel(Integer idEmpresa, String caracterRif, String direccion, String nombre, Timestamp fechaCreacion,
-			Timestamp fechaEstatus, Integer idEstatusEmpresa, Integer idMunicipio, Integer idEmpresaCoe, String rif,
+			Timestamp fechaEstatus, Integer idEstatusEmpresa, Integer idMunicipio, String idEmpresaCoe, String rif,
 			String sigla, byte[] logo) {
 
 		this.idEmpresa = idEmpresa;
@@ -148,11 +158,11 @@ public class EmpresaModel {
 		this.idEstado = idEstado;
 	}
 
-	public Integer getIdEmpresaCoe() {
+	public String getIdEmpresaCoe() {
 		return idEmpresaCoe;
 	}
 
-	public void setIdEmpresaCoe(Integer idEmpresaCoe) {
+	public void setIdEmpresaCoe(String idEmpresaCoe) {
 		this.idEmpresaCoe = idEmpresaCoe;
 	}
 

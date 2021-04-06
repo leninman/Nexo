@@ -27,7 +27,6 @@ import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Locacion;
 import com.beca.misdivisas.services.LogService;
-import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
@@ -47,17 +46,16 @@ public class MapController {
 
 	@Autowired
 	private LogService logServ;
-	
-	@Autowired
-	private MenuService menuService;
 
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
-		model.addAttribute(Constantes.U_SUARIO, usuario);
-		model.addAttribute(Constantes.MENUES, menuService.getMenu(usuario.getIdUsuario()));
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA,
-				Util.getRemoteIp(request), usuario);
+				true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.MAPA;
 	}
@@ -94,14 +92,18 @@ public class MapController {
 				locacion.setLatitud(Double.parseDouble(sucursales.get(i).getLatitud()));
 				locacion.setLongitud(Double.parseDouble(sucursales.get(i).getLongitud()));
 				locacion.setAccion(sucursales.get(i).getIdSucursal().toString());
-				locacion.setLogo(Constantes.IMAGES);
+				if(empresa.getLogo()!= null)
+					locacion.setLogo(Constantes.IMAGES);
+				else
+					locacion.setLogo("img/sucursal.png");					
+				
 				locacion.setPosicion(i);
 				locaciones.add(locacion);
 			}
 		}
 		
-		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.SUCURSALES_EMPRESA, Constantes.TEXTO_REPORTE_MAPA, Util.getRemoteIp(request),
-				usuario);
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.SUCURSALES_EMPRESA, Constantes.TEXTO_REPORTE_MAPA, true,
+				Util.getRemoteIp(request), usuario);
 
 		return locaciones;
 	}

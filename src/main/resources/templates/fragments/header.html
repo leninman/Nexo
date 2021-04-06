@@ -1,43 +1,28 @@
 
 <th:block th:fragment="header">
-
-		<!-- Topbar -->
+<!-- Topbar -->
 	<nav class="navbar navbar-expand navbar-light bg-gray-300 topbar mb-1 static-top shadow" >
 		<div style="width: 50%; height: 100%">
 			<a href="main">
 				<img th:src="@{/img/exterior_60.png}" alt="BECA" width="50%" height="100%" style="margin-left: 1%"/>
 			</a>
 		</div>
-
-
 		<!-- Topbar Navbar -->
         <ul class="navbar-nav ml-auto">
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small" sec:authentication="name"></span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small"  th:text="${session.Usuario.nombreCompleto}"></span>
                 <img class="img-profile rounded-circle" th:src="@{/img/user_orange.png}" alt="memorynotfound user">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-            	<div sec:authorize="hasAnyRole('ADMIN_BECA')">
-					<a class="dropdown-item" href="./gestionarRoles" id="profiles">
-	                  <i class="fas fa-user-tag fa-sm fa-fw mr-2 text-gray-400"></i>
-	                  <span th:text="#{msj.cambiar.perfiles}"></span>
-	                </a>
-	               	<a class="dropdown-item" href="./changeCompany" id="changeUser">
-	                  <i class="fas fa-exchange-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-	                  <span th:text="#{msj.cambiar.cliente}"></span>
-	                </a>
-                </div>
-               	<div sec:authorize="hasAnyRole('CONSULTOR', 'ADMIN')">
-	               	<a class="dropdown-item" href="./changePassword" id="changePassword">
-	                  <i class="fas fas fa-user-lock fa-sm fa-fw mr-2 text-gray-400"></i>
-	                  <span th:text="#{msj.cambiar.contrasena}"> </span>                
-	                </a>
-                </div>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+		          <a  th:each="menu : ${menues}" th:if="${menu.tipoMenu}=='U'" class="dropdown-item" th:href="${menu.accion}" th:id="${menu.accion}+'l'">
+		          	<i  th:class="${menu.icono}"></i>
+		          	<span th:text="${menu.nombreOpcion}"></span>
+		          </a>
+		        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                  <i class="fas fa-sign-out-alt"></i>
                   <span th:text="#{msj.cerrar.sesion}"></span>
                 </a>
               </div>
@@ -45,29 +30,8 @@
           </ul>
      </nav>     
      <!-- End of Topbar -->
-     
-     <!-- Session Modal-->
-     <div class="modal fade" id="sessionModal" tabindex="-1" role="dialog"
-		aria-labelledby="exampleModalLabel" aria-hidden="true">
-	 	<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content">				
-				<div class="modal-header" style="text-align: right;">
-					<h5 class="modal-title" id="exampleModalLabel" th:text="#{msj.sesion.exp}"></h5>
-					<button class="close" type="button" data-dismiss="modal" onclick="location.href = 'logout';">
-						<i class="far fa-times-circle"></i>
-					</button>
-				</div>
-				<div class="modal-body" ></div>
-				<div  style="text-align: center;" >
-					<button class="btn btn-secondary" type="button"
-						data-dismiss="modal" onclick="location.href = 'logout';" style="height:40px;width:100px" th:text="#{msj.no}"></button>
-					<button class="btn btn-primary" type="button"
-						data-dismiss="modal" onclick="extendSession()"style="height:40px;width:100px" th:text="#{msj.si}"></button>
-				</div>
-				<br/>
-				</div>
-			</div>
-	    </div>
-		<th:block th:replace="fragments/logoutModal :: logoutModal" />		
-		<script src="js/sessionCheck.js"></script>    
+		<th:block th:replace="fragments/modals :: sessionModal" />
+		<th:block th:replace="fragments/modals :: logoutModal" />
+		<th:block th:replace="fragments/modals :: spinnerModal" />
+		<script src="js/sessionCheck.js"></script>		
 </th:block>

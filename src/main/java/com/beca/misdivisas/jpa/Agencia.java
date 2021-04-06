@@ -4,7 +4,6 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
@@ -18,7 +17,9 @@ public class Agencia implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="\"id_agencia\"")
+	@SequenceGenerator(name="\"ALMACEN\".\"seq_agencia_idAgencia\"", sequenceName ="\"ALMACEN\".\"seq_agencia_idAgencia\"", allocationSize = 1)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="\"ALMACEN\".\"seq_agencia_idAgencia\"")
+	@Column(name="\"id_agencia\"", unique = true, nullable = false, columnDefinition = "serial")
 	private Integer idAgencia;
 
 	@Column(name="\"agencia\"")
@@ -45,15 +46,13 @@ public class Agencia implements Serializable {
 	@Column(name="\"numero_agencia\"")
 	private Integer numeroAgencia;
 	
+	private Boolean almacenamiento;
+	
 	//bi-directional many-to-one association to EstatusAgencia
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_estatus_agencia\"", insertable = false, updatable = false)
 		})
 	private EstatusAgencia estatusAgencia;
-	
-	//bi-directional many-to-one association to Remesa
-	@OneToMany(mappedBy="agencia")
-	private List<Remesa> remesas;
 
 	public Agencia() {
 	}
@@ -137,27 +136,15 @@ public class Agencia implements Serializable {
 	public void setEstatusAgencia(EstatusAgencia estatusAgencia) {
 		this.estatusAgencia = estatusAgencia;
 	}
+
+	public Boolean getAlmacenamiento() {
+		return almacenamiento;
+	}
+
+	public void setAlmacenamiento(Boolean almacenamiento) {
+		this.almacenamiento = almacenamiento;
+	}
 	
-	public List<Remesa> getRemesas() {
-		return this.remesas;
-	}
-
-	public void setRemesas(List<Remesa> remesas) {
-		this.remesas = remesas;
-	}
-
-	public Remesa addRemesa(Remesa remesa) {
-		getRemesas().add(remesa);
-		remesa.setAgencia(this);
-
-		return remesa;
-	}
-
-	public Remesa removeRemesa(Remesa remesa) {
-		getRemesas().remove(remesa);
-		remesa.setAgencia(null);
-
-		return remesa;
-	}
+	
 
 }

@@ -1,0 +1,233 @@
+<th:block th:fragment="listaSolicitudesCargadas">
+	<div th:if="${param.success}">
+		<div class="alert alert-info">Operaci&oacute;n Realizada
+			Exitosamente</div>
+	</div>
+	<div th:if="${param.error}">
+		<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
+	</div>
+	<div th:if="${#lists.isEmpty(solicitudesRetiro)}"
+		class="container my-5">
+		<h5 align="center">No hay solicitudes por aprobar</h5>
+	</div>
+	<div th:unless="${#lists.isEmpty(solicitudesRetiro)}"
+		class="container my-5">
+		<h5 align="center">Listado de Solicitudes de Retiro de Efectivo por Aprobar / Anular</h5>
+		<div class="card">
+			<div class="card-body" align="center">
+				<div class="container my-5">
+					<div>
+						<div  class="table-responsive-sm">
+							<table class="table">
+								<thead>
+									<tr>
+										<th></th>
+										<th th:text="#{etq.retiro.tipo.billete}"></th>
+										<th style="width: 12%;" th:text="#{etq.retiro.fecha.estimada}"></th>
+										<th th:text="#{etq.retiro.agencia}"></th>
+								<!--	<th th:text="#{etq.retiro.tipo.autorizado}"></th> -->
+										<th th:text="#{etq.retiro.autorizado}"></th>
+										<th th:text="#{etq.retiro.moneda}"></th>
+										<th th:text="#{etq.retiro.monto}"></th>
+										<th th:text="#{etq.retiro.estatus}"></th>
+										<th th:text="#{etq.acciones}" colspan="3"></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="solicitud : ${solicitudesRetiro}">
+										<td><input type="checkbox" name="solicitudSeleccionada"
+											id="solicitudSeleccionada"
+											th:value="${solicitud.IdSolicitud}"
+											onclick="checkSolicitud()" /></td>
+										<td th:text="${solicitud.tipoBillete}"></td>
+										<td th:text="${solicitud.fechaEstimada}"></td>
+										<td th:text="${#numbers.formatInteger(solicitud.agencia.numeroAgencia, 3) + ' - ' + solicitud.agencia.agencia}"></td>
+<!-- 										<td th:text="${solicitud.autorizado.tipoAutorizado.tipoAutorizado}"></td> -->
+										<td th:text="${solicitud.nombreAutorizado}"></td>
+										<td th:text="${solicitud.moneda.moneda}"></td>
+										<td th:text="${#numbers.formatDecimal(solicitud.monto, 0, 'POINT', 2, 'COMMA')}"></td>
+										<td th:text="${solicitud.estatus}"></td>
+										<td>
+											<button type="button" name="editar" class="btn btn-secondary btn-sm"
+												th:title="#{msj.solicitud.retiro.revisar}"
+												th:onClick="|verSolicitud('${solicitud.idSolicitud}')|">
+												<i class="fas fa-eye"></i>
+											</button>
+										</td>
+										<td>
+											<div>
+												<button type="button"
+													th:title="#{msj.solicitud.retiro.anular}"
+													class="btn btn-danger btn-sm" data-toggle="modal"
+													th:attr="data-target='#recordDeleteModal'+${solicitud.idSolicitud}">
+													<i class="fas fa-trash"></i>
+												</button>
+												<div class="modal fade"
+													th:attr="id='recordDeleteModal'+${solicitud.idSolicitud}"
+													tabindex="-1" role="dialog"
+													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered"
+														role="document">
+														<div class="modal-content">
+
+															<div class="modal-header" style="text-align: right;">
+																<h5 class="modal-title" id="recordDeleteModalLabel"
+																	th:text="#{msj.confirm.elim.solicitud.retiro}"></h5>
+																<button class="close" type="button" data-dismiss="modal"
+																	aria-label="Close">
+																	<i class="far fa-times-circle"></i>
+																</button>
+															</div>
+															<div class="modal-body"></div>
+															<form method="POST" th:action="@{anularSolicitudRetiro}"
+																th:attr="id='form'+${solicitud.idSolicitud}">
+																<div style="text-align: center;">
+																	<button class="btn btn-secondary" type="button"
+																		data-dismiss="modal"
+																		style="height: 40px; width: 100px" th:text="#{msj.no}"></button>
+																	<input type="hidden" name="idSolicitud"
+																		id="idSolicitud" th:value="${solicitud.idSolicitud}" />
+																	<input type="hidden" name="accionFrom" id="accionFrom"
+																		value="RetiroEfectivo/Aprobacion" />
+																	<button type="submit" name="submit"
+																		class="btn btn-primary"
+																		style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+																</div>
+															</form>
+															<br />
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
+										<td>
+											<div>
+												<button type="button"
+													th:title="#{msj.solicitud.retiro.aprobar}"
+													class="btn btn-primary btn-sm" data-toggle="modal"
+													th:attr="data-target='#recordAprobarModal'+${solicitud.idSolicitud}">
+													<i class="far fa-thumbs-up"></i>
+												</button>
+												<div class="modal fade"
+													th:attr="id='recordAprobarModal'+${solicitud.idSolicitud}"
+													tabindex="-1" role="dialog"
+													aria-labelledby="recordAprobarModalLabel"
+													aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered"
+														role="document">
+														<div class="modal-content">
+
+															<div class="modal-header" style="text-align: right;">
+																<h5 class="modal-title" id="recordAprobarModalLabel"
+																	th:text="#{msj.confirm.aprobar.solicitud.retiro}"></h5>
+																<button class="close" type="button" data-dismiss="modal"
+																	aria-label="Close">
+																	<i class="far fa-times-circle"></i>
+																</button>
+															</div>
+															<div class="modal-body"></div>
+															<form method="POST" th:action="@{aprobarSolicitudRetiro}"
+																th:attr="id='formAprobar'+${solicitud.idSolicitud}">
+																<div style="text-align: center;">
+																	<button class="btn btn-secondary" type="button"
+																		data-dismiss="modal"
+																		style="height: 40px; width: 100px" th:text="#{msj.no}"></button>
+																	<input type="hidden" name="idSolicitudAprobar"
+																		id="idSolicitudAprobar"
+																		th:value="${solicitud.idSolicitud}" />
+																	<button type="submit" name="submit"
+																		class="btn btn-primary"
+																		style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+																</div>
+															</form>
+															<br />
+														</div>
+													</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<br>
+						<div class="row" style="text-align: center;">
+							<div class="form-group col-md-6">
+								<input type="button" class="btn btn-primary"
+									value="Aprobar seleccionadas" data-toggle="modal"
+									th:attr="data-target='#aprobarSeleccionModal'"
+									id="aprobarSeleccionadas" disabled>
+								<div class="modal fade" th:attr="id='aprobarSeleccionModal'"
+									tabindex="-1" role="dialog"
+									aria-labelledby="aprobarSeleccionModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered" role="document">
+										<div class="modal-content">
+											<div class="modal-header" style="text-align: right;">
+												<h5 class="modal-title" id="aprobarSeleccionModalLabel"
+													th:text="#{msj.confirm.aprobar.solicitudes.retiro}"></h5>
+												<button class="close" type="button" data-dismiss="modal"
+													aria-label="Close">
+													<i class="far fa-times-circle"></i>
+												</button>
+											</div>
+											<div class="modal-body"></div>
+											<form method="POST" th:action="@{aprobarSolicitudesRetiro}"
+												th:attr="id='formAprobarSeleccion'">
+												<div style="text-align: center;">
+													<button class="btn btn-secondary" type="button"
+														data-dismiss="modal" style="height: 40px; width: 100px"
+														th:text="#{msj.no}"></button>
+													<input type="hidden" name="idsSolicitudAprobar"
+														id="idsSolicitudAprobar" />
+													<button type="submit" name="submit" class="btn btn-primary"
+														style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+												</div>
+											</form>
+											<br />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group col-md-6">
+								<input type="button" class="btn btn-danger"
+									value="Anular seleccionadas" data-toggle="modal"
+									th:attr="data-target='#anularSeleccionModal'"
+									id="anularSeleccionadas" disabled>
+								<div class="modal fade" th:attr="id='anularSeleccionModal'"
+									tabindex="-1" role="dialog"
+									aria-labelledby="anularSeleccionModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered" role="document">
+										<div class="modal-content">
+											<div class="modal-header" style="text-align: right;">
+												<h5 class="modal-title" id="anularSeleccionModalLabel"
+													th:text="#{msj.confirm.elim.solicitudes.retiro}"></h5>
+												<button class="close" type="button" data-dismiss="modal"
+													aria-label="Close">
+													<i class="far fa-times-circle"></i>
+												</button>
+											</div>
+											<div class="modal-body"></div>
+											<form method="POST" th:action="@{anularSolicitudesRetiro}"
+												th:attr="id='formAnular'">
+												<div style="text-align: center;">
+													<button class="btn btn-secondary" type="button"
+														data-dismiss="modal" style="height: 40px; width: 100px"
+														th:text="#{msj.no}"></button>
+													<input type="hidden" name="idsSolicitudAnular"
+														id="idsSolicitudAnular" />
+													<button type="submit" name="submit" class="btn btn-primary"
+														style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+												</div>
+											</form>
+											<br />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>

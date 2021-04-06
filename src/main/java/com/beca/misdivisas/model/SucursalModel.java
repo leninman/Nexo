@@ -2,7 +2,6 @@ package com.beca.misdivisas.model;
 
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -118,7 +117,7 @@ public class SucursalModel {
 	
 
 	public Boolean getAcopio() {
-		return acopio;
+		return acopio == null ? false : acopio;
 	}
 
 	public void setAcopio(Boolean acopio) {

@@ -185,3 +185,50 @@ function validar_Rep_Sucursal(){
 		$("#father").show();
 	}
 }
+
+function verReporteSolicitudRetiro(){
+	var muestra=0;
+	var mensaje ='';
+	
+	if($( "#fechaInicio" ).val() == ""){
+		$("#fechaInicio").css("border", "1px solid red");
+		mensaje += 'Debe seleccionar Fecha de Inicio. <br/>';
+		muestra = 1;
+	}else{
+		$("#fechaInicio").css("border", "");
+	}
+	
+	if($( "#fechaFin" ).val() == ""){
+		$("#fechaFin").css("border", "1px solid red");
+		mensaje += 'Debe seleccionar Fecha de Fin.<br/>';
+		muestra = 1;
+	}else{
+		$("#fechaFin").css("border", "");
+	}
+	
+	var fi = $("#fechaInicio").datepicker('getDate');
+	var ff = $("#fechaFin").datepicker('getDate');
+	
+	if(fi>ff){
+		$("#fechaFin").css("border", "1px solid red");
+		mensaje += 'Fecha Fin debe ser mayor o igual que Fecha Inicio.<br/>';
+		muestra = 1;
+	}
+	
+	if(muestra==1){
+		$("#modalbody").html(mensaje);
+		$("#exampleModalCenter").modal('show');
+		$("#tablaRemesas").DataTable().destroy();
+		$("#father").hide();
+	}else{
+		var fechaInicio =  $( "#fechaInicio" ).val();	
+		var fechaFin =  $( "#fechaFin" ).val();
+		var moneda = $( "#moneda" ).val();
+		var estatus = $( "#estatus" ).val();
+
+		tablaSolicitudesRetiro(fechaInicio, fechaFin, moneda, estatus);
+		
+		$("#father").show();
+	}
+	
+}

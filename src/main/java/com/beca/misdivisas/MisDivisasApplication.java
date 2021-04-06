@@ -6,9 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-//import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
-
-//@EnableEncryptableProperties
 @EnableAutoConfiguration
 @SpringBootApplication//(exclude={org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration.class})
 public class MisDivisasApplication extends SpringBootServletInitializer {

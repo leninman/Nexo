@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="es">
+<head>
+<title th:text="#{titulo}"></title>
+
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+<link rel="shortcut icon" type="image/x-icon"
+	th:href="@{/img/favicon.ico}" />
+<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon">
+
+<!-- Custom fonts for this template-->
+<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+	type="text/css">
+<link href="css/fonts-family-nunito.css" rel="stylesheet">
+
+<!-- Custom styles for this template-->
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-dark">
+
+	<div class="container">
+
+		<!-- Outer Row -->
+		<div class="row justify-content-center">
+
+			<div class="col-xl-10 col-lg-14 col-md-9">
+
+				<div class="card o-hidden border-0 shadow-lg my-5">
+					<div class="card-body p-0">
+						<!-- Nested Row within Card Body -->
+						<div class="row">
+							<div class="col-lg-5 d-none d-lg-block bg-login-image"></div>
+							<div class="col-lg-6">
+								<div class="p-5">
+									<br />
+									<div class="text-center">
+										<h1 class="h4 text-gray-900 mb-4"
+											th:text="#{tit.seguridad.validacion}"></h1>
+									</div>
+									<br /> <br />
+									<div id="counter">
+											120							
+									</div>
+									<form id="otp_form" th:action="@{/validarOtp}" method="post">										
+										<div class="form-group">
+											<input type="checkbox" name="frecuente" id="frecuente"
+												onchange="getFrecuente(this)" th:checked="false" />
+										</div>
+										<div class="form-group">
+											<h6 class="modal-title" id="exampleModalLabel"
+												style="margin-bottom: 20px;">Seleccionar en caso de que
+												este ingresando en un equipo de uso frecuente</h6>
+											<input type="text" class="form-control form-control-user"
+												id="otp" name="otp" aria-describedby="otp"
+												th:placeholder="#{msj.ing.otp}" required="required"
+												th:autofocus="autofocus">
+											<input type="hidden" th:value="${session.generatedOtp}" id="generatedOtp" name="generatedOtp">
+										</div>
+										<br /> <a href="javascript:;"
+											onclick="validateForm();"
+											class="btn btn-dark btn-user btn-block"
+											th:text="#{bot.login}"></a> <br /> <br />
+										<div>
+											<p class="text-danger"
+												id="otpError"></p>
+										</div>
+										<br />
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript-->
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="js/sb-admin-2.min.js"></script>
+	
+	<script src="js/otp.js"></script>
+</body>
+
+</html>

@@ -1,5 +1,4 @@
 package com.beca.misdivisas.jpa;
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "\"USUARIO_EQUIPO_FRECUENTE\"", schema = "\"SEGURIDAD\"")
 @NamedQuery(name = "UsuarioEquipoFrecuente.findAll", query = "SELECT u FROM UsuarioEquipoFrecuente u")
-public class UsuarioEquipoFrecuente {
+public class UsuarioEquipoFrecuente implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id

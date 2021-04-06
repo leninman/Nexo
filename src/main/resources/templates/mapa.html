@@ -95,9 +95,13 @@
 	
 
 	<script type="text/javascript" th:src="@{/js/ol/ol_v5.2.0.js}"></script>
-	<script type="text/javascript" th:src="@{/js/ol/ol-popup.js}"></script>
-	
-
+	<script type="text/javascript" th:src="@{/js/ol/ol-popup.js}"></script>	
+    <script src="js/bootnavbar.js" ></script>
+    <script>
+        $(function () {
+            $('#main_navbar').bootnavbar();
+        })
+    </script>
 <script type="text/javascript">
 
 var locacion =[] ;
@@ -221,7 +225,6 @@ function pintar(locations){
 	    }
 	});
 }
-
 
 </script>
 </body>

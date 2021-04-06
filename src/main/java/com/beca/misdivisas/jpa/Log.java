@@ -29,6 +29,9 @@ public class Log implements Serializable {
 
 	@Column(name="\"id_empresa\"")
 	private Integer idEmpresa;
+	
+	@Column(name="\"id_menu\"")
+	private Integer idMenu;
 
 	@Column(name="\"id_usuario\"")
 	private Integer idUsuario;
@@ -93,6 +96,14 @@ public class Log implements Serializable {
 
 	public void setIdEmpresa(Integer idEmpresa) {
 		this.idEmpresa = idEmpresa;
+	}
+	
+	public Integer getIdMenu() {
+		return this.idMenu;
+	}
+
+	public void setIdMenu(Integer idMenu) {
+		this.idMenu = idMenu;
 	}
 
 	public Integer getIdUsuario() {

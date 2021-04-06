@@ -4,7 +4,6 @@ package com.beca.misdivisas.jpa;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.List;
 
 
 /**
@@ -24,10 +23,6 @@ public class EstatusAgencia implements Serializable {
 	@Column(name="\"estatus_agencia\"")
 	private String estatusAgencia;
 
-	//bi-directional many-to-one association to Agencia
-	@OneToMany(mappedBy="estatusAgencia")
-	private List<Agencia> agencias;
-
 	public EstatusAgencia() {
 	}
 
@@ -46,27 +41,4 @@ public class EstatusAgencia implements Serializable {
 	public void setEstatusAgencia(String estatusAgencia) {
 		this.estatusAgencia = estatusAgencia;
 	}
-
-	public List<Agencia> getAgencias() {
-		return this.agencias;
-	}
-
-	public void setAgencias(List<Agencia> agencias) {
-		this.agencias = agencias;
-	}
-
-	public Agencia addAgencia(Agencia agencia) {
-		getAgencias().add(agencia);
-		agencia.setEstatusAgencia(this);
-
-		return agencia;
-	}
-
-	public Agencia removeAgencia(Agencia agencia) {
-		getAgencias().remove(agencia);
-		agencia.setEstatusAgencia(null);
-
-		return agencia;
-	}
-
 }

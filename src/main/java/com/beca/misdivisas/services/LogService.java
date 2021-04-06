@@ -25,7 +25,7 @@ public class LogService {
 	@Autowired
 	 private static final Logger logger = LoggerFactory.getLogger(LogService.class);
 	
-	public void registrar(HttpSession sesion, HttpServletRequest request,  ILogRepo logRepo) {
+	public void registrar(HttpSession sesion, HttpServletRequest request,  ILogRepo logRepo, String accion, String opcion) {
 		Date date = new Date();
 		Log audit = new Log();
 		String ip = Util.getRemoteIp(request);
@@ -33,34 +33,53 @@ public class LogService {
 		if (us != null) {
 			audit.setIdEmpresa(us.getIdEmpresa());
 			audit.setIdUsuario(us.getIdUsuario());
-			audit.setNombreUsuario(us.getNombreUsuario());
+			audit.setNombreUsuario(us.getNombreUsuario().toUpperCase());
 		}
 		audit.setFecha(new Timestamp(date.getTime()));
 		audit.setIpOrigen(ip);
-		audit.setAccion("Logout");
-		audit.setDetalle("Logout");
-		audit.setOpcionMenu("Cerrar Sesion");
+		audit.setAccion(accion);
+		audit.setDetalle(accion);
+		audit.setOpcionMenu(opcion);
 		audit.setResultado(true);
 		logRepo.save(audit);
+		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Opcion:"+ opcion);
 	}
 	
-	public  void registrarLog(String accion, String detalle,  String opcion, String ip, Usuario us) {
+	public void registrarLogin(Usuario us, HttpServletRequest request,  ILogRepo logRepo, String accion, String opcion) {
+		Date date = new Date();
+		Log audit = new Log();
+		String ip = Util.getRemoteIp(request);
+
+		audit.setNombreUsuario(us.getNombreUsuario().toUpperCase());
+		audit.setFecha(new Timestamp(date.getTime()));
+		audit.setIpOrigen(ip);
+		audit.setAccion(accion);
+		audit.setDetalle(accion);
+		audit.setOpcionMenu(opcion);
+		audit.setResultado(true);
+		logRepo.save(audit);
+		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Opcion:"+ opcion);
+	}
+	
+	public  void registrarLog(String accionUrl, String detalle,  String opcionMenu, boolean resultado, String ipOrigen, Usuario us) {
 		Date date = new Date();
 		Log audit = new Log();
 				
 		audit.setFecha(new Timestamp(date.getTime()));
-		audit.setIpOrigen(ip);
-		audit.setAccion(accion);
+		audit.setIpOrigen(ipOrigen);
+		audit.setAccion(accionUrl);
 		audit.setDetalle(detalle);
 		if(us!=null) {
-			audit.setIdEmpresa(us.getIdEmpresa());
-			audit.setIdUsuario(us.getIdUsuario());
-			audit.setNombreUsuario(us.getNombreUsuario());
+			if(us.getIdUsuario()!=null){
+				audit.setIdEmpresa(us.getIdEmpresa());
+				audit.setIdUsuario(us.getIdUsuario());
+			}
+			audit.setNombreUsuario(us.getNombreUsuario().toUpperCase());
 		}
 
-		audit.setOpcionMenu(opcion);
-		audit.setResultado(true);
+		audit.setOpcionMenu(opcionMenu);
+		audit.setResultado(resultado);
 		logRepo.save(audit);
-		logger.info("Ip origen: "+ ip +" Accion:" +accion +" Detalle:"+ detalle + " Opcion:"+ opcion);
+		logger.info("Ip origen: "+ ipOrigen +" Accion:" +accionUrl +" Detalle:"+ detalle + " Opcion:"+ opcionMenu);
 	}
 }

@@ -1,0 +1,64 @@
+
+<th:block th:fragment="logoutModal">
+
+	<!-- Logout Modal-->
+
+	    <!-- Logout Modal-->
+		<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog"
+			aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">				
+					<div class="modal-header" style="text-align: right;">
+						<h5 class="modal-title" id="exampleModalLabel" th:text="#{msj.cerrar.sesion.pregunta}"></h5>
+						<button class="close" type="button" data-dismiss="modal" >
+							<i class="far fa-times-circle"></i>
+						</button>
+					</div>
+					<div class="modal-body" ></div>
+					<div  style="text-align: center;" >
+						<button class="btn btn-secondary" type="button"
+							data-dismiss="modal" style="height:40px;width:100px" th:text="#{msj.no}"></button>
+						<button class="btn btn-primary" type="button"
+							data-dismiss="modal"onclick="location.href = 'logout';" style="height:40px;width:100px" th:text="#{msj.si}"></button>
+					</div>
+					<br/>
+				</div>
+			</div>
+	    </div>
+
+</th:block>
+
+<th:block th:fragment="sessionModal">
+     <!-- Session Modal-->
+     <div class="modal fade" id="sessionModal" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+	 	<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">				
+				<div class="modal-header" style="text-align: right;">
+					<h5 class="modal-title" id="exampleModalLabel" th:text="#{msj.sesion.exp}"></h5>
+					<button class="close" type="button" data-dismiss="modal" onclick="extendSession()">
+						<i class="far fa-times-circle"></i>
+					</button>
+				</div>
+				<div class="modal-body" ></div>
+				<div  style="text-align: center;" >
+					<button class="btn btn-secondary" type="button"
+						data-dismiss="modal" onclick="location.href = 'logout';" style="height:40px;width:100px" th:text="#{msj.no}"></button>
+					<button class="btn btn-primary" type="button"
+						data-dismiss="modal" onclick="extendSession()"style="height:40px;width:100px" th:text="#{msj.si}"></button>
+				</div>
+				<br/>
+				</div>
+			</div>
+	    </div>
+</th:block>
+
+<th:block th:fragment="spinnerModal">
+<div class="modal bd-example-modal-lg" id="spinnerModal" data-backdrop="static" data-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary" style="width: 50px; height: 50px;"></div>
+        </div>
+    </div>
+</div>
+</th:block>

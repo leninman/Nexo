@@ -29,10 +29,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private String ldapUrl;
 	
 	@Value("${ldap.base.dn}")
-	private String ldapBaseDn;	
+	private String ldapBaseDn;
+	
 	
 	@Autowired
 	private UserDetailsService userDetailsService;	
+	
+	//Cambios JF
+	@Autowired
+    private CustomWebAuthenticationDetailsSource authenticationDetailsSource;
+	
 	
 	@Autowired
 	private BCryptPasswordEncoder bCrypt;
@@ -48,18 +54,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 
+	//Cambios JF
 	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {		
-			auth.authenticationProvider(activeDAOAuthenticationProvider());		
-			auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
-
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			//Clientes externos BD
+			auth.authenticationProvider(activeDAOAuthenticationProvider());
+			//Clientes internos LDAP Torre
+			auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider(ldapDomain, ldapUrl, ldapBaseDn));
+			//Clientes internos LDAP Agencias
+			//auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider(ldapDomain, ldapUrl, ldapBaseDn));
 	}
 
-	
+	//Cambios JF
 	@Bean
-	public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+	public AuthenticationProvider activeDirectoryLdapAuthenticationProvider(String domain, String url, String rootDn) {
 		CustomActiveDirectoryLdapAuthenticationProvider provider = new CustomActiveDirectoryLdapAuthenticationProvider(
-				ldapDomain, ldapUrl, ldapBaseDn);
+				domain, url, rootDn);
 		provider.setConvertSubErrorCodesToExceptions(true);
 		provider.setUseAuthenticationRequestCredentials(true);
 		//provider.setRoleDao(roleDao);
@@ -95,7 +105,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          .loginProcessingUrl("/login") //the url to submit the username and password to
          .usernameParameter("username")
          .passwordParameter("password")
-         .successHandler(new CustomAuthenticationSuccessHandler())
+         .successHandler(new CustomAuthenticationSuccessHandler(logRepo))
+       //Cambios JF agregar esta linea
+         .authenticationDetailsSource(authenticationDetailsSource) 
 		 //.defaultSuccessUrl("/main", true)  //the landing page after a successful login
          .failureUrl("/login?error") //the landing page after an unsuccessful login
          //.failureHandler(authenticationFailureHandler())         

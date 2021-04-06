@@ -6,7 +6,7 @@
       </encoder>
    </appender>
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>/app/logs/misDivisas.log</file>
+    <file></file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
         <fileNamePattern>/app/logs/AppNexoDivisas-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
         <maxFileSize>10MB</maxFileSize>    
@@ -14,7 +14,7 @@
         <totalSizeCap>1GB</totalSizeCap>
     </rollingPolicy>
     <encoder>
-        <pattern>%msg%n</pattern>
+        <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p] %m%n</pattern>
     </encoder>
 </appender> 
    <root level = "INFO">

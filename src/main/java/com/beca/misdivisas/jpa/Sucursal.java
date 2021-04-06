@@ -3,8 +3,9 @@ package com.beca.misdivisas.jpa;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
@@ -18,7 +19,9 @@ public class Sucursal implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="\"id_sucursal\"")
+	@SequenceGenerator(name = "\"ALMACEN\".\"seq_sucursal_idSucursal\"", sequenceName = "\"ALMACEN\".\"seq_sucursal_idSucursal\"", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "\"ALMACEN\".\"seq_sucursal_idSucursal\"")
+	@Column(name = "\"id_sucursal\"", unique = true, nullable = false, columnDefinition = "serial")	
 	private Integer idSucursal;
 
 	private Boolean acopio;
@@ -44,11 +47,8 @@ public class Sucursal implements Serializable {
 
 	private String sucursal;
 
-	//bi-directional many-to-one association to Remesa
-	@OneToMany(mappedBy="sucursal")
-	private List<Remesa> remesas;
-
 	//bi-directional many-to-one association to Empresa
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_empresa\"", insertable = false, updatable = false)})
 	private Empresa empresa;
@@ -148,36 +148,11 @@ public class Sucursal implements Serializable {
 		this.sucursal = sucursal;
 	}
 
-	public List<Remesa> getRemesas() {
-		return this.remesas;
-	}
-
-	public void setRemesas(List<Remesa> remesas) {
-		this.remesas = remesas;
-	}
-
-	public Remesa addRemesa(Remesa remesa) {
-		getRemesas().add(remesa);
-		remesa.setSucursal(this);
-
-		return remesa;
-	}
-
-	public Remesa removeRemesa(Remesa remesa) {
-		getRemesas().remove(remesa);
-		remesa.setSucursal(null);
-
-		return remesa;
-	}
-
-	public Empresa getEmpresa() {
-		return this.empresa;
-	}
-
-	public void setEmpresa(Empresa empresa) {
-		this.empresa = empresa;
-	}
-
+	
+	public Empresa getEmpresa() { return this.empresa; }
+	  
+	public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
+	 
 	public EstatusSucursal getEstatusSucursal() {
 		return this.estatusSucursal;
 	}

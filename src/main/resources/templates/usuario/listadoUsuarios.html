@@ -9,8 +9,8 @@
 					<input type="hidden" id="botonAgregar" value="H">
 					 
 					<p class="my-5"> 
-						<a id="boton_agregar" href="usuarioMainAgregar" class="btn btn-secondary" th:title="#{msj.usuario.crear}" tabindex="-1"> <i
-									class="fas fa-user-plus ml-2"></i></a>
+						<a id="boton_agregar" th:href="${existe}?'#':'usuarioMainAgregar'" class="btn btn-secondary btn-sm" th:title="#{msj.usuario.crear}" tabindex="-1" th:disabled="${existe}"> 
+						<i class="fas fa-user-plus ml-2"></i></a>
 					</p>
 					
 					<div class="col-md-10">
@@ -31,25 +31,19 @@
 									<tr th:each="Usuario : ${Usuarios}">
 										<td th:text="${Usuario.nombreUsuario}"></td>
 										<td th:text="${Usuario.email}"></td>
-										<div th:if="${Usuario.habilitado}">
-											<td th:text="Si"></td>
-										</div>
-										<div th:unless="${Usuario.habilitado}">
-											<td th:text="No"></td>
-										</div>
-										
-										<div sec:authorize="hasRole('ADMIN')">
+										<td th:text="${Usuario.habilitado} ? 'Si' : 'No'"></td>										
+										<div th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Externo'">
 											<td>
 												<form th:if="${!Usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${Usuario.idUsuario}">
 													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${Usuario.idUsuario}" />
-										            <button type="submit" name="submit"  class="btn btn-secondary" th:title="#{msj.usuario.editar}">
+										            <button type="submit" name="submit"  class="btn btn-secondary btn-sm" th:title="#{msj.usuario.editar}">
 										            	<i class="fas fa-user-edit ml-2" ></i>
 										            </button>										           										            
 										        </form>
 											</td>											
 											<td>
 											<div th:if="${!Usuario.admin}">
-												<button type="button" th:title="#{msj.usuario.eliminar}" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${Usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
+												<button type="button" th:title="#{msj.usuario.eliminar}" class="btn btn-danger btn-sm" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${Usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
 										        <!-- Logout Modal-->
 												<div class="modal fade" th:attr="id='recordDeleteModal'+${Usuario.idUsuario}" tabindex="-1" role="dialog"
 													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
@@ -60,7 +54,7 @@
 																<h5 class="modal-title" id="recordDeleteModalLabel" th:text="#{msj.confirm.elim.usuario}"></h5>
 																<button class="close" type="button" data-dismiss="modal"
 																	aria-label="Close">
-																	<span aria-hidden="true">x</span>
+																	<i class="far fa-times-circle"></i>
 																</button>
 															</div>
 															<div class="modal-body"></div>
@@ -83,11 +77,11 @@
 										    </td>
 										</div>
 										
-										<div sec:authorize="hasRole('ADMIN_BECA')">
+										<div th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Interno'">
 											<td>
 												<form th:if="${Usuario.admin}" method="POST" th:action="@{usuarioEditar}" th:attr="id='form'+${Usuario.idUsuario}">
 													<input type="hidden" name="usuarioId" id="usuarioId" th:value="${Usuario.idUsuario}" />
-										            <button type="submit" name="submit"  class="btn btn-secondary" th:title="#{msj.usuario.editar}">
+										            <button type="submit" name="submit"  class="btn btn-secondary btn-sm" th:title="#{msj.usuario.editar}">
 										            	<i class="fas fa-user-edit ml-2" ></i>
 										            </button>										           										            
 										        </form>										
@@ -95,7 +89,7 @@
 											
 											<td>
 											<div th:if="${Usuario.admin}">
-												<button type="button" th:title="#{msj.usuario.eliminar}" class="btn btn-danger" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${Usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
+												<button type="button" th:title="#{msj.usuario.eliminar}" class="btn btn-danger btn-sm" data-toggle="modal" th:attr="data-target='#recordDeleteModal'+${Usuario.idUsuario}"><i class="fas fa-user-times ml-2"></i></button>
 										        <!-- Logout Modal-->
 												<div class="modal fade" th:attr="id='recordDeleteModal'+${Usuario.idUsuario}" tabindex="-1" role="dialog"
 													aria-labelledby="recordDeleteModalLabel" aria-hidden="true">
@@ -104,9 +98,8 @@
 														
 															<div class="modal-header" style="text-align: right;">
 																<h5 class="modal-title" id="recordDeleteModalLabel" th:text="#{msj.confirm.elim.usuario}"></h5>
-																<button class="close" type="button" data-dismiss="modal"
-																	aria-label="Close">
-																	<span aria-hidden="true">x</span>
+																<button class="close" type="button" data-dismiss="modal" aria-label="Close">
+																	<i class="far fa-times-circle"></i>
 																</button>
 															</div>
 															<div class="modal-body"></div>
@@ -124,18 +117,12 @@
 													</div>
 											    </div>
 											</div>
-										    </td>
-											<script>document.getElementById("botonAgregar").value = "D";</script>											
+										
 										</div>
 									</tr>
 								</tbody>
 							</table>
-							<script>
-							var nombre = document.getElementById("botonAgregar").value;
-								
-							if(nombre == "D")
-									document.getElementById("boton_agregar").className += " disabled"; 
-							</script>
+
 						</div>
 
 					</div>
@@ -160,19 +147,22 @@
                        	
                         	<div class="form-group col-md-8">
                                 <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena}"></label> 
-                                <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> 
+                                <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a" maxlength="20"> 
                                 <span th:if="${#fields.hasErrors('usuario.contrasena')}" th:errors="*{usuario.contrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> 
+                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> 
+                                <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a" maxlength="20"> 
                                 <span th:if="${#fields.hasErrors('usuario.repitaContrasena')}" th:errors="*{usuario.repitaContrasena}" class="text-danger"></span>
                             </div> 
                             <div class="form-group col-md-8">
-                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> 
+                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> 
+                                <input type="text" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo" maxlength="255"> 
                                 <span th:if="${#fields.hasErrors('usuario.nombreCompleto')}" th:errors="*{usuario.nombreCompleto}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{usuario.email}" class="form-control" id="email" placeholder="E-mail"> 
+                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> 
+                                <input type="text" th:field="*{usuario.email}" class="form-control" id="email" placeholder="E-mail" maxlength="255"> 
                                 <span th:if="${#fields.hasErrors('usuario.email')}" th:errors="*{usuario.email}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
@@ -180,8 +170,8 @@
                                 <input type="hidden" value="on" name="_habilitado"/>
 							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="*{usuario.habilitado}" th:field="*{usuario.habilitado}"/>							    
                             </div>
-                            <div  class="form-group col-md-8">
-								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />		
+                            <div  th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Externo'" class="form-group col-md-8">
+								<th:block th:replace="perfil/perfilList :: listadoPerfilesUsuario" />		
 							</div>
                             <div class="form-group col-md-8" Style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}" onclick="seleccionarTodos();">
@@ -204,20 +194,20 @@
                 <div class="col-md-10">
                     <form action="#" th:action="@{/usuarioChange}" th:object="${usuario}" method="post">
                         <div class="row" >
-                        	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.idUsuario}" />
-                            <input type="hidden" th:field="*{nombreUsuario}" class="form-control" id="nombreUsuario" value="a">
-                            <input type="hidden" th:field="*{email}" class="form-control" id="email" value="a@a">
-                            <input type="hidden" th:field="*{nombreCompleto}" class="form-control" id="nombreCompleto" value="a">
-                            <input type="hidden" th:field="*{contrasena1}" class="form-control" id="contrasena1">
+                        	<input type="hidden" name="usuarioId" id="usuarioId" th:value="${usuario.usuario.idUsuario}" />
+                            <input type="hidden" th:field="*{usuario.nombreUsuario}" class="form-control" id="nombreUsuario" value="a">
+                            <input type="hidden" th:field="*{usuario.email}" class="form-control" id="email" value="a@a">
+                            <input type="hidden" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" value="a">
+                            <input type="hidden" th:field="*{usuario.contrasena1}" class="form-control" id="contrasena1">
                             
                         	<div class="form-group col-md-8">
-                                <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena.actual}"></label> <input type="password" th:field="*{contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="text-danger"></span>
+                                <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena.actual}"></label> <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a" maxlength="20"> <span th:if="${#fields.hasErrors('usuario.contrasena')}" th:errors="*{usuario.contrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="nuevaContrasena" class="col-form-label" th:text="#{etq.nueva.contrasena}"></label> <input type="password" th:field="*{nuevaContrasena}"  class="form-control"  id="nuevaContrasena" placeholder="Nueva Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('nuevaContrasena')}" th:errors="*{nuevaContrasena}" class="text-danger"></span>
+                                <label for="nuevaContrasena" class="col-form-label" th:text="#{etq.nueva.contrasena}"></label> <input type="password" th:field="*{usuario.nuevaContrasena}"  class="form-control"  id="nuevaContrasena" placeholder="Nueva Contrase&ntilde;a" maxlength="20"> <span th:if="${#fields.hasErrors('usuario.nuevaContrasena')}" th:errors="*{usuario.nuevaContrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
+                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a" maxlength="20"> <span th:if="${#fields.hasErrors('usuario.repitaContrasena')}" th:errors="*{usuario.repitaContrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8" style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}">
@@ -243,28 +233,28 @@
                         <div class="row">
 
                             <div class="form-group col-md-8">
-                                <label for="nombreUsuario" class="col-form-label" th:text="#{etq.usuario}"></label> <input type="text" th:field="*{usuario.nombreUsuario}" class="form-control" id="nombreUsuario" placeholder="Nombre Usuario"> <span th:if="${#fields.hasErrors('usuario.nombreUsuario')}" th:errors="*{nombreUsuario}" class="text-danger"></span>
+                                <label for="nombreUsuario" class="col-form-label" th:text="#{etq.usuario}"></label> <input type="text" th:field="*{usuario.nombreUsuario}" class="form-control" id="nombreUsuario" placeholder="Nombre Usuario" maxlength="20"> <span th:if="${#fields.hasErrors('usuario.nombreUsuario')}" th:errors="*{usuario.nombreUsuario}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena}"></label> <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('usuario.contrasena')}" th:errors="*{usuario.contrasena}" class="text-danger"></span>
+                                <label for="contrasena" class="col-form-label" th:text="#{etq.contrasena}"></label> <input type="password" th:field="*{usuario.contrasena}"  class="form-control"  id="contrasena" placeholder="Contrase&ntilde;a" maxlength="20"> <span th:if="${#fields.hasErrors('usuario.contrasena')}" th:errors="*{usuario.contrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a"> <span th:if="${#fields.hasErrors('usuario.repitaContrasena')}" th:errors="*{repitaContrasena}" class="text-danger"></span>
+                                <label for="repitaContrasena" class="col-form-label" th:text="#{etq.rep.contrasena}"></label> <input type="password" th:field="*{usuario.repitaContrasena}"  class="form-control"  id="repitaContrasena" placeholder="Repita Contrase&ntilde;a" maxlength="20"> <span th:if="${#fields.hasErrors('usuario.repitaContrasena')}" th:errors="*{usuario.repitaContrasena}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo"> <span th:if="${#fields.hasErrors('usuario.nombreCompleto')}" th:errors="*{nombreCompleto}" class="text-danger"></span>
+                                <label for="nombreCompleto" class="col-form-label" th:text="#{etq.nombre.completo}"></label> <input type="text" th:field="*{usuario.nombreCompleto}" class="form-control" id="nombreCompleto" placeholder="Nombre Completo" maxlength="255"> <span th:if="${#fields.hasErrors('usuario.nombreCompleto')}" th:errors="*{usuario.nombreCompleto}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
-                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{usuario.email}" class="form-control" id="email" placeholder="E-mail"> <span th:if="${#fields.hasErrors('usuario.email')}" th:errors="*{email}" class="text-danger"></span>
+                                <label for="email" class="col-form-label" th:text="#{etq.email}"></label> <input type="text" th:field="*{usuario.email}" class="form-control" id="email" placeholder="E-mail" maxlength="255"> <span th:if="${#fields.hasErrors('usuario.email')}" th:errors="*{usuario.email}" class="text-danger"></span>
                             </div>
                             <div class="form-group col-md-8">
                                 <label for="habilitado" class="col-form-label" th:text="#{etq.habilitado}"></label>                                
-                                <input type="hidden" value="on" name="_habilitado"/>
-							    <input type="checkbox" name="habilitado" onchange="getHabilitado(this)" th:checked="${habilitado}"/>
+                                <input type="hidden" value="on" name="_habilitado"/>							   
+							     <input type="checkbox" name="habilitado" th:checked="*{usuario.habilitado}" th:field="*{usuario.habilitado}"/>
 
                             </div>
-                            <div  class="form-group col-md-8">
-								<th:block th:replace="rol/rolList :: listadoRolesUsuario" />
+                            <div  th:if="${session.Usuario.getAdmin()} and ${session.Usuario.tipoUsuario}=='Externo'" class="form-group col-md-8">
+								<th:block th:replace="perfil/perfilList :: listadoPerfilesUsuario" />
 							</div>
                             <div class="form-group col-md-8" style="text-align: center;">
                             	<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}" onclick="seleccionarTodos();">

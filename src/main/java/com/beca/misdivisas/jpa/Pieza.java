@@ -3,6 +3,8 @@ package com.beca.misdivisas.jpa;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 /**
  * The persistent class for the "PIEZA" database table.
@@ -34,6 +36,7 @@ public class Pieza implements Serializable {
 	private Integer idRemesa;
 
 	//bi-directional many-to-one association to Denominacion
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_denominacion\"", insertable = false, updatable = false)
 		})

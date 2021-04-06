@@ -9,6 +9,8 @@ public class Login {
 	private String username;
 	private String password;
 	private Empresa empresa;
+	private String vista;
+	
 	private List<Empresa> empresas;
 	
 	public String getUsername() {
@@ -34,6 +36,12 @@ public class Login {
 	}
 	public void setEmpresas(List<Empresa> empresas) {
 		this.empresas = empresas;
+	}
+	public String getVista() {
+		return vista;
+	}
+	public void setVista(String vista) {
+		this.vista = vista;
 	}
 	
 	

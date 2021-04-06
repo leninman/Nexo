@@ -5,6 +5,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -47,6 +50,7 @@ public class Empresa implements Serializable {
 	@Column(name="\"id_municipio\"")
 	private Integer idMunicipio;
 	
+	@NotNull(message = "requerido")
 	@Column(name="\"id_empresa_coe\"")
 	private Integer idEmpresaCoe;
 
@@ -57,6 +61,7 @@ public class Empresa implements Serializable {
 	@NotBlank(message = "requerido")
 	private String sigla;
 	
+	@JsonIgnore
 	private byte[] logo;
 
 	//bi-directional many-to-one association to EstatusEmpresa
@@ -66,6 +71,7 @@ public class Empresa implements Serializable {
 	private EstatusEmpresa estatusEmpresa;
 
 	//bi-directional many-to-one association to Sucursal
+	@JsonBackReference
 	@OneToMany(mappedBy="empresa")
 	private List<Sucursal> sucursals;
 
