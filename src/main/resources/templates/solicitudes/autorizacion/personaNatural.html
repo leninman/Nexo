@@ -13,12 +13,11 @@ input[type=number] {
 </style>
 <div th:if="${crear}" class="row">
 	<div class="container my-5" align="center">
-		<h5 align="center">Nuevo Autorizado</h5>
+		<h5 align="center">Solicitud Autorizados</h5>
 		<div class="card col-md-12" style="width: 100%">
 			<div class="card-body" style="text-align: left; width: 100%">
 				<div class="col-md-12">
 					<form action="#" th:object="${autorizadoPersonaNatural}" method="post" enctype="multipart/form-data">
-						<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
 						<script>
 							$('form').on(
 									'submit',
@@ -28,32 +27,6 @@ input[type=number] {
 												"agregarAutorizadoPersonaNatural",
 												this);
 									});
-							
-							function cleanImg() {
-								document.getElementById('documentoImg').value = '';
-								document.getElementById('imgDocumentoAutorizado').value = '';
-								if (document.getElementById('imagenDocumento'))
-									document.getElementById("imagenDocumento").remove();
-							}
-
-							function loadImg(event) {
-								// define reader as a new instance of FileReader
-								if (validarImagen()) {
-									var reader = new FileReader();
-									reader.readAsDataURL(event.target.files[0]);
-									// Handle progress, success, and errors
-									reader.onload = function() {
-										var container = document.getElementById('logoContainer');
-										container.innerHTML = '';
-										var imageNode = document.createElement('img');
-										imageNode.className = 'logo-image';
-										imageNode.id = 'imagenDocumento';
-										imageNode.src = reader.result;
-										document.getElementById('imgDocumentoAutorizado').value = reader.result.substring(reader.result.indexOf(",") + 1);
-										container.appendChild(imageNode);
-									};
-								}
-							}
 						</script>
 						<div class="row">
 							<input type="hidden" name="idTipoAutorizado"
@@ -113,8 +86,8 @@ input[type=number] {
 							</div>
 							<div class="form-group col-md-6">
 								<label for="email" class="col-form-label">Correo
-									electr&oacute;nico</label> <input type="text" th:field="*{email}"
-									class="form-control" id="text" maxlength=150>
+									electr&oacute;nico</label> <input type="email" th:field="*{email}"
+									class="form-control" id="text" maxlength=100>
 									<span th:if="${#fields.hasErrors('email')}"
 									th:errors="*{email}" class="text-danger"></span>
 							</div>
@@ -122,13 +95,14 @@ input[type=number] {
 								<div class="logo-selector">
 									<label for="documentoImg" class="col-form-label">Documento
 										de Identidad (JPG, GIF o PNG)</label>
-								    <div>
+									<div>
 										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoImg').click()" value="Examinar"> 
 										<input type="button" class="btn btn-primary" onclick="cleanImg('documentoImg','imgDocumentoAutorizado', 'imagenDocumento' )" value="Limpiar">
 										<input type="file" th:field="*{documentoImg}" class="form-control" style="display: none" id="documentoImg" onchange="loadImage(event, 'documentoImgContainer', 'imagenDocumento', 'imgDocumentoAutorizado', 'documentoImgErrorServer', 'documentoImgErrorClient')">										
 										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 
 										<span id="documentoImgErrorServer" th:if="${#fields.hasErrors('documentoImg')}" th:errors="*{documentoImg}"	class="text-danger"></span> 
 										<span id="documentoImgErrorClient"	style="display: none" class="text-danger"></span>
+										
 									</div>
 								</div>								
 							</div>
@@ -144,7 +118,7 @@ input[type=number] {
 							<div class="form-group col-md-6">
 								<label for="placa" class="col-form-label">Placa</label> <input
 									type="text" th:field="*{placa}" class="form-control" id="placa"
-									maxlength=10>
+									maxlength=100>
 									<span th:if="${#fields.hasErrors('placa')}"
 									th:errors="*{placa}" class="text-danger"></span>
 							</div>
@@ -171,12 +145,11 @@ input[type=number] {
 
 <div th:if="!${crear}" class="row">
 	<div class="container my-5" align="center">
-		<h5 align="center">Actualizar Autorizado</h5>
+		<h5 align="center">Solicitud Autorizados</h5>
 		<div class="card col-md-12" style="width: 100%">
 			<div class="card-body" style="text-align: left; width: 100%">
 				<div class="col-md-12">
 					<form action="#" th:object="${autorizadoPersonaNatural}" method="post" enctype="multipart/form-data">
-						<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
 						<script>
 							$('form').on('submit',function(e) {
 								e.preventDefault();
@@ -267,13 +240,13 @@ input[type=number] {
 									<input type="text" th:field="*{telefono}" oninput="soloNumeros(this)"
 									class="form-control rif" placeholder="Numero de telefono" id="telefono" maxlength=7>
 								</div>									
-									<span th:if="${#fields.hasErrors('telefono')}"
-									th:errors="*{telefono}" class="text-danger"></span>
+							 		<span th:if="${#fields.hasErrors('telefono')}"
+									th:errors="*{telefono}" class="text-danger"></span> 
 							</div>
 							<div class="form-group col-md-6">
-								<label for="text" class="col-form-label">Correo
+								<label for="email" class="col-form-label">Correo
 									electr&oacute;nico</label> <input type="text" th:field="*{email}"
-									class="form-control" id="email" maxlength=150>
+									class="form-control" id="email" maxlength=100>
 									<span th:if="${#fields.hasErrors('email')}"
 									th:errors="*{email}" class="text-danger"></span>
 							</div>
@@ -281,11 +254,11 @@ input[type=number] {
 								<div class="logo-selector">
 									<label for="documentoImg" class="col-form-label">Documento
 										de Identidad (JPG, GIF o PNG)</label>
-								    <div>
+									<div>
 										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoImg').click()" value="Examinar"> 
 										<input type="button" class="btn btn-primary" onclick="cleanImg('documentoImg','imgDocumentoAutorizado', 'imagenDocumento' )" value="Limpiar">
 										<input type="file" th:field="*{documentoImg}" class="form-control" style="display: none" id="documentoImg" onchange="loadImage(event, 'documentoImgContainer', 'imagenDocumento', 'imgDocumentoAutorizado', 'documentoImgErrorServer', 'documentoImgErrorClient')">										
-										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 
+										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 									
 										<span id="documentoImgErrorServer" th:if="${#fields.hasErrors('documentoImg')}" th:errors="*{documentoImg}"	class="text-danger"></span> 
 										<span id="documentoImgErrorClient"	style="display: none" class="text-danger"></span>
 									</div>
@@ -295,7 +268,7 @@ input[type=number] {
 										id="imagenDocumento" class="logo-image"
 										th:src="|data:image/jpg+gif+png;base64,${autorizadoPersonaNatural.imagenDocumento}|">
 								</div>
-							</div>							
+							</div>
 							<div class="form-group col-md-12">
 								<label for="placa" class="col-form-label"><b>Datos del
 									Veh&iacute;culo</b></label>
@@ -303,7 +276,7 @@ input[type=number] {
 							<div class="form-group col-md-6">
 								<label for="placa" class="col-form-label">Placa</label> <input
 									type="text" th:field="*{placa}" class="form-control" id="placa"
-									maxlength=10>
+									maxlength=100>
 									<span th:if="${#fields.hasErrors('placa')}"
 									th:errors="*{placa}" class="text-danger"></span>
 							</div>
@@ -315,6 +288,8 @@ input[type=number] {
 									<span th:if="${#fields.hasErrors('marcaModeloColor')}"
 									th:errors="*{marcaModeloColor}" class="text-danger"></span>
 							</div>
+
+							
 						</div>
 						<div class="form-group col-md-12" style="text-align: center;">
 								<input type="submit" class="btn btn-primary" value="Actualizar">

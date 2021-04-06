@@ -30,5 +30,9 @@ public interface IAutorizadoRepo extends JpaRepository<Autorizado, Integer>{
 	public Autorizado findByIdEmpresaAndDocumentoIdentidadAndIdTipoAutorizadoAndEstado(int idEmpresa, String documentoId, int tipoAutorizado, String estado);
 	
 	public Autorizado findByIdTipoAutorizadoAndIdEmpresaAndIdTransportistaAndEstado(int idTipoAutorizado, int idEmpresa, int idTransportista, String estado);
+	
+	public List<Autorizado> findByIdEmpresaAndEstado(Integer idEmpresa, String estado);
+	
+	
 
 }

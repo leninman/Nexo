@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +44,7 @@ import com.beca.misdivisas.jpa.TipoAutorizado;
 import com.beca.misdivisas.jpa.Transportista;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.AutorizadoModel;
+import com.beca.misdivisas.model.AutorizadoBanco;
 import com.beca.misdivisas.model.AutorizadoPersonaJuridica;
 import com.beca.misdivisas.model.AutorizadoPersonaNatural;
 import com.beca.misdivisas.model.AutorizadoBeneficioTraspaso;
@@ -96,23 +96,13 @@ public class AutorizadoController {
 		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
 		modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
 
-		final List<Autorizado> autorizados = autorizadoRepository.findByIdEmpresaAndEstadoOrderByIdTipoAutorizadoAscDocumentoIdentidadAsc(usuario.getIdEmpresa(), "A");
+		final List<Autorizado> autorizados = autorizadoRepository.findByIdEmpresaAndEstado(usuario.getIdEmpresa(), "A");
 		final List<AutorizadoModel> listaAutorizados = new ArrayList<AutorizadoModel>();
-		
-		for (Iterator<Autorizado> iterator = autorizados.iterator(); iterator.hasNext();) {
-			Autorizado autorizado = (Autorizado) iterator.next();
-			if(autorizado.getTipoAutorizado().getIdTipoAutorizado().equals(3)) {
-				Optional<Transportista> transportista = transportistaRepository.findById(autorizado.getIdTransportista());		
-				autorizado.setRifEmpresa(transportista.get().getRif());
-				autorizado.setNombreEmpresa(transportista.get().getTransportista());
-			}
-			
-			listaAutorizados.add(new AutorizadoModel(autorizado.getIdAutorizado(),
-					autorizado.getTipoAutorizado().getTipoAutorizado(), autorizado.getRifEmpresa(),
-					autorizado.getNombreEmpresa(), autorizado.getDocumentoIdentidad(),
-					autorizado.getNombreCompleto()));
-		}
-
+		autorizados.stream()
+				.forEach(autorizado -> listaAutorizados.add(new AutorizadoModel(autorizado.getIdAutorizado(),
+						autorizado.getTipoAutorizado().getTipoAutorizado(), autorizado.getRifEmpresa(),
+						autorizado.getNombreEmpresa(), autorizado.getDocumentoIdentidad(),
+						autorizado.getNombreCompleto())));
 		modelo.addAttribute("autorizados", listaAutorizados);
 
 		HttpSession session = factory.getObject();
@@ -150,11 +140,11 @@ public class AutorizadoController {
 			autorizadoEmpresaTransporte.setIdTipoAutorizado(tipoAutorizacion);
 			model.addAttribute("autorizadoEmpresaTransporte", autorizadoEmpresaTransporte);
 			return Constantes.OP_AUTORIZADOS_EMP_TRANSPORTE;
-		/*case 4:
+		case 4:
 			final AutorizadoBeneficioTraspaso autorizadoBeneficioTraspaso = new AutorizadoBeneficioTraspaso();
 			autorizadoBeneficioTraspaso.setIdTipoAutorizado(tipoAutorizacion);
 			model.addAttribute("autorizadoBeneficioTraspaso", autorizadoBeneficioTraspaso);
-			return Constantes.OP_AUTORIZADOS_BENEF_TRASPASO;*/
+			return Constantes.OP_AUTORIZADOS_BENEF_TRASPASO;
 		case 1:
 			final AutorizadoPersonaNatural autorizadoPersonaNatural = new AutorizadoPersonaNatural();
 			autorizadoPersonaNatural.setIdTipoAutorizado(tipoAutorizacion);
@@ -170,7 +160,6 @@ public class AutorizadoController {
 		}
 	}
 
-	/*
 	@PostMapping("agregarAutorizadoBeneficiarioTraspaso")
 	public String agregarAutorizadoBeneficioTraspaso(@Valid AutorizadoBeneficioTraspaso autorizadoBeneficioTraspaso,
 			BindingResult result, Model model) throws Exception {
@@ -214,7 +203,7 @@ public class AutorizadoController {
 		}
 
 		return "redirect:autorizadosListar?success";
-	}*/
+	}
 
 	@PostMapping("agregarAutorizadoEmpresaTransporte")
 	public String agregarAutorizadoEmpresaTransporte(@Valid AutorizadoEmpresaTransporte autorizadoEmpresaTransporte,
@@ -229,7 +218,7 @@ public class AutorizadoController {
 			return Constantes.OP_AUTORIZADOS_EMP_TRANSPORTE;
 		}
 
-		final Autorizado autorizado = convertirAutorizadoEmpresaTransporteToAutorizado(autorizadoEmpresaTransporte);		
+		final Autorizado autorizado = convertirAutorizadoEmpresaTransporteToAutorizado(autorizadoEmpresaTransporte);
 		autorizado.setEstado(Constantes.ACTIVO);
 		Date date = new Date();
 		long time = date.getTime();
@@ -263,33 +252,27 @@ public class AutorizadoController {
 
 	@PostMapping("agregarAutorizadoPersonaNatural")
 	public String agregarAutorizadoPersonaNatural(@Valid AutorizadoPersonaNatural autorizadoPersonaNatural,
-			BindingResult result, Model model, @RequestParam("crear") Boolean accionCrear) throws Exception {
+			BindingResult result, Model model) throws Exception {
 
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
-		model.addAttribute(Constantes.CREAR, accionCrear);
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		validarAutorizadoPersonaNatural(autorizadoPersonaNatural, result, accionCrear, usuario.getIdEmpresa());
+		validarAutorizadoPersonaNatural(autorizadoPersonaNatural, result, usuario.getIdEmpresa());
 		if (result.hasErrors()) {
+			if (autorizadoPersonaNatural.getIdAutorizado() == null) {
+				model.addAttribute(Constantes.CREAR, true);
+			} else {
+				model.addAttribute(Constantes.CREAR, false);
+			}
+
 			model.addAttribute("autorizadoPersonaNatural", autorizadoPersonaNatural);
 			if (autorizadoPersonaNatural.getImgDocumentoAutorizado() != null
 					&& !autorizadoPersonaNatural.getImgDocumentoAutorizado().isEmpty()) {
 				autorizadoPersonaNatural.setImagenDocumento(autorizadoPersonaNatural.getImgDocumentoAutorizado());
 				autorizadoPersonaNatural.setDocumentoImg(new MockMultipartFile("documentoImg",
 						Base64.getDecoder().decode(autorizadoPersonaNatural.getImgDocumentoAutorizado().getBytes())));
-			}else {
-				if(!accionCrear) {
-					Autorizado a = autorizadoRepository.findById(autorizadoPersonaNatural.getIdAutorizado().intValue());					
-						try {
-							if(a!= null)
-								if(a.getImagenDocumento()!=null && !a.getImagenDocumento().isEmpty())
-									autorizadoPersonaNatural.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+a.getImagenDocumento(), "documentoImg"));
-						} catch (IOException e) {
-							return "redirect:"+Constantes.ERROR;
-						}
-				}
 			}
-
 			return Constantes.OP_AUTORIZADOS_PER_NATURAL;
+
 		}
 
 		Autorizado autorizadoToUpdate = new Autorizado();
@@ -297,14 +280,15 @@ public class AutorizadoController {
 			autorizadoToUpdate = autorizadoRepository.findById(autorizadoPersonaNatural.getIdAutorizado()).get();
 		}
 
-		final Autorizado autorizado = convertirAutorizadoPersonaNaturalToAutorizado(autorizadoPersonaNatural, autorizadoToUpdate);
+		final Autorizado autorizado = convertirAutorizadoPersonaNaturalToAutorizado(autorizadoPersonaNatural,
+				autorizadoToUpdate);
 		autorizado.setIdEmpresa(usuario.getIdEmpresa());
 		autorizado.setEstado(Constantes.ACTIVO);
 		Date date = new Date();
 		long time = date.getTime();
 		Timestamp ts = new Timestamp(time);
 
-		if (accionCrear) {
+		if (autorizadoPersonaNatural.getIdAutorizado() == null) {
 			autorizado.setFechaCreacion(ts);
 		} else {
 			autorizado.setFechaCreacion(autorizadoToUpdate.getFechaCreacion());
@@ -315,7 +299,7 @@ public class AutorizadoController {
 
 			autorizadoRepository.save(autorizado);
 		} catch (Exception e) {
-			return Constantes.ERROR;
+
 		}
 
 		if (autorizadoPersonaNatural.getIdAutorizado() == null) {
@@ -340,27 +324,23 @@ public class AutorizadoController {
 			BindingResult result, Model model, @RequestParam("crear") Boolean accionCrear) throws Exception {
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		model.addAttribute(Constantes.CREAR, accionCrear);
-		
-		validarAutorizadoPersonaJuridica(autorizadoPersonaJuridica, result, accionCrear, usuario.getIdEmpresa());
 
+		validarAutorizadoPersonaJuridica(autorizadoPersonaJuridica, result, accionCrear, usuario.getIdEmpresa());
 		if (result.hasErrors()) {
-			Autorizado a = null;
+
+			model.addAttribute(Constantes.CREAR, accionCrear);
+
+			if (autorizadoPersonaJuridica.getIdAutorizado() == null) {
+				model.addAttribute(Constantes.CREAR, true);
+			} else {
+				model.addAttribute(Constantes.CREAR, false);
+			}
 			model.addAttribute("autorizadoPersonaJuridica", autorizadoPersonaJuridica);
-			if(!accionCrear)
-				a = autorizadoRepository.findById(autorizadoPersonaJuridica.getIdAutorizado().intValue());
 			if (autorizadoPersonaJuridica.getImgDocumentoAutorizado() != null
 					&& !autorizadoPersonaJuridica.getImgDocumentoAutorizado().isEmpty()) {
 				autorizadoPersonaJuridica.setImagenDocumento(autorizadoPersonaJuridica.getImgDocumentoAutorizado());
 				autorizadoPersonaJuridica.setDocumentoImg(new MockMultipartFile("documentoImg",
 						Base64.getDecoder().decode(autorizadoPersonaJuridica.getImgDocumentoAutorizado().getBytes())));
-			}else if(!accionCrear) {									
-				try {
-					if(a!= null)
-						if(a.getImagenDocumento()!=null && !a.getImagenDocumento().isEmpty())
-							autorizadoPersonaJuridica.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+a.getImagenDocumento(), "documentoImg"));
-				} catch (IOException e) {					
-				}
 			}
 			if (autorizadoPersonaJuridica.getImgDocumentoAdicionalAutorizado() != null
 					&& !autorizadoPersonaJuridica.getImgDocumentoAdicionalAutorizado().isEmpty()) {
@@ -370,13 +350,6 @@ public class AutorizadoController {
 						.setDocumentoAdicionalImg(new MockMultipartFile("documentoAdicionalImg", Base64.getDecoder()
 								.decode(autorizadoPersonaJuridica.getImgDocumentoAdicionalAutorizado().getBytes())));
 
-			}else if(!accionCrear) {									
-				try {
-					if(a!= null)
-						if(a.getImagenAdicional()!=null && !a.getImagenAdicional().isEmpty())
-							autorizadoPersonaJuridica.setImagenDocumentoAdicional(Util.obtenerArchivoStr(rutaImg+a.getImagenAdicional(), "documentoAdicionalImg"));
-				} catch (IOException e) {					
-				}
 			}
 			if (autorizadoPersonaJuridica.getImgDocumentoRifAutorizado() != null
 					&& !autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().isEmpty()) {
@@ -384,20 +357,18 @@ public class AutorizadoController {
 						.setImagenDocumentoRif(autorizadoPersonaJuridica.getImgDocumentoRifAutorizado());
 				autorizadoPersonaJuridica.setDocumentoRifImg(new MockMultipartFile("documentoRifImg", Base64
 						.getDecoder().decode(autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().getBytes())));
-			}else if(!accionCrear) {									
-				try {
-					if(a!= null)
-						if(a.getImagenRif()!=null && !a.getImagenRif().isEmpty())
-							autorizadoPersonaJuridica.setImagenDocumentoRif(Util.obtenerArchivoStr(rutaImg+a.getImagenRif(), "documentoRifImg"));
-				} catch (IOException e) {					
-				}
 			}
 
 			return Constantes.OP_AUTORIZADOS_PER_JURIDICA;
 		}
 
+		Autorizado autorizadoToUpdate = new Autorizado();
+		if (autorizadoPersonaJuridica.getIdAutorizado() != null) {
+			autorizadoToUpdate = autorizadoRepository.findById(autorizadoPersonaJuridica.getIdAutorizado()).get();
+		}
+
 		final Autorizado autorizado = convertirAutorizadoPersonaJuridicaToAutorizado(autorizadoPersonaJuridica,
-				accionCrear);
+				accionCrear, autorizadoToUpdate);
 		autorizado.setIdEmpresa(usuario.getIdEmpresa());
 		autorizado.setEstado(Constantes.ACTIVO);
 		Date date = new Date();
@@ -408,10 +379,9 @@ public class AutorizadoController {
 			autorizado.setFechaCreacion(ts);
 
 		} else {
-			final Autorizado autorizadoToUpdate = autorizadoRepository
-					.findById(autorizadoPersonaJuridica.getIdAutorizado()).get();
 			autorizado.setFechaCreacion(autorizadoToUpdate.getFechaCreacion());
 		}
+
 		autorizado.setFechaActualizacion(ts);
 		autorizadoRepository.save(autorizado);
 
@@ -456,12 +426,12 @@ public class AutorizadoController {
 				final AutorizadoPersonaNatural autorizadoPersonaNatural = AutorizadoUtils
 						.convertirAutorizadoToAutorizadoPersonaNatural(autorizado);
 				try {
-					
-					if(autorizado.getImagenDocumento()!=null && !autorizado.getImagenDocumento().isEmpty())
-						autorizadoPersonaNatural.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenDocumento(), "documentoImg"));
-
+					String imagenDocumento = Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(),
+							"documentoImg");
+					autorizadoPersonaNatural.setImagenDocumento(imagenDocumento);
+					autorizadoPersonaNatural.setImgDocumentoAutorizado(imagenDocumento);
 				} catch (IOException e) {
-					return "redirect:"+Constantes.ERROR;
+
 				}
 				model.addAttribute("autorizadoPersonaNatural", autorizadoPersonaNatural);
 				return Constantes.OP_AUTORIZADOS_PER_NATURAL;
@@ -469,15 +439,25 @@ public class AutorizadoController {
 				final AutorizadoPersonaJuridica autorizadoPersonaJuridica = AutorizadoUtils
 						.convertirAutorizadoToAutorizadoPersonaJuridica(autorizado);
 				try {
-					if (autorizado.getImagenDocumento() != null && !autorizado.getImagenDocumento().isEmpty())
-						autorizadoPersonaJuridica.setImagenDocumento(
-								Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(), "documentoImg"));
-					if (autorizado.getImagenRif() != null && !autorizado.getImagenRif().isEmpty())
-						autorizadoPersonaJuridica.setImagenDocumentoRif(
-								Util.obtenerArchivoStr(rutaImg + autorizado.getImagenRif(), "documentoRifImg"));
-					if (autorizado.getImagenAdicional() != null && !autorizado.getImagenAdicional().isEmpty())
-						autorizadoPersonaJuridica.setImagenDocumentoAdicional(Util
-								.obtenerArchivoStr(rutaImg + autorizado.getImagenAdicional(), "documentoAdicionalImg"));
+					if (autorizado.getImagenDocumento() != null && !autorizado.getImagenDocumento().isEmpty()) {
+						String imagenDocumento = Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(),
+								"documentoImg");
+						autorizadoPersonaJuridica.setImagenDocumento(imagenDocumento);
+						autorizadoPersonaJuridica.setImgDocumentoAutorizado(imagenDocumento);
+					}
+					if (autorizado.getImagenRif() != null && !autorizado.getImagenRif().isEmpty()) {
+						String imagenRif = Util.obtenerArchivoStr(rutaImg + autorizado.getImagenRif(),
+								"documentoRifImg");
+						autorizadoPersonaJuridica.setImagenDocumentoRif(imagenRif);
+						autorizadoPersonaJuridica.setImgDocumentoRifAutorizado(imagenRif);
+
+					}
+					if (autorizado.getImagenAdicional() != null && !autorizado.getImagenAdicional().isEmpty()) {
+						String imagenAdicional = Util.obtenerArchivoStr(rutaImg + autorizado.getImagenAdicional(),
+								"documentoAdicionalImg");
+						autorizadoPersonaJuridica.setImagenDocumentoAdicional(imagenAdicional);
+						autorizadoPersonaJuridica.setImgDocumentoAdicionalAutorizado(imagenAdicional);
+					}
 				} catch (IOException e) {
 
 				}
@@ -495,39 +475,24 @@ public class AutorizadoController {
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		Autorizado autorizadoAEliminar = autorizadoRepository.findById(id);
-		
-		try {
-			if (autorizadoAEliminar == null) {
-				return "redirect:autorizados?error";
-	
-			} else {
-				final boolean tieneSolicitudActiva = tieneSolicitudActiva(id);
-				if (tieneSolicitudActiva) {
-					redirectAttributes.addFlashAttribute("solicitudActiva", "solicitudActiva");
-					return "redirect:autorizados";
-				}
-				
-				if(autorizadoAEliminar.getImagenDocumento()!= null && !autorizadoAEliminar.getImagenDocumento().isEmpty())
-					Util.eliminarArchivo(rutaImg, autorizadoAEliminar.getImagenDocumento());
-				if(autorizadoAEliminar.getImagenRif()!= null && !autorizadoAEliminar.getImagenRif().isEmpty())
-					Util.eliminarArchivo(rutaImg, autorizadoAEliminar.getImagenRif());
-				if(autorizadoAEliminar.getImagenAdicional()!= null && !autorizadoAEliminar.getImagenAdicional().isEmpty())
-					Util.eliminarArchivo(rutaImg, autorizadoAEliminar.getImagenAdicional());
-				Date date = new Date();
-				long time = date.getTime();
-				Timestamp ts = new Timestamp(time);
-				autorizadoAEliminar.setEstado("I");
-				autorizadoAEliminar.setFechaActualizacion(ts);
-				autorizadoRepository.save(autorizadoAEliminar);
-				String detalle = MessageFormat.format(Constantes.ACCION_EDITAR_AUTORIZADO, "Autorizado Persona Juridica",
-						autorizadoAEliminar.getIdAutorizado(), autorizadoAEliminar.getIdTipoAutorizado(),
-						usuario.getIdUsuario(), usuario.getNombreUsuario());
-				logServ.registrarLog(Constantes.ELIMINAR_AUTORIZADO, detalle, Constantes.AUTORIZADO_PERSONA_JURIDICA, true,
-						Util.getRemoteIp(request), usuario);
-				return "redirect:autorizados?success";
-			}
-		} catch (IOException e) {
+		if (autorizadoAEliminar == null) {
 			return "redirect:autorizados?error";
+
+		} else {
+			final boolean tieneSolicitudActiva = tieneSolicitudActiva(id);
+			if (tieneSolicitudActiva) {
+				redirectAttributes.addFlashAttribute("solicitudActiva", "solicitudActiva");
+				return "redirect:autorizados";
+			}
+
+			autorizadoAEliminar.setEstado("I");
+			autorizadoRepository.save(autorizadoAEliminar);
+			String detalle = MessageFormat.format(Constantes.ACCION_EDITAR_AUTORIZADO, "Autorizado Persona Juridica",
+					autorizadoAEliminar.getIdAutorizado(), autorizadoAEliminar.getIdTipoAutorizado(),
+					usuario.getIdUsuario(), usuario.getNombreUsuario());
+			logServ.registrarLog(Constantes.ELIMINAR_AUTORIZADO, detalle, Constantes.AUTORIZADO_PERSONA_JURIDICA, true,
+					Util.getRemoteIp(request), usuario);
+			return "redirect:autorizados?success";
 		}
 	}
 
@@ -535,276 +500,159 @@ public class AutorizadoController {
 	public String autorizadosListar(Model model) {
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		final List<Autorizado> autorizados = autorizadoRepository.findByIdEmpresaAndEstadoOrderByIdTipoAutorizadoAscDocumentoIdentidadAsc(usuario.getIdEmpresa(),
+		final List<Autorizado> autorizados = autorizadoRepository.findByIdEmpresaAndEstado(usuario.getIdEmpresa(),
 				Constantes.ACTIVO);
 		final List<AutorizadoModel> listaAutorizados = new ArrayList<AutorizadoModel>();
-		
-		for (Iterator<Autorizado> iterator = autorizados.iterator(); iterator.hasNext();) {
-			Autorizado autorizado = (Autorizado) iterator.next();
-			if(autorizado.getTipoAutorizado().getIdTipoAutorizado().equals(3)) {
-				Optional<Transportista> transportista = transportistaRepository.findById(autorizado.getIdTransportista());		
-				autorizado.setRifEmpresa(transportista.get().getRif());
-				autorizado.setNombreEmpresa(transportista.get().getTransportista());
-			}
-			
-			listaAutorizados.add(new AutorizadoModel(autorizado.getIdAutorizado(),
-					autorizado.getTipoAutorizado().getTipoAutorizado(), autorizado.getRifEmpresa(),
-					autorizado.getNombreEmpresa(), autorizado.getDocumentoIdentidad(),
-					autorizado.getNombreCompleto()));
-		}
-
+		autorizados.stream()
+				.forEach(autorizado -> listaAutorizados.add(new AutorizadoModel(autorizado.getIdAutorizado(),
+						autorizado.getTipoAutorizado().getTipoAutorizado(), autorizado.getRifEmpresa(),
+						autorizado.getNombreEmpresa(), autorizado.getDocumentoIdentidad(),
+						autorizado.getNombreCompleto())));
 		model.addAttribute("autorizados", listaAutorizados);
 
 		return Constantes.OP_AUTORIZADOS_LISTA;
 	}
 
-	/*private void validarAutorizado(AutorizadoBanco autorizadoBanco, BindingResult result) throws Exception {
+	private void validarAutorizado(AutorizadoBanco autorizadoBanco, BindingResult result) throws Exception {
 		if (autorizadoBanco.getCaracterRifAutorizado() != null && !autorizadoBanco.getRifAutorizado().isEmpty()) {
 			if (!autorizadoBanco.getRifAutorizado().matches("[0-9]{9}")) {
-				result.rejectValue("rifAutorizado", "", "debe tener 9 d\u00EDgitos");
+				result.rejectValue("rifAutorizado", "", "debe tener 9 digitos");
 			} else if (!ValidationUtils
 					.validarRif(autorizadoBanco.getCaracterRifAutorizado() + autorizadoBanco.getRifAutorizado())) {
-				result.rejectValue("rifAutorizado", "", "inv\u00E1lido");
+				result.rejectValue("rifAutorizado", "", "inválido");
 			}
 		}
 
-	}*/
-	
+	}
+
 	private void validarAutorizado(AutorizadoEmpresaTransporte autorizadoBanco, BindingResult result) throws Exception {
 		if (autorizadoBanco.getCaracterRifAutorizado() != null && !autorizadoBanco.getRifAutorizado().isEmpty()) {
 			if (!autorizadoBanco.getRifAutorizado().matches("[0-9]{9}")) {
-				result.rejectValue("rifAutorizado", "", "debe tener 9 d\u00EDgitos");
+				result.rejectValue("rifAutorizado", "", "debe tener 9 digitos");
 			} else if (!ValidationUtils
 					.validarRif(autorizadoBanco.getCaracterRifAutorizado() + autorizadoBanco.getRifAutorizado())) {
-				result.rejectValue("rifAutorizado", "", "inv\u00E1lido");
-			}			
+				result.rejectValue("rifAutorizado", "", "inválido");
+			}
 			List<Transportista> transportistas = transportistaRepository
-					.findByRif(autorizadoBanco.getCaracterRifAutorizado()
-							+ autorizadoBanco.getRifAutorizado());
+					.findByRif(autorizadoBanco.getCaracterRifAutorizado() + autorizadoBanco.getRifAutorizado());
 			if (transportistas == null || transportistas.isEmpty()) {
 				result.rejectValue("rifAutorizado", "", "Transportista no autorizado por el banco");
 			}
-			//buscar por tipoAutorizado, idEmpresa, id_transportista, estado
-			if(transportistas!=null && transportistas.size()>0) {
-				autorizadoBanco.setIdTransportista(transportistas.get(0).getIdTransportista()); 
-				Autorizado au = autorizadoRepository.findByIdTipoAutorizadoAndIdEmpresaAndIdTransportistaAndEstado(autorizadoBanco.getIdTipoAutorizado(), autorizadoBanco.getIdEmpresa(), transportistas.get(0).getIdTransportista(), "A");
-				if(au != null) {
+			// buscar por tipoAutorizado, idEmpresa, id_transportista, estado
+			if (transportistas != null && transportistas.size() > 0) {
+				autorizadoBanco.setIdTransportista(transportistas.get(0).getIdTransportista());
+				Autorizado au = autorizadoRepository.findByIdTipoAutorizadoAndIdEmpresaAndIdTransportistaAndEstado(
+						autorizadoBanco.getIdTipoAutorizado(), autorizadoBanco.getIdEmpresa(),
+						transportistas.get(0).getIdTransportista(), "A");
+				if (au != null) {
 					result.rejectValue("rifAutorizado", "", "Ya existe este autorizado");
 				}
 			}
 		}
 	}
 
-	private void validarAutorizadoPersonaNatural(AutorizadoPersonaNatural autorizado, BindingResult result, boolean creando, int idEmpresa)
-			throws Exception {
-		
-		if(autorizado.getNombreAutorizado() != null &&  !autorizado.getNombreAutorizado().trim().isEmpty()) {			
-			autorizado.setNombreAutorizado(autorizado.getNombreAutorizado().trim());
-				
-			if(!autorizado.getNombreAutorizado().matches("[a-zA-Z\\ \\Á\\á\\É\\é\\Í\\í\\Ó\\ó\\Ú\\ú\\Ñ\\ñ]*")) {
-				result.rejectValue("nombreAutorizado", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getNombreAutorizado().length() > 100) {
-				result.rejectValue("nombreAutorizado", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
+	private void validarAutorizadoPersonaNatural(AutorizadoPersonaNatural autorizado, BindingResult result,
+			int idEmpresa) throws Exception {
+		if (autorizado.getImgDocumentoAutorizado().isEmpty()
+				|| (autorizado.getDocumentoImg() != null && autorizado.getDocumentoImg().getBytes().length > 0)) {
+			if (autorizado.getDocumentoImg() == null || autorizado.getDocumentoImg().getBytes().length == 0) {
+				result.rejectValue("documentoImg", "", "requerido");
+			} else {
+				if (!ValidationUtils.isValidImageType(autorizado.getDocumentoImg())) {
+					result.rejectValue("documentoImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
+				} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoImg())) {
+					result.rejectValue("documentoImg", "", "no puede ser mayor a 1 MB");
+				}
 			}
 		}
-		
-		if(creando || !creando && !autorizado.getImgDocumentoAutorizado().isEmpty()) {
-			if ((autorizado.getDocumentoImg() != null && autorizado.getDocumentoImg().getBytes().length > 0) || autorizado.getImgDocumentoAutorizado().isEmpty()) {
-				if (autorizado.getDocumentoImg() == null || autorizado.getDocumentoImg().getBytes().length == 0) {
-					result.rejectValue("documentoImg", "", "requerido");
-				} else {
-					if (!ValidationUtils.isValidImageType(autorizado.getDocumentoImg())) {
-						result.rejectValue("documentoImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
-					} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoImg())) {
-						result.rejectValue("documentoImg", "", "no puede ser mayor a 1 MB");
-					}
-				}
-			}
-			if (!NumberUtils.isDigits(autorizado.getDocumentoAutorizado())) {
-				result.rejectValue("documentoAutorizado", "", "debe contener solo n\u00FAmeros");
-			}else {
-				if(creando) {
-					Autorizado a = autorizadoRepository.findByIdEmpresaAndDocumentoIdentidadAndIdTipoAutorizadoAndEstado(idEmpresa, autorizado.getTipoDocumentoAutorizado() + Util.formatoDocumentoIdentidad(autorizado.getDocumentoAutorizado()),autorizado.getIdTipoAutorizado(), Constantes.ACTIVO);
-					if(a!=null) {
-						result.rejectValue("documentoAutorizado", "", "Ya existen estos datos para un autorizado");
-					}
-				}
-			}
+		if (!NumberUtils.isDigits(autorizado.getDocumentoAutorizado())) {
+			result.rejectValue("documentoAutorizado", "", "debe contener solo números");
 		}
 
 		if (autorizado.getTelefono() != null && !autorizado.getTelefono().isEmpty()) {
 			if (!autorizado.getTelefono().matches("[0-9]{7}")) {
-				result.rejectValue("telefono", "", "debe tener 7 d\u00EDgitos");
+				result.rejectValue("telefono", "", "debe tener 7 digitos");
 			}
 		}
 
 		if (autorizado.getEmail() != null && !autorizado.getEmail().isEmpty()
 				&& !ValidationUtils.isValidEmail(autorizado.getEmail())) {
-			result.rejectValue("email", "", "inv\u00E1lido");
+			result.rejectValue("email", "", "inválido");
 		}
-		
-		if(autorizado.getMarcaModeloColor() != null &&  !autorizado.getMarcaModeloColor().trim().isEmpty()) {			
-			autorizado.setMarcaModeloColor(autorizado.getMarcaModeloColor().trim());
-				
-			if (!autorizado.getMarcaModeloColor().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
-				result.rejectValue("marcaModeloColor", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getMarcaModeloColor().length() > 100) {
-				result.rejectValue("marcaModeloColor", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
-			}
-		}
-		
-		if(autorizado.getPlaca() != null &&  !autorizado.getPlaca().trim().isEmpty()) {			
-			autorizado.setPlaca(autorizado.getPlaca().trim());
-				
-			if (!autorizado.getPlaca().matches("[a-zA-Z0-9\\-]*")) {
-				result.rejectValue("placa", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getPlaca().length() > 10) {
-				result.rejectValue("placa", "", "debe tener una longitud m\u00E1xima de 10 caracteres");
-			}
-		}
-		
 	}
 
-	private void validarAutorizadoPersonaJuridica(AutorizadoPersonaJuridica autorizado, BindingResult result, boolean creando, int idEmpresa)
-			throws Exception {	
-		
-		if(autorizado.getNombreAutorizado() != null &&  !autorizado.getNombreAutorizado().trim().isEmpty()) {			
-			autorizado.setNombreAutorizado(autorizado.getNombreAutorizado().trim());
-				
-			if(!autorizado.getNombreAutorizado().matches("[a-zA-Z\\ \\Á\\á\\É\\é\\Í\\í\\Ó\\ó\\Ú\\ú\\Ñ\\ñ]*")) {
-				result.rejectValue("nombreAutorizado", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getNombreAutorizado().length() > 100) {
-				result.rejectValue("nombreAutorizado", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
-			}
-		}
-		
+	private void validarAutorizadoPersonaJuridica(AutorizadoPersonaJuridica autorizado, BindingResult result,
+			boolean creando, int idEmpresa) throws Exception {
 		if (autorizado.getTelefono() != null && !autorizado.getTelefono().isEmpty()) {
 			if (!autorizado.getTelefono().matches("[0-9]{7}")) {
-				result.rejectValue("telefono", "", "debe tener 7 d\u00EDgitos");
+				result.rejectValue("telefono", "", "debe tener 7 digitos");
 			}
 		}
-		
-		if (autorizado.getEmail() != null && !autorizado.getEmail().isEmpty()
-				&& !ValidationUtils.isValidEmail(autorizado.getEmail())) {
-			result.rejectValue("email", "", "inv\u00E1lido");
-		}
-		
-		if(autorizado.getMarcaModeloColor() != null &&  !autorizado.getMarcaModeloColor().trim().isEmpty()) {			
-			autorizado.setMarcaModeloColor(autorizado.getMarcaModeloColor().trim());
-				
-			if (!autorizado.getMarcaModeloColor().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
-				result.rejectValue("marcaModeloColor", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getMarcaModeloColor().length() > 100) {
-				result.rejectValue("marcaModeloColor", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
-			}
-		}
-		
-		if(autorizado.getPlaca() != null &&  !autorizado.getPlaca().trim().isEmpty()) {			
-			autorizado.setPlaca(autorizado.getPlaca().trim());
-				
-			if (!autorizado.getPlaca().matches("[a-zA-Z0-9\\-]*")) {
-				result.rejectValue("placa", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getPlaca().length() > 10) {
-				result.rejectValue("placa", "", "debe tener una longitud m\u00E1xima de 10 caracteres");
-			}
-		}
-		
-		if(autorizado.getNombreEmpresa() != null &&  !autorizado.getNombreEmpresa().trim().isEmpty()) {			
-			autorizado.setNombreEmpresa(autorizado.getNombreEmpresa().trim());
-				
-			if (!autorizado.getNombreEmpresa().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
-				result.rejectValue("nombreEmpresa", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getNombreEmpresa().length() > 100) {
-				result.rejectValue("nombreEmpresa", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
-			}
-		}
-			
-		if(autorizado.getCargo() != null &&  !autorizado.getCargo().trim().isEmpty()) {			
-			autorizado.setCargo(autorizado.getCargo().trim());
-			
-			if (!autorizado.getCargo().matches(Constantes.CARACTERES_PERMITIDOS_PATTERN.pattern())) {
-				result.rejectValue("cargo", "", "contiene caracteres especiales no v\u00E1lidos");	
-			}
-			else if (autorizado.getCargo().length() > 50) {
-				result.rejectValue("cargo", "", "debe tener una longitud m\u00E1xima de 50 caracteres");
-			}
-		}
-			
-	
-		
+
 		if (autorizado.getCaracterRifEmpresa() != null && !autorizado.getRifEmpresa().isEmpty()) {
 			if (!autorizado.getRifEmpresa().matches("[0-9]{9}")) {
-				result.rejectValue("rifEmpresa", "", "debe tener 9 d\u00EDgitos");
+				result.rejectValue("rifEmpresa", "", "debe tener 9 digitos");
 			} else if (!ValidationUtils.validarRif(autorizado.getCaracterRifEmpresa() + autorizado.getRifEmpresa())) {
-				result.rejectValue("rifEmpresa", "", "inv\u00E1lido");
+				result.rejectValue("rifEmpresa", "", "inválido");
 			}
 		}
-		if (autorizado.getDocumentoAutorizado().isEmpty() || !NumberUtils.isDigits(autorizado.getDocumentoAutorizado())) {
-			result.rejectValue("documentoAutorizado", "", "debe contener solo n\u00FAmeros");
-		}	
 		
-		if(creando || !creando && !autorizado.getImgDocumentoAutorizado().isEmpty()) {
-			if (autorizado.getImgDocumentoAutorizado().isEmpty()
-					|| (autorizado.getDocumentoImg() != null && autorizado.getDocumentoImg().getBytes().length > 0)) {
-				if (autorizado.getDocumentoImg() == null || autorizado.getDocumentoImg().getBytes().length == 0) {
-					result.rejectValue("documentoImg", "", "requerido");
-				} else {
-					if (!ValidationUtils.isValidImageType(autorizado.getDocumentoImg())) {
-						result.rejectValue("documentoImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
-					} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoImg())) {
-						result.rejectValue("documentoImg", "", "no puede ser mayor a 1 MB");
-					}
+		if (autorizado.getDocumentoAutorizado().isEmpty()
+				|| !NumberUtils.isDigits(autorizado.getDocumentoAutorizado())) {
+			result.rejectValue("documentoAutorizado", "", "debe contener solo numeros");
+		}
+		
+		if (autorizado.getImgDocumentoAutorizado().isEmpty()
+				|| (autorizado.getDocumentoImg() != null && autorizado.getDocumentoImg().getBytes().length > 0)) {
+			if (autorizado.getDocumentoImg() == null || autorizado.getDocumentoImg().getBytes().length == 0) {
+				result.rejectValue("documentoImg", "", "requerido");
+			} else {
+				if (!ValidationUtils.isValidImageType(autorizado.getDocumentoImg())) {
+					result.rejectValue("documentoImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
+				} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoImg())) {
+					result.rejectValue("documentoImg", "", "no puede ser mayor a 1 MB");
 				}
 			}
 		}
-		
-		if(creando || !creando && !autorizado.getImgDocumentoAdicionalAutorizado().isEmpty()) {
-			if (autorizado.getImgDocumentoAdicionalAutorizado().isEmpty() || (autorizado.getDocumentoAdicionalImg() != null
+
+		if (autorizado.getImgDocumentoAdicionalAutorizado().isEmpty() || (autorizado.getDocumentoAdicionalImg() != null
+				&& autorizado.getDocumentoAdicionalImg().getBytes().length > 0)) {
+			if ((autorizado.getDocumentoAdicionalImg() != null
 					&& autorizado.getDocumentoAdicionalImg().getBytes().length > 0)) {
-				if ((autorizado.getDocumentoAdicionalImg() != null
-						&& autorizado.getDocumentoAdicionalImg().getBytes().length > 0)) {
-					if (!ValidationUtils.isValidImageType(autorizado.getDocumentoAdicionalImg())) {
-						result.rejectValue("documentoAdicionalImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
-					} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoAdicionalImg())) {
-						result.rejectValue("documentoAdicionalImg", "", "no puede ser mayor a 1 MB");
-					}
+				if (!ValidationUtils.isValidImageType(autorizado.getDocumentoAdicionalImg())) {
+					result.rejectValue("documentoAdicionalImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
+				} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoAdicionalImg())) {
+					result.rejectValue("documentoAdicionalImg", "", "no puede ser mayor a 1 MB");
 				}
 			}
 		}
-		
-		if(creando || !creando && !autorizado.getImgDocumentoRifAutorizado().isEmpty()) {
-			if (autorizado.getImgDocumentoRifAutorizado().isEmpty()
-					|| (autorizado.getDocumentoRifImg() != null && autorizado.getDocumentoRifImg().getBytes().length > 0)) {
-				if (autorizado.getDocumentoRifImg() == null || autorizado.getDocumentoRifImg().getBytes().length == 0) {
-					result.rejectValue("documentoRifImg", "", "requerido");
-				} else {
-					if (!ValidationUtils.isValidImageType(autorizado.getDocumentoRifImg())) {
-						result.rejectValue("documentoRifImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
-					} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoRifImg())) {
-						result.rejectValue("documentoRifImg", "", "no puede ser mayor a 1 MB");
-					}
+
+		if (autorizado.getImgDocumentoRifAutorizado().isEmpty()
+				|| (autorizado.getDocumentoRifImg() != null && autorizado.getDocumentoRifImg().getBytes().length > 0)) {
+			if (autorizado.getDocumentoRifImg() == null || autorizado.getDocumentoRifImg().getBytes().length == 0) {
+				result.rejectValue("documentoRifImg", "", "requerido");
+			} else {
+				if (!ValidationUtils.isValidImageType(autorizado.getDocumentoRifImg())) {
+					result.rejectValue("documentoRifImg", "", "debe tener el formato JPG, GIF, BMP o PNG");
+				} else if (!ValidationUtils.isValidImageSize(autorizado.getDocumentoRifImg())) {
+					result.rejectValue("documentoRifImg", "", "no puede ser mayor a 1 MB");
 				}
 			}
 		}
-		if(creando) {
-			if (autorizado.getDocumentoAutorizado() != null && ! autorizado.getDocumentoAutorizado().isEmpty()) {
-				Autorizado a = autorizadoRepository.findByIdEmpresaAndDocumentoIdentidadAndRifEmpresaAndIdTipoAutorizadoAndEstado(idEmpresa, autorizado.getTipoDocumentoAutorizado() + Util.formatoDocumentoIdentidad(autorizado.getDocumentoAutorizado()), autorizado.getCaracterRifEmpresa()+autorizado.getRifEmpresa(),autorizado.getIdTipoAutorizado(), Constantes.ACTIVO);
-				if(a!=null) {
-					result.rejectValue("documentoAutorizado", "", "Ya existen estos datos para un autorizado");
-					result.rejectValue("rifEmpresa", "", "Ya existen estos datos para un autorizado");
-				}
+		if (creando) {
+			Autorizado a = autorizadoRepository
+					.findByIdEmpresaAndDocumentoIdentidadAndRifEmpresaAndIdTipoAutorizadoAndEstado(idEmpresa,
+							autorizado.getTipoDocumentoAutorizado() + autorizado.getDocumentoAutorizado(),
+							autorizado.getCaracterRifEmpresa() + autorizado.getRifEmpresa(),
+							autorizado.getIdTipoAutorizado(), Constantes.ACTIVO);
+			if (a != null) {
+				result.rejectValue("documentoAutorizado", "", "Ya existe esta combinación para un autorizado");
+				result.rejectValue("rifEmpresa", "", "Ya existe esta combinación para un autorizado");
 			}
 		}
 	}
 
-	/*private Autorizado convertirAutorizadoBeneficioTraspasoToAutorizado(AutorizadoBeneficioTraspaso solictudTraspaso)
+	private Autorizado convertirAutorizadoBeneficioTraspasoToAutorizado(AutorizadoBeneficioTraspaso solictudTraspaso)
 			throws IOException {
 		final Autorizado autorizado = new Autorizado();
 
@@ -815,78 +663,71 @@ public class AutorizadoController {
 		autorizado.setNombreEmpresa(solictudTraspaso.getNombreEmpresa());
 		autorizado.setIdTipoAutorizado(solictudTraspaso.getIdTipoAutorizado());
 		return autorizado;
-	}*/
+	}
 
 	private Autorizado convertirAutorizadoEmpresaTransporteToAutorizado(
 			AutorizadoEmpresaTransporte autorizadoEmpresaTransporte) throws IOException {
 		final Autorizado autorizado = new Autorizado();
 
 		if (autorizadoEmpresaTransporte.getIdAutorizado() != null)
-			autorizado.setIdAutorizado(autorizadoEmpresaTransporte.getIdAutorizado());		
+			autorizado.setIdAutorizado(autorizadoEmpresaTransporte.getIdAutorizado());
 		autorizado.setIdTipoAutorizado(autorizadoEmpresaTransporte.getIdTipoAutorizado());
 		autorizado.setIdEmpresa(autorizadoEmpresaTransporte.getIdEmpresa());
 		autorizado.setIdTransportista(autorizadoEmpresaTransporte.getIdTransportista());
-		
+		// autorizado.setIdTransportista(autorizadoEmpresaTransporte.get);
+		// autorizado.setRifEmpresa(autorizadoEmpresaTransporte.getCaracterRifAutorizado()
+		// + autorizadoEmpresaTransporte.getRifAutorizado());
+		// autorizado.setNombreEmpresa(autorizadoEmpresaTransporte.getNombreAutorizado());
+
 		return autorizado;
 	}
 
 	private Autorizado convertirAutorizadoPersonaNaturalToAutorizado(AutorizadoPersonaNatural autorizadoPersonaNatural,
 			Autorizado autorizadoToUpdate) throws Exception {
 		final Autorizado autorizado = new Autorizado();
-		//BufferedImage imgBuffered = null;
+		BufferedImage imgBuffered = null;
 		Tika defaultTika = new Tika();
 		if (autorizadoPersonaNatural.getIdAutorizado() != null)
 			autorizado.setIdAutorizado(autorizadoPersonaNatural.getIdAutorizado());
-		
+
+		autorizado.setDocumentoIdentidad(autorizadoPersonaNatural.getTipoDocumentoAutorizado()
+				+ autorizadoPersonaNatural.getDocumentoAutorizado());
+		autorizado.setNombreCompleto(autorizadoPersonaNatural.getNombreAutorizado());
 		autorizado.setIdTipoAutorizado(autorizadoPersonaNatural.getIdTipoAutorizado());
-		autorizado.setDocumentoIdentidad(autorizadoPersonaNatural.getTipoDocumentoAutorizado() + Util.formatoDocumentoIdentidad(autorizadoPersonaNatural.getDocumentoAutorizado()));
-		autorizado.setNombreCompleto(autorizadoPersonaNatural.getNombreAutorizado());		
-		autorizado.setTelefonoMovil(autorizadoPersonaNatural.getPrefijoTelefono() + autorizadoPersonaNatural.getTelefono());
+		autorizado.setTelefonoMovil(
+				autorizadoPersonaNatural.getPrefijoTelefono() + autorizadoPersonaNatural.getTelefono());
 		autorizado.setEmail(autorizadoPersonaNatural.getEmail());
 		autorizado.setMarcaModeloColorVehiculo(autorizadoPersonaNatural.getMarcaModeloColor());
 		autorizado.setPlacaVehiculo(autorizadoPersonaNatural.getPlaca());
 
-		/*
-		 * String imagenDocumento = autorizadoToUpdate.getImagenDocumento() != null ?
-		 * Util.obtenerArchivoStr(rutaImg + autorizadoToUpdate.getImagenDocumento(),
-		 * "documentoImg") : null; if
-		 * (autorizadoPersonaNatural.getImgDocumentoAutorizado()!=null &&
-		 * !autorizadoPersonaNatural.getImgDocumentoAutorizado().equals(imagenDocumento)
-		 * ) { if (autorizadoPersonaNatural.getDocumentoImg().getOriginalFilename() !=
-		 * null &&
-		 * !autorizadoPersonaNatural.getDocumentoImg().getOriginalFilename().isEmpty())
-		 * { imgBuffered =
-		 * Util.convertFile(autorizadoPersonaNatural.getImgDocumentoAutorizado().
-		 * getBytes(), 'D'); String deteccion =
-		 * defaultTika.detect(autorizadoPersonaNatural.getDocumentoImg().getBytes());
-		 * String extension = deteccion.split("/")[1];
-		 * autorizado.setImagenDocumento(Util.saveFile(imgBuffered, 'D', extension,
-		 * rutaImg)); } } else if (imagenDocumento != null) {
-		 * autorizado.setImagenDocumento(autorizadoToUpdate.getImagenDocumento()); }
-		 */
-		
-		
-		if (autorizadoPersonaNatural.getDocumentoImg().getOriginalFilename() != null && !autorizadoPersonaNatural.getDocumentoImg().getOriginalFilename().isEmpty()) {
-			    String deteccion = defaultTika.detect(autorizadoPersonaNatural.getDocumentoImg().getBytes());
-			    String extension = deteccion.split("/")[1];
-			autorizado.setImagenDocumento(Util.saveFile(Util.convertFile(autorizadoPersonaNatural.getImgDocumentoAutorizado().getBytes(), 'D'), 'D', extension, rutaImg));
-			Util.eliminarArchivo(rutaImg, autorizadoToUpdate.getImagenDocumento());
-		}else {
+		String imagenDocumento = autorizadoToUpdate.getImagenDocumento() != null
+				? Util.obtenerArchivoStr(rutaImg + autorizadoToUpdate.getImagenDocumento(), "documentoImg")
+				: null;
+		if (autorizadoPersonaNatural.getImgDocumentoAutorizado() != null
+				&& !autorizadoPersonaNatural.getImgDocumentoAutorizado().equals(imagenDocumento)) {
+			if (autorizadoPersonaNatural.getDocumentoImg().getOriginalFilename() != null
+					&& !autorizadoPersonaNatural.getDocumentoImg().getOriginalFilename().isEmpty()) {
+				imgBuffered = Util.convertFile(autorizadoPersonaNatural.getImgDocumentoAutorizado().getBytes(), 'D');
+				String deteccion = defaultTika.detect(autorizadoPersonaNatural.getDocumentoImg().getBytes());
+				String extension = deteccion.split("/")[1];
+				autorizado.setImagenDocumento(Util.saveFile(imgBuffered, 'D', extension, rutaImg));
+			}
+		} else if (imagenDocumento != null) {
 			autorizado.setImagenDocumento(autorizadoToUpdate.getImagenDocumento());
 		}
-
 		return autorizado;
 	}
 
 	private Autorizado convertirAutorizadoPersonaJuridicaToAutorizado(
-			AutorizadoPersonaJuridica autorizadoPersonaJuridica, boolean creando) throws Exception {
+			AutorizadoPersonaJuridica autorizadoPersonaJuridica, boolean creando, Autorizado autorizadoToUpdate)
+			throws Exception {
 		final Autorizado autorizado = new Autorizado();
-		BufferedImage img;
+		BufferedImage imgBuffered = null;
 		if (autorizadoPersonaJuridica.getIdAutorizado() != null)
 			autorizado.setIdAutorizado(autorizadoPersonaJuridica.getIdAutorizado());
 
 		autorizado.setDocumentoIdentidad(autorizadoPersonaJuridica.getTipoDocumentoAutorizado()
-				+ Util.formatoDocumentoIdentidad(autorizadoPersonaJuridica.getDocumentoAutorizado()));
+				+ autorizadoPersonaJuridica.getDocumentoAutorizado());
 		autorizado.setNombreCompleto(autorizadoPersonaJuridica.getNombreAutorizado());
 		autorizado.setRifEmpresa(
 				autorizadoPersonaJuridica.getCaracterRifEmpresa() + autorizadoPersonaJuridica.getRifEmpresa());
@@ -901,62 +742,53 @@ public class AutorizadoController {
 
 		Autorizado a;
 		Tika defaultTika = new Tika();
-		if (!creando) {
-			a = autorizadoRepository.findById((int) autorizadoPersonaJuridica.getIdAutorizado());
+		
+		String imagenDocumento = autorizadoToUpdate.getImagenDocumento() != null
+				? Util.obtenerArchivoStr(rutaImg + autorizadoToUpdate.getImagenDocumento(), "documentoImg")
+				: null;
+		if (autorizadoPersonaJuridica.getImgDocumentoAutorizado() != null
+				&& !autorizadoPersonaJuridica.getImgDocumentoAutorizado().equals(imagenDocumento)) {
 			if (autorizadoPersonaJuridica.getDocumentoImg().getOriginalFilename() != null
 					&& !autorizadoPersonaJuridica.getDocumentoImg().getOriginalFilename().isEmpty()) {
-				img = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoAutorizado().getBytes(), 'D');
+				imgBuffered = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoAutorizado().getBytes(), 'D');
 				String deteccion = defaultTika.detect(autorizadoPersonaJuridica.getDocumentoImg().getBytes());
 				String extension = deteccion.split("/")[1];
-				autorizado.setImagenDocumento(Util.saveFile(img, 'D', extension, rutaImg));
-				Util.eliminarArchivo(rutaImg, a.getImagenDocumento());
-			} else {
-				autorizado.setImagenDocumento(a.getImagenDocumento());
+				autorizado.setImagenDocumento(Util.saveFile(imgBuffered, 'D', extension, rutaImg));
 			}
-
+		} else if (imagenDocumento != null) {
+			autorizado.setImagenDocumento(autorizadoToUpdate.getImagenDocumento());
+		}
+		
+		String imagenRif = autorizadoToUpdate.getImagenRif() != null
+				? Util.obtenerArchivoStr(rutaImg + autorizadoToUpdate.getImagenRif(), "documentoRifImg")
+				: null;
+		if (autorizadoPersonaJuridica.getImgDocumentoRifAutorizado() != null
+				&& !autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().equals(imagenRif)) {
 			if (autorizadoPersonaJuridica.getDocumentoRifImg().getOriginalFilename() != null
 					&& !autorizadoPersonaJuridica.getDocumentoRifImg().getOriginalFilename().isEmpty()) {
-				img = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().getBytes(), 'R');
+				imgBuffered = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().getBytes(), 'D');
 				String deteccion = defaultTika.detect(autorizadoPersonaJuridica.getDocumentoRifImg().getBytes());
 				String extension = deteccion.split("/")[1];
-				autorizado.setImagenRif(Util.saveFile(img, 'R', extension, rutaImg));
-				Util.eliminarArchivo(rutaImg, a.getImagenRif());
-			} else {
-				autorizado.setImagenRif(a.getImagenRif());
+				autorizado.setImagenRif(Util.saveFile(imgBuffered, 'D', extension, rutaImg));
 			}
+		} else if (imagenRif != null) {
+			autorizado.setImagenRif(autorizadoToUpdate.getImagenRif());
+		}
+		
+		String imagenAdicional = autorizadoToUpdate.getImagenAdicional() != null
+				? Util.obtenerArchivoStr(rutaImg + autorizadoToUpdate.getImagenAdicional(), "documentoAdicionalImg")
+				: null;
+		if (autorizadoPersonaJuridica.getImgDocumentoRifAutorizado() != null
+				&& !autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().equals(imagenAdicional)) {
 			if (autorizadoPersonaJuridica.getDocumentoAdicionalImg().getOriginalFilename() != null
 					&& !autorizadoPersonaJuridica.getDocumentoAdicionalImg().getOriginalFilename().isEmpty()) {
-				img = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoAdicionalAutorizado().getBytes(), 'A');
+				imgBuffered = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoAdicionalAutorizado().getBytes(), 'D');
 				String deteccion = defaultTika.detect(autorizadoPersonaJuridica.getDocumentoAdicionalImg().getBytes());
 				String extension = deteccion.split("/")[1];
-				autorizado.setImagenAdicional(Util.saveFile(img, 'A', extension, rutaImg));
-				Util.eliminarArchivo(rutaImg, a.getImagenAdicional());
-			} else {
-				autorizado.setImagenAdicional(a.getImagenAdicional());
+				autorizado.setImagenAdicional(Util.saveFile(imgBuffered, 'D', extension, rutaImg));
 			}
-		} else {
-
-			if (autorizadoPersonaJuridica.getDocumentoImg().getOriginalFilename() != null
-					&& !autorizadoPersonaJuridica.getDocumentoImg().getOriginalFilename().isEmpty()) {
-				img = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoAutorizado().getBytes(), 'D');
-				String deteccion = defaultTika.detect(autorizadoPersonaJuridica.getDocumentoImg().getBytes());
-				String extension = deteccion.split("/")[1];
-				autorizado.setImagenDocumento(Util.saveFile(img, 'D', extension, rutaImg));
-			}
-			if (autorizadoPersonaJuridica.getDocumentoRifImg().getOriginalFilename() != null
-					&& !autorizadoPersonaJuridica.getDocumentoRifImg().getOriginalFilename().isEmpty()) {
-				img = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoRifAutorizado().getBytes(), 'R');
-				String deteccion = defaultTika.detect(autorizadoPersonaJuridica.getDocumentoRifImg().getBytes());
-				String extension = deteccion.split("/")[1];
-				autorizado.setImagenRif(Util.saveFile(img, 'R', extension, rutaImg));
-			}
-			if (autorizadoPersonaJuridica.getDocumentoAdicionalImg().getOriginalFilename() != null
-					&& !autorizadoPersonaJuridica.getDocumentoAdicionalImg().getOriginalFilename().isEmpty()) {
-				img = Util.convertFile(autorizadoPersonaJuridica.getImgDocumentoAdicionalAutorizado().getBytes(), 'A');
-				String deteccion = defaultTika.detect(autorizadoPersonaJuridica.getDocumentoAdicionalImg().getBytes());
-				String extension = deteccion.split("/")[1];
-				autorizado.setImagenAdicional(Util.saveFile(img, 'A', extension, rutaImg));
-			}
+		} else if (imagenAdicional != null) {
+			autorizado.setImagenAdicional(autorizadoToUpdate.getImagenAdicional());
 		}
 
 		return autorizado;

@@ -13,12 +13,12 @@ input[type=number] {
 </style>
 <div th:if="${crear}" class="row">
 	<div class="container my-5" align="center">
-		<h5 align="center">Nuevo Autorizado</h5>
+		<h5 align="center">Solicitud Autorizados</h5>
 		<div class="card" style="width: 90%">
 			<div class="card-body" style="text-align: left; width: 170%">
 				<div class="col-md-10">
 					<form action="#" th:object="${autorizadoPersonaJuridica}" method="post" enctype="multipart/form-data">
-						<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
+						<input type="hidden" th:value="${crear}" id="crear" name="crear">
 						<script>
 							$('form').on(
 									'submit',
@@ -46,18 +46,18 @@ input[type=number] {
 							</div>
 							
 							<div class="form-group col-md-8">
-								<label for="rifEmpresa" class="col-form-label">RIF
+								<label for="rifEmpresa" class="col-form-label">Rif
 									Empresa</label>
 								<div class="rif_row">
 									<select th:field="*{caracterRifEmpresa}"
 										id="caracterRifEmpresa" class="form-control caracter">
 										<option selected value="J">J</option>
 										<option value="G">G</option>
-										<option value="C">C</option>
+										<option value="P">P</option>
 										<option value="V">V</option>
 										<option value="E">E</option>
 									</select> <input type="text" th:field="*{rifEmpresa}"
-										class="form-control rif" id="rifEmpresa" placeholder="RIF"
+										class="form-control rif" id="rifEmpresa" placeholder="Rif"
 										maxlength="9" oninput="soloNumeros(this)">
 								</div>
 								<span th:if="${#fields.hasErrors('rifEmpresa')}"
@@ -97,13 +97,13 @@ input[type=number] {
 							<div class="form-group col-md-8">
 								<label for="cargo" class="col-form-label">Cargo dentro de la Empresa
 								</label> <input type="text" th:field="*{cargo}"
-									class="form-control" id="cargo" maxlength=50>
+									class="form-control" id="cargo" maxlength=100>
 									<span th:if="${#fields.hasErrors('cargo')}"
 									th:errors="*{cargo}" class="text-danger"></span>
 							</div>
 							<div class="form-group col-md-8">
-								<label for="telefono" class="col-form-label">Telefono
-									Movil</label> 
+								<label for="telefono" class="col-form-label">Tel&eacute;fono
+									M&oacute;vil</label> 
 								<div class="rif_row">
 									<select th:field="*{prefijoTelefono}" id="prefijoTelefono"
 										class="form-control caracter">
@@ -120,9 +120,9 @@ input[type=number] {
 									th:errors="*{telefono}" class="text-danger"></span>
 							</div>
 							<div class="form-group col-md-8">
-								<label for="text" class="col-form-label">Correo
+								<label for="email" class="col-form-label">Correo
 									electr&oacute;nico</label> <input type="text" th:field="*{email}"
-									class="form-control" id="email" maxlength=150>
+									class="form-control" id="email" maxlength=100>
 									<span th:if="${#fields.hasErrors('email')}"
 									th:errors="*{email}" class="text-danger"></span>
 							</div>
@@ -139,6 +139,7 @@ input[type=number] {
 										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 
 										<span id="documentoImgErrorServer" th:if="${#fields.hasErrors('documentoImg')}" th:errors="*{documentoImg}"	class="text-danger"></span> 
 										<span id="documentoImgErrorClient"	style="display: none" class="text-danger"></span>
+										
 									</div>
 								</div>
 								<div class="logo-container" id="documentoImgContainer">
@@ -150,7 +151,7 @@ input[type=number] {
 							<div class="form-group col-md-8 logo-row">
 								<div class="logo-selector">
 									<label for="documentoRifImg" class="col-form-label">Documento
-										RIF (JPG, GIF o PNG)</label>
+										Rif (JPG, GIF o PNG)</label>
 									<div>
 										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoRifImg').click()" value="Examinar">
 										<input type="button" class="btn btn-primary" onclick="limpiarImagen('imgDocumentoRifAutorizado','documentoRifContainer');" value="Limpiar"> 											
@@ -192,7 +193,7 @@ input[type=number] {
 							<div class="form-group col-md-8">
 								<label for="placa" class="col-form-label">Placa</label> <input
 									type="text" th:field="*{placa}" class="form-control" id="placa"
-									maxlength=10>
+									maxlength=100>
 									<span th:if="${#fields.hasErrors('placa')}"
 									th:errors="*{placa}" class="text-danger"></span>
 							</div>
@@ -204,7 +205,7 @@ input[type=number] {
 									<span th:if="${#fields.hasErrors('marcaModeloColor')}"
 									th:errors="*{marcaModeloColor}" class="text-danger"></span>
 							</div>
-							</div>
+						</div>
 
 							<div class="form-group col-md-8" style="text-align: center;">
 								<input type="submit" class="btn btn-primary" th:value="#{bot.guardar}">
@@ -220,12 +221,12 @@ input[type=number] {
 
 <div th:if="!${crear}" class="row">
 	<div class="container my-5" align="center">
-		<h5 align="center">Actualizar Autorizado</h5>
+		<h5 align="center">Solicitud Autorizados</h5>
 		<div class="card" style="width: 90%">
 			<div class="card-body" style="text-align: left; width: 170%">
 				<div class="col-md-10">
 					<form action="#" th:object="${autorizadoPersonaJuridica}" method="post" enctype="multipart/form-data">
-						<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
+						<input type="hidden" th:value="${crear}" id="crear" name="crear">
 						<script>
 							$('form').on('submit',function(e) {e.preventDefault();
 							processPostForm("agregarAutorizadoPersonaJuridica",this);});
@@ -248,18 +249,18 @@ input[type=number] {
 									B&aacute;sicos</label>
 							</div>
 							<div class="form-group col-md-8">
-								<label for="rifEmpresa" class="col-form-label">RIF
+								<label for="rifEmpresa" class="col-form-label">Rif
 									Empresa</label>
 								<div class="rif_row">
 									<select th:field="*{caracterRifEmpresa}"
 										id="caracterRifEmpresa" class="form-control caracter" readonly>
 										<option selected value="J">J</option>
 										<option value="G">G</option>
-										<option value="C">C</option>
+										<option value="P">P</option>
 										<option value="V">V</option>
 										<option value="E">E</option>
 									</select> <input type="text" th:field="*{rifEmpresa}" oninput="soloNumeros(this)"
-										class="form-control rif" id="rifEmpresa" placeholder="RIF"
+										class="form-control rif" id="rifEmpresa" placeholder="Rif"
 										maxlength="9" readonly>
 								</div>
 								<span th:if="${#fields.hasErrors('rifEmpresa')}"
@@ -299,13 +300,13 @@ input[type=number] {
 							<div class="form-group col-md-8">
 								<label for="cargo" class="col-form-label">Cargo dentro de la Empresa
 								</label> <input type="text" th:field="*{cargo}"
-									class="form-control" id="cargo" maxlength=50>
+									class="form-control" id="cargo" maxlength=100>
 									<span th:if="${#fields.hasErrors('cargo')}"
 									th:errors="*{cargo}" class="text-danger"></span>
 							</div>
 							<div class="form-group col-md-8">
-								<label for="telefono" class="col-form-label">Telefono
-									Movil</label>
+								<label for="telefono" class="col-form-label">Tel&eacute;fono
+									M&oacute;vil</label>
 								<div class="rif_row">
 									<select th:field="*{prefijoTelefono}" id="prefijoTelefono"
 										class="form-control caracter">
@@ -324,7 +325,7 @@ input[type=number] {
 							<div class="form-group col-md-8">
 								<label for="email" class="col-form-label">Correo
 									electr&oacute;nico</label> <input type="text" th:field="*{email}"
-									class="form-control" id="email" maxlength=150>
+									class="form-control" id="email" maxlength=100>
 									<span th:if="${#fields.hasErrors('email')}"
 									th:errors="*{email}" class="text-danger"></span>
 							</div>
@@ -334,14 +335,14 @@ input[type=number] {
 								<div class="logo-selector">
 									<label for="documentoImg" class="col-form-label">Documento
 										de Identidad (JPG, GIF o PNG)</label>
-								    <div>
+									  <div>
 										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoImg').click()" value="Examinar"> 
 										<input type="button" class="btn btn-primary" onclick="cleanImg('documentoImg','imgDocumentoAutorizado', 'imagenDocumento' )" value="Limpiar">
 										<input type="file" th:field="*{documentoImg}" class="form-control" style="display: none" id="documentoImg" onchange="loadImage(event, 'documentoImgContainer', 'imagenDocumento', 'imgDocumentoAutorizado', 'documentoImgErrorServer', 'documentoImgErrorClient')">										
 										<input type="hidden" th:field="*{imgDocumentoAutorizado}" id="imgDocumentoAutorizado"> 
 										<span id="documentoImgErrorServer" th:if="${#fields.hasErrors('documentoImg')}" th:errors="*{documentoImg}"	class="text-danger"></span> 
 										<span id="documentoImgErrorClient"	style="display: none" class="text-danger"></span>
-									</div>
+									 </div>
 								</div>
 								<div class="logo-container" id="documentoImgContainer">
 									<img th:if="${autorizadoPersonaJuridica.imagenDocumento}"
@@ -353,14 +354,15 @@ input[type=number] {
 							<div class="form-group col-md-8 logo-row">
 								<div class="logo-selector">
 									<label for="documentoRifImg" class="col-form-label">Documento
-										RIF (JPG, GIF o PNG)</label>
-									<div>
+										Rif (JPG, GIF o PNG)</label>
+								<div>
 										<input type="button" class="btn btn-primary" onclick="document.getElementById('documentoRifImg').click()" value="Examinar">
 										<input type="button" class="btn btn-primary" onclick="limpiarImagen('imgDocumentoRifAutorizado','documentoRifContainer');" value="Limpiar"> 											
 										<input type="file"  th:field="*{documentoRifImg}" class="form-control" style="display: none" id="documentoRifImg" onchange="loadImage(event, 'documentoRifContainer', 'imagenDocumentoRif', 'imgDocumentoRifAutorizado', 'documentoImgRifErrorServer', 'documentoRifImgErrorClient')">
 										<input type="hidden" th:field="*{imgDocumentoRifAutorizado}" id="imgDocumentoRifAutorizado"> 
 										<span id="documentoRifImgErrorServer" th:if="${#fields.hasErrors('documentoRifImg')}" th:errors="*{documentoRifImg}"	class="text-danger"></span> 
 										<span id="documentoRifImgErrorClient"	style="display: none" class="text-danger"></span>
+								<!--  	<span th:if="${#fields.hasErrors('documentoRifImg')}" th:errors="*{documentoRifImg}" class="text-danger"></span>  -->
 									</div>
 								</div>
 								<div class="logo-container" id="documentoRifContainer">
@@ -395,7 +397,7 @@ input[type=number] {
 							<div class="form-group col-md-8">
 								<label for="placa" class="col-form-label">Placa</label> <input
 									type="text" th:field="*{placa}" class="form-control" id="placa"
-									maxlength=10>
+									maxlength=100>
 									<span th:if="${#fields.hasErrors('placa')}"
 									th:errors="*{placa}" class="text-danger"></span>
 							</div>
