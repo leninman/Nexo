@@ -20,8 +20,11 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.beca.misdivisas.interfaces.IAgenciaRepo;
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
 import com.beca.misdivisas.interfaces.IRemesaRepo;
+import com.beca.misdivisas.jpa.Agencia;
+
 import com.beca.misdivisas.jpa.Empresa;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
@@ -39,6 +42,9 @@ public class MapController {
 	private IEmpresaRepo empresaRepo;
 
 	@Autowired
+	private IAgenciaRepo agenciaRepo;
+
+	@Autowired
 	private IRemesaRepo remesaRepo;
 
 	@Autowired
@@ -54,8 +60,9 @@ public class MapController {
 		usuarioModel.setUsuario(usuario);
 		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
-		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA,
-				true, Util.getRemoteIp(request), usuario);
+		model.addAttribute(Constantes.TIPO_MAPA, "sucursales");
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA,
+				Constantes.TEXTO_REPORTE_MAPA, true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.MAPA;
 	}
@@ -87,23 +94,24 @@ public class MapController {
 				descripcion += "<br>" + Constantes.SIMBOLO_EURO + Util.formatMonto(montoEuro.toString());
 			else
 				descripcion += "<br>" + Constantes.SIMBOLO_EURO + "0,00";
-			if (montoDolar != BigDecimal.valueOf(0, 00) || montoEuro != BigDecimal.valueOf(0, 00)) {
-				locacion.setSucursal(sucursales.get(i).getSucursal() + "<br>" + descripcion);
-				locacion.setLatitud(Double.parseDouble(sucursales.get(i).getLatitud()));
-				locacion.setLongitud(Double.parseDouble(sucursales.get(i).getLongitud()));
-				locacion.setAccion(sucursales.get(i).getIdSucursal().toString());
-				if(empresa.getLogo()!= null)
-					locacion.setLogo(Constantes.IMAGES);
-				else
-					locacion.setLogo("img/sucursal.png");					
-				
-				locacion.setPosicion(i);
-				locaciones.add(locacion);
-			}
+			// if (montoDolar != BigDecimal.valueOf(0, 00) || montoEuro !=
+			// BigDecimal.valueOf(0, 00)) {
+			locacion.setSucursal(sucursales.get(i).getSucursal() + "<br>" + descripcion);
+			locacion.setLatitud(Double.parseDouble(sucursales.get(i).getLatitud()));
+			locacion.setLongitud(Double.parseDouble(sucursales.get(i).getLongitud()));
+			locacion.setAccion(sucursales.get(i).getIdSucursal().toString());
+			if (empresa.getLogo() != null)
+				locacion.setLogo(Constantes.IMAGES);
+			else
+				locacion.setLogo("img/sucursal.png");
+
+			locacion.setPosicion(i);
+			locaciones.add(locacion);	
+			// }
 		}
-		
-		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.SUCURSALES_EMPRESA, Constantes.TEXTO_REPORTE_MAPA, true,
-				Util.getRemoteIp(request), usuario);
+
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.SUCURSALES_EMPRESA,
+				Constantes.TEXTO_REPORTE_MAPA, true, Util.getRemoteIp(request), usuario);
 
 		return locaciones;
 	}
@@ -145,7 +153,58 @@ public class MapController {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(logo);
+	}
+
+	@GetMapping(value = "/mapaAgencias", produces = "application/json")
+	public String mapaAgencia(Model model, HttpServletRequest request) {
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		model.addAttribute(Constantes.TIPO_MAPA, "agencias" );
+		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA,
+				Constantes.TEXTO_REPORTE_MAPA, true, Util.getRemoteIp(request), usuario);
+
+		return Constantes.MAPA;
+	}
+
+	
+	
+	
+	
+	@GetMapping(path = "/agencias", produces = "application/json")
+	@ResponseBody
+	public List<Locacion> getAgenciaLocation(HttpServletRequest request) {
+		Locacion locacion = null;
+		List<Locacion> locaciones = new ArrayList<>();
+		String descripcion = null;
+		int i = 0;
+
+		final List<Agencia> agencias = agenciaRepo.findByAlmacenamientoOrRecaudacion(true,true);
+		for (final Agencia agencia : agencias) {
+			if (agencia.getLatitud() != null && agencia.getLongitud() != null && !agencia.getLatitud().isEmpty()
+					&& !agencia.getLongitud().isEmpty() && agencia.getIdEstatusAgencia() != 2) {
+			
+				if(agencia.getAlmacenamiento() != true && agencia.getRecaudacion() !=false)
+					descripcion = "Recaudación"; else
+				if(agencia.getAlmacenamiento() != false && agencia.getRecaudacion() !=true)
+					descripcion = "Almacenamiento"; else
+				if(agencia.getAlmacenamiento() != false && agencia.getRecaudacion() !=false)
+					descripcion = "Almacenamiento y Recaudación"; 
+				locacion = new Locacion();
+				locacion.setSucursal(agencia.getAgencia() + "<br>" + agencia.getNumeroAgencia() + "<br>" + descripcion);
+				locacion.setLatitud(Double.parseDouble(agencia.getLatitud()));
+				locacion.setLongitud(Double.parseDouble(agencia.getLongitud()));
+				locacion.setAccion(agencia.getIdAgencia().toString());
+				locacion.setLogo("img/sucursal.png");
+				locacion.setPosicion(i);
+				locaciones.add(locacion);
+				i++;
+			}
+		}
+		return locaciones;
 	}
 }

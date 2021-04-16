@@ -162,11 +162,11 @@ public class EmpresaController {
 	@GetMapping("/empresaListar")
 	public String empresaListar(Model model) {
 		final List<Empresa> empresas = empresaRepository.findAllOrderByName();
-		List<EmpresaModel> emoresasModel = empresas.stream().map((emp) -> convertirEmpresaListToEmpresaModel(emp))
+		List<EmpresaModel> empresasModel = empresas.stream().map((emp) -> convertirEmpresaListToEmpresaModel(emp))
 				.collect(Collectors.toList());
-		if (emoresasModel.isEmpty())
-			emoresasModel = null;
-		model.addAttribute(Constantes.EMPRESAS, emoresasModel);
+		if (empresasModel.isEmpty())
+			empresasModel = null;
+		model.addAttribute(Constantes.EMPRESAS, empresasModel);
 		return "empresa/listaEmpresas";
 	}
 

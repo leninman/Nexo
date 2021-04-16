@@ -516,10 +516,10 @@ public class AutorizadoController {
 	private void validarAutorizado(AutorizadoBanco autorizadoBanco, BindingResult result) throws Exception {
 		if (autorizadoBanco.getCaracterRifAutorizado() != null && !autorizadoBanco.getRifAutorizado().isEmpty()) {
 			if (!autorizadoBanco.getRifAutorizado().matches("[0-9]{9}")) {
-				result.rejectValue("rifAutorizado", "", "debe tener 9 digitos");
+				result.rejectValue("rifAutorizado", "", "debe tener 9 d\u00EDgitos");
 			} else if (!ValidationUtils
 					.validarRif(autorizadoBanco.getCaracterRifAutorizado() + autorizadoBanco.getRifAutorizado())) {
-				result.rejectValue("rifAutorizado", "", "inválido");
+				result.rejectValue("rifAutorizado", "", "inv\\u00E1lido");
 			}
 		}
 
@@ -528,10 +528,10 @@ public class AutorizadoController {
 	private void validarAutorizado(AutorizadoEmpresaTransporte autorizadoBanco, BindingResult result) throws Exception {
 		if (autorizadoBanco.getCaracterRifAutorizado() != null && !autorizadoBanco.getRifAutorizado().isEmpty()) {
 			if (!autorizadoBanco.getRifAutorizado().matches("[0-9]{9}")) {
-				result.rejectValue("rifAutorizado", "", "debe tener 9 digitos");
+				result.rejectValue("rifAutorizado", "", "debe tener 9 d\u00EDgitos");
 			} else if (!ValidationUtils
 					.validarRif(autorizadoBanco.getCaracterRifAutorizado() + autorizadoBanco.getRifAutorizado())) {
-				result.rejectValue("rifAutorizado", "", "inválido");
+				result.rejectValue("rifAutorizado", "", "inv\\u00E1lido");
 			}
 			List<Transportista> transportistas = transportistaRepository
 					.findByRif(autorizadoBanco.getCaracterRifAutorizado() + autorizadoBanco.getRifAutorizado());
@@ -571,13 +571,13 @@ public class AutorizadoController {
 
 		if (autorizado.getTelefono() != null && !autorizado.getTelefono().isEmpty()) {
 			if (!autorizado.getTelefono().matches("[0-9]{7}")) {
-				result.rejectValue("telefono", "", "debe tener 7 digitos");
+				result.rejectValue("telefono", "", "debe tener 7 d\u00EDgitos");
 			}
 		}
 
 		if (autorizado.getEmail() != null && !autorizado.getEmail().isEmpty()
 				&& !ValidationUtils.isValidEmail(autorizado.getEmail())) {
-			result.rejectValue("email", "", "inválido");
+			result.rejectValue("email", "", "inv\u00E1lido");
 		}
 	}
 
@@ -585,15 +585,15 @@ public class AutorizadoController {
 			boolean creando, int idEmpresa) throws Exception {
 		if (autorizado.getTelefono() != null && !autorizado.getTelefono().isEmpty()) {
 			if (!autorizado.getTelefono().matches("[0-9]{7}")) {
-				result.rejectValue("telefono", "", "debe tener 7 digitos");
+				result.rejectValue("telefono", "", "debe tener 7 d\u00EDgitos");
 			}
 		}
 
 		if (autorizado.getCaracterRifEmpresa() != null && !autorizado.getRifEmpresa().isEmpty()) {
 			if (!autorizado.getRifEmpresa().matches("[0-9]{9}")) {
-				result.rejectValue("rifEmpresa", "", "debe tener 9 digitos");
+				result.rejectValue("rifEmpresa", "", "debe tener 9 d\u00EDgitos");
 			} else if (!ValidationUtils.validarRif(autorizado.getCaracterRifEmpresa() + autorizado.getRifEmpresa())) {
-				result.rejectValue("rifEmpresa", "", "inválido");
+				result.rejectValue("rifEmpresa", "", "inv\u00E1lido");
 			}
 		}
 		

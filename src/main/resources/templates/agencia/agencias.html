@@ -1,0 +1,241 @@
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+	-moz-appearance: textfield;
+}
+</style>
+<div th:if="${crear}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Creaci&oacute;n de Agencia</h5>
+		<div class="card" style="width: 80%">
+			<div class="card-body" style="text-align: left; width: 170%">
+				<div class="col-md-10">
+					<form action="#" th:object="${agenciaModel}" method="post">
+						<script>
+							$('form').on('submit', function(e) {
+								e.preventDefault();
+								processAgenciaForm("agenciaAgregar", this);
+							});
+						</script>
+						<div class="row">
+							<div class="form-group col-md-4">
+								<label for="agencia" class="col-form-label">Agencia</label> <input
+									type="text" th:field="*{agencia}" class="form-control"
+									id="agencia" placeholder="Nombre de agencia" maxlength=100>
+								<span th:if="${#fields.hasErrors('agencia')}"
+									th:errors="*{agencia}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="nAgencia" class="col-form-label">N&uacute;mero
+									de Agencia</label> <input type="text" th:field="*{nAgencia}"
+									class="form-control" id="nAgencia"
+									placeholder="N&uacute;mero de agencia" maxlength=4
+									oninput="soloNumeros(this)" /> <span
+									th:if="${#fields.hasErrors('nAgencia')}"
+									th:errors="*{nAgencia}" class="text-danger"></span>
+							</div>
+							<div class="latitud_longitud">
+								<div class="form-group col-md-6">
+									<label for="latitud" class="col-form-label">Latitud</label> <input
+										type="text" th:field="*{latitud}" class="form-control"
+										id="latitud" placeholder="Latitud" maxlength=14> <span
+										th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"
+										class="text-danger"></span>
+								</div>
+								<div class="form-group col-md-6">
+									<label for="longitud" class="col-form-label">Longitud</label> <input
+										type="text" th:field="*{longitud}" class="form-control"
+										id="longitud" placeholder="Longitud" maxlength=14> <span
+										th:if="${#fields.hasErrors('longitud')}"
+										th:errors="*{longitud}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="estado" class="col-form-label">Estado</label>
+								<div>
+									<select id="estado" th:field="*{idEstado}" class="form-control"
+										onchange="getAgenciaMunicipios(event)">
+										<option value="-1">Seleccionar</option>
+										<option th:each="dropDownItem : ${estados}"
+											th:value="${dropDownItem.idEstado}"
+											th:text="${dropDownItem.estado}" />
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="municipio" class="col-form-label">Municipio</label>
+								<div>
+									<select th:field="*{idMunicipio}" id="idMunicipioAgencia"
+										class="form-control"><option th:if="${municipios}"
+											value=-1>Seleccionar</option>
+										<option th:each="dropDownItem : ${municipios}"
+											th:value="${dropDownItem.idMunicipio}"
+											th:text="${dropDownItem.municipio}" />
+									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
+										th:errors="*{idMunicipio}" class="text-danger"></span>
+								</div>
+							</div>
+
+							<div class="form-group col-md-6">
+								<div>
+
+									<label for="almacenamiento" class="col-form-label">Almacenamiento</label>
+									<input type="checkbox" name="almacenamiento"
+										id="almacenamiento" th:field="*{almacenamiento}"
+										onchange="getAlmacenamiento(this)"
+										th:checked="${almacenamiento}" />
+								</div>
+								<div>
+									<label for="recaudacion" class="col-form-label">Recaudaci&oacute;n</label>
+									<input type="checkbox" name="recaudacion" 
+									id="recaudacion" th:field="*{recaudacion}"
+										onchange="getRecaudacion(this)"
+										th:checked="${recaudacion}" />
+
+								</div>
+								<label for="idEstatusAgencia" class="col-form-label">Estatus</label>
+								<div>
+									<select th:field="*{idEstatusAgencia}" id="idEstatusAgencia"
+										class="form-control" style="max-width: 30%;">
+										<option selected value="1">Activa</option>
+										<option value="2">Inactiva</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-group col-md-8" style="text-align: center;">
+								<input type="submit" class="btn btn-primary"
+									th:value="#{bot.guardar}">
+								<!--    	<input type="button" class="btn btn-secondary"
+									th:onclick="|agencias('${agenciaModel.idAgencia}')|"
+									th:value="#{bot.cancelar}">  -->
+								<a class="btn btn-secondary" href="./agenciaHome">Cancelar</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div th:if="${editar}" class="row">
+	<div class="container my-5" align="center">
+		<h5 align="center">Actualizaci&oacute;n de Agencia</h5>
+		<div class="card" style="width: 80%">
+			<div class="card-body" style="text-align: left; width: 170%">
+				<div class="col-md-10">
+					<form action="#" th:object="${agenciaModel}" method="post">
+						<script>
+							$('form').on('submit', function(e) {
+								e.preventDefault();
+								processAgenciaForm("agenciaActualizar", this);
+							});
+						</script>
+						<div class="row">
+							<input type="hidden" name="idAgencia" id="idAgencia"
+								th:value="${agenciaModel.idAgencia}" />
+							<div class="form-group col-md-4">
+								<label for="agencia" class="col-form-label">Agencia</label> <input
+									type="text" th:field="*{agencia}" class="form-control"
+									id="agencia" placeholder="Nombre de agencia" maxlength=100>
+								<span th:if="${#fields.hasErrors('agencia')}"
+									th:errors="*{agencia}" class="text-danger"></span>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="agencia" class="col-form-label">N&uacute;mero
+									de Agencia</label> <input type="text" th:field="*{nAgencia}"
+									class="form-control" id="nAgencia"
+									placeholder="N&uacute;mero de agencia" maxlength=4
+									oninput="soloNumeros(this)" /> <span
+									th:if="${#fields.hasErrors('nAgencia')}"
+									th:errors="*{nAgencia}" class="text-danger"></span>
+							</div>
+							<div class="latitud_longitud">
+								<div class="form-group col-md-6">
+									<label for="latitud" class="col-form-label">Latitud</label> <input
+										type="text" th:field="*{latitud}" class="form-control"
+										id="latitud" placeholder="Latitud" maxlength=14> <span
+										th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"
+										class="text-danger"></span>
+								</div>
+								<div class="form-group col-md-6">
+									<label for="longitud" class="col-form-label">Longitud</label> <input
+										type="text" th:field="*{longitud}" class="form-control"
+										id="longitud" placeholder="Longitud" maxlength=14> <span
+										th:if="${#fields.hasErrors('longitud')}"
+										th:errors="*{longitud}" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="estado" class="col-form-label">Estado</label>
+								<div>
+									<select id="estado" th:field="*{idEstado}" class="form-control"
+										onchange="getAgenciaMunicipios(event)">
+										<option value="-1">Seleccionar</option>
+										<option th:each="dropDownItem : ${estados}"
+											th:value="${dropDownItem.idEstado}"
+											th:text="${dropDownItem.estado}" />
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-4">
+								<label for="municipio" class="col-form-label">Municipio</label>
+								<div>
+									<select th:field="*{idMunicipio}" id="idMunicipioSucursal"
+										class="form-control">
+										<option th:if="${municipios}" value=-1>Seleccionar</option>
+										<option th:each="dropDownItem : ${municipios}"
+											th:value="${dropDownItem.idMunicipio}"
+											th:text="${dropDownItem.municipio}" />
+									</select> <span th:if="${#fields.hasErrors('idMunicipio')}"
+										th:errors="*{idMunicipio}" class="text-danger"></span>
+								</div>
+							</div>
+
+							<div class="form-group col-md-6">
+								<div>
+
+									<label for="almacenamiento" class="col-form-label">Almacenamiento</label>
+									<input type="checkbox" name="almacenamiento"
+										id="almacenamiento" th:field="*{almacenamiento}"
+										onchange="getAlmacenamiento(this)"
+										th:checked="${almacenamiento}" />
+								</div>
+								<div>
+									<label for="recaudacion" class="col-form-label">Recaudaci&oacute;n</label>
+									<input type="checkbox" name="recaudacion" 
+									id="recaudacion" th:field="*{recaudacion}"
+										onchange="getRecaudacion(this)"
+										th:checked="${recaudacion}" />
+
+								</div>
+								<label for="idEstatusAgencia" class="col-form-label">Estatus</label>
+								<div>
+									<select th:field="*{idEstatusAgencia}" id="idEstatusAgencia"
+										class="form-control" style="max-width: 30%;">
+										<option selected value="1">Activa</option>
+										<option value="2">Inactiva</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group col-md-8" style="text-align: center;">
+								<input type="submit" class="btn btn-primary"
+									th:value="#{bot.actualizar}">
+								<!--		<input type="button" class="btn btn-secondary"
+									th:onclick="|agencias('${agenciaModel.idAgencia}')|"
+									th:value="#{bot.cancelar}" 	>   -->
+								<a class="btn btn-secondary" href="./agenciaHome">Cancelar</a>
+							</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

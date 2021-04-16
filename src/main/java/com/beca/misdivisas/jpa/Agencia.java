@@ -4,6 +4,9 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.List;
+
+
 
 
 /**
@@ -29,7 +32,7 @@ public class Agencia implements Serializable {
 	private Timestamp fechaCreacion;
 
 	@Column(name="\"fecha_estatus\"")
-	private Timestamp fechaEstatus;
+	private Timestamp fechaEstatus; 
 
 	@Column(name="\"id_estatus_agencia\"")
 	private Integer idEstatusAgencia;
@@ -48,11 +51,23 @@ public class Agencia implements Serializable {
 	
 	private Boolean almacenamiento;
 	
+	private Boolean recaudacion;
+	
 	//bi-directional many-to-one association to EstatusAgencia
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_estatus_agencia\"", insertable = false, updatable = false)
 		})
 	private EstatusAgencia estatusAgencia;
+	
+	@ManyToOne
+	@JoinColumns({@JoinColumn(name = "\"id_municipio\"", insertable = false, updatable = false)
+		})
+	private Municipio municipio;
+
+
+	//bi-directional many-to-one association to Remesa
+	@OneToMany(mappedBy="agencia")
+	private List<Remesa> remesas;
 
 	public Agencia() {
 	}
@@ -145,6 +160,43 @@ public class Agencia implements Serializable {
 		this.almacenamiento = almacenamiento;
 	}
 	
+	public List<Remesa> getRemesas() {
+		return this.remesas;
+	}
+
+	public void setRemesas(List<Remesa> remesas) {
+		this.remesas = remesas;
+	}
+
+	public Remesa addRemesa(Remesa remesa) {
+		getRemesas().add(remesa);
+		remesa.setAgencia(this);
+
+		return remesa;
+	}
+
+	public Remesa removeRemesa(Remesa remesa) {
+		getRemesas().remove(remesa);
+		remesa.setAgencia(null);
+
+		return remesa;
+	}
+	
+	public Municipio getMunicipio() {
+		return municipio;
+	}
+
+	public void setMunicipio(Municipio municipio) {
+		this.municipio = municipio;
+	}
+
+	public Boolean getRecaudacion() {
+		return recaudacion;
+	}
+
+	public void setRecaudacion(Boolean recaudacion) {
+		this.recaudacion = recaudacion;
+	}
 	
 
 }

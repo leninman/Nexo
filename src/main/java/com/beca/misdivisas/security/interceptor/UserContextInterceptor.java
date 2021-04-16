@@ -41,7 +41,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	private static final List<String> REPORTES_URL = Arrays.asList("/remesa", "/remesaNoApta", "/irregularidades",
 			"/remesabycartaporte", "/totalPorSucursal", "/remesaEntregaPendiente", "/remesasPendientes", "/reporteSolicitudRetiro");
 
-	private static final List<String> MAPA_URLS = Arrays.asList("/sucursales");
+	private static final List<String> MAPA_URLS = Arrays.asList("/sucursales", "/agencias");
 
 	private static final List<String> USER_URLS = Arrays.asList("/usuarioMainAgregar", "/usuarioListar",
 			"/resultadoCambio", "/usuarioEditar", "/usuarioAgregar", "/usuarioUpdate", "/usuarioEliminar", "/cert",
@@ -53,6 +53,9 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	private static final List<String> EMPRESA_URLS = Arrays.asList("/crearEmpresa", "/empresaListar", "/empresaEditar",
 			"/empresaAgregar", "/empresaActualizar", "/municipios", "/sucursalHome", "/sucursalCrear",
 			"/sucursalListar", "/sucursalEditar", "/sucursalAgregar", "/sucursalActualizar");
+	
+	private static final List<String> AGENCIA_URLS = Arrays.asList("/crearAgencia", "/agenciaListar", "/agenciaEditar",
+			"/agenciaAgregar", "/agenciaActualizar", "/municipios", "/agencias");
 
 	private static final List<String> PERFIL_URLS = Arrays.asList("/crearPerfilHome", "/crearPerfil",
 			"/editarPerfilHome", "/editarPerfil", "/eliminarPerfil", "/perfiles");
@@ -156,6 +159,10 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			}
 			if (urlMenues.stream().anyMatch((menu) -> EMPRESA_URLS.contains(menu))
 					|| EMPRESA_URLS.contains(servletPath)) {
+				return true;
+			}
+			if (urlMenues.stream().anyMatch((menu) -> AGENCIA_URLS.contains(menu))
+					|| AGENCIA_URLS.contains(servletPath)) {
 				return true;
 			}
 			if (OTROS_PATHS.contains(servletPath)) {

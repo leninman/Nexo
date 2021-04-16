@@ -19,8 +19,17 @@
 					<div class="col-md-10">
 						<h5 th:case="null" th:title="#{msj.empresa.vacia}"></h5>
 						<div th:case="*">
-							<table class="table table-striped table-responsive-md table-hover">
+							<table id="tabla"
+							
+							class="table table-striped table-responsive-md table-hover">
 								<thead>
+								
+								
+									<tr>
+										<td colspan="5"><input id="buscar" type="text"
+											class="form-control" placeholder="Buscador de Empresas" />
+										</td>
+									</tr>
 									<tr>
 										<th th:text="#{etq.rif}"></th>
 										<th th:text="#{etq.nombre}"></th>

@@ -13,11 +13,12 @@ input[type=number] {
 </style>
 <div th:if="${crear}" class="row">
 	<div class="container my-5" align="center">
-		<h5 align="center">Solicitud Autorizados</h5>
+		<h5 align="center">Nuevo Autorizado</h5>
 		<div class="card col-md-12" style="width: 100%">
 			<div class="card-body" style="text-align: left; width: 100%">
 				<div class="col-md-12">
 					<form action="#" th:object="${autorizadoPersonaNatural}" method="post" enctype="multipart/form-data">
+					<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
 						<script>
 							$('form').on(
 									'submit',
@@ -86,8 +87,8 @@ input[type=number] {
 							</div>
 							<div class="form-group col-md-6">
 								<label for="email" class="col-form-label">Correo
-									electr&oacute;nico</label> <input type="email" th:field="*{email}"
-									class="form-control" id="text" maxlength=100>
+									electr&oacute;nico</label> <input type="text" th:field="*{email}"
+									class="form-control" id="text" maxlength=150>
 									<span th:if="${#fields.hasErrors('email')}"
 									th:errors="*{email}" class="text-danger"></span>
 							</div>
@@ -118,7 +119,7 @@ input[type=number] {
 							<div class="form-group col-md-6">
 								<label for="placa" class="col-form-label">Placa</label> <input
 									type="text" th:field="*{placa}" class="form-control" id="placa"
-									maxlength=100>
+									maxlength=10>
 									<span th:if="${#fields.hasErrors('placa')}"
 									th:errors="*{placa}" class="text-danger"></span>
 							</div>
@@ -145,11 +146,12 @@ input[type=number] {
 
 <div th:if="!${crear}" class="row">
 	<div class="container my-5" align="center">
-		<h5 align="center">Solicitud Autorizados</h5>
+		<h5 align="center">Actualizar Autorizado</h5>
 		<div class="card col-md-12" style="width: 100%">
 			<div class="card-body" style="text-align: left; width: 100%">
 				<div class="col-md-12">
 					<form action="#" th:object="${autorizadoPersonaNatural}" method="post" enctype="multipart/form-data">
+					<input type="hidden" th:value="${crear}" id="crear" name="crear"/>
 						<script>
 							$('form').on('submit',function(e) {
 								e.preventDefault();
@@ -246,7 +248,7 @@ input[type=number] {
 							<div class="form-group col-md-6">
 								<label for="email" class="col-form-label">Correo
 									electr&oacute;nico</label> <input type="text" th:field="*{email}"
-									class="form-control" id="email" maxlength=100>
+									class="form-control" id="email" maxlength=150>
 									<span th:if="${#fields.hasErrors('email')}"
 									th:errors="*{email}" class="text-danger"></span>
 							</div>
@@ -276,7 +278,7 @@ input[type=number] {
 							<div class="form-group col-md-6">
 								<label for="placa" class="col-form-label">Placa</label> <input
 									type="text" th:field="*{placa}" class="form-control" id="placa"
-									maxlength=100>
+									maxlength=10>
 									<span th:if="${#fields.hasErrors('placa')}"
 									th:errors="*{placa}" class="text-danger"></span>
 							</div>

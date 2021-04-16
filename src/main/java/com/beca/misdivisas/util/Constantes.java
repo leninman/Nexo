@@ -200,6 +200,8 @@ public final class Constantes {
 	public static final String ESTADOS = "estados";
 	public static final String MUNICIPIOS = "municipios";
 	public static final String MAPA = "mapa";
+	public static final String MAPA_AGENCIA = "agencia/mapaAgencia";
+	public static final String TIPO_MAPA = "tipoMapa";
 	public static final String VISTA_GENERAL = "Vista general";
 	public static final String VISTA_EMPRESA = "Vista por empresa";
 	public static final String TIPO_VISTA_EMPRESA = "E";
@@ -300,5 +302,12 @@ public final class Constantes {
 	public static final String OPCIONES = "opciones";
 	public static final String TIPOS_AUTORIZADO = "tiposAutorizado";
 	public static final String TIPO_AUTORIZADO_MODEL = "tipoAutorizadoModel";
+
+	public static final String AGENCIAS = "agencias";
+	public static final String AGENCIA_MODEL = "agenciaModel";
+	public static final String ACCION_AGENCIA = "{0} Agencia : NombreAgencia({1});  idAgencia({2}); idUsuario({3}); nombreUsuario({4});";
+	public static final String EDICION_AGENCIA = "Editar agencia";
+
+	
 	
 }

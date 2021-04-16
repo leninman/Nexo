@@ -102,13 +102,20 @@
             $('#main_navbar').bootnavbar();
         })
     </script>
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
 
 var locacion =[] ;
 var locaciones = [];
 var locations = [];
 
-window.onpaint =  $.getJSON("./sucursales", function (data) {
+/*<![CDATA[*/
+var tipoMapa = /*[[${tipoMapa}]]*/ 'default';
+var locationMapping = "./"+tipoMapa;
+/*]]>*/
+
+
+
+window.onpaint =  $.getJSON(locationMapping, function (data) {
 
 	for(var i=0; i<data.length;i++){
 		locacion =[] ;
