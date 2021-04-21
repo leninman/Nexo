@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -109,6 +111,9 @@ public class SolicitudRetiroController {
 	
 	@Autowired
 	private ITransportistaRepo transportistaRepo;
+	
+	@PersistenceContext
+	private EntityManager entityManger;
 	
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
@@ -309,20 +314,20 @@ public class SolicitudRetiroController {
 	}
 
 	private List<SolicitudRetiroModel> getSolicitudesRetiro(Integer idEmpresa, Integer estatusA, Integer estatusB) {
-		final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
-				: solicitudRetiroRepo.findAll();
+		final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa) : solicitudRetiroRepo.findAll();
 		final List<SolicitudRetiroModel> listaSolicitudes = new ArrayList<SolicitudRetiroModel>();
-		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud)
-				.collect(Collectors.toList());
+		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud).collect(Collectors.toList());
 		final List<SolicitudRetiroTraza> solicitudTrazas = solicitudRetiroTrazaRepo.findByIdSolicitudIn(solicitudesIds);
+
 		solicitudes.stream().forEach((solicitud) -> {
 			final Optional<SolicitudRetiroTraza> solicitudTraza = solicitudTrazas.stream()
-					.filter(traza -> traza.getIdSolicitud() == solicitud.getIdSolicitud()).sorted(new SortByIdTraza())
+					.filter(traza -> traza.getIdSolicitud().equals(solicitud.getIdSolicitud())).sorted(new SortByIdTraza())
 					.findFirst();
-			if (solicitudTraza.isPresent() && (solicitudTraza.get().getIdEstatusSolicitud() == estatusA
-					|| (estatusB != null && solicitudTraza.get().getIdEstatusSolicitud() == estatusB))) {
+			if (solicitudTraza.isPresent() && (solicitudTraza.get().getIdEstatusSolicitud().equals(estatusA)
+					|| (estatusB != null && solicitudTraza.get().getIdEstatusSolicitud().equals(estatusB)))) {
 				
-				if (solicitud.getAutorizado().getIdTipoAutorizado() == 3) {
+				if (solicitud.getAutorizado().getIdTipoAutorizado().intValue() == 3) {
+					entityManger.detach(solicitud.getAutorizado());
 					Optional <Transportista> transportista = transportistaRepo.findById(solicitud.getAutorizado().getIdTransportista());
 					solicitud.getAutorizado().setRifEmpresa(transportista.get().getRif());
 					solicitud.getAutorizado().setNombreEmpresa(transportista.get().getTransportista());
@@ -338,22 +343,20 @@ public class SolicitudRetiroController {
 		return listaSolicitudes;
 	}
 
-	private List<ReporteSolicitudRetiro> getReporteSolicitudesRetiro(Integer idEmpresa, Date fechaInicio, Date fechaFin,
-			Integer idMoneda, Integer estatus) {
+	private List<ReporteSolicitudRetiro> getReporteSolicitudesRetiro(Integer idEmpresa, Date fechaInicio, Date fechaFin,Integer idMoneda, Integer estatus) {
 		final List<SolicitudRetiro> solicitudes = solicitudRetiroRepo.findByIdEmpresaAndIdMoneda(idEmpresa, idMoneda);
 		final List<ReporteSolicitudRetiro> listaSolicitudes = new ArrayList<ReporteSolicitudRetiro>();
 		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud)
 				.collect(Collectors.toList());
-		final List<SolicitudRetiroTraza> solicitudTrazas = estatus == -1
+		final List<SolicitudRetiroTraza> solicitudTrazas = estatus.intValue() == -1
 				? solicitudRetiroTrazaRepo.findByIdSolicitudInAndFecha(solicitudesIds, fechaInicio, fechaFin)
-				: solicitudRetiroTrazaRepo.findByIdSolicitudInAndFechaAndIdEstatus(solicitudesIds, fechaInicio,
-						fechaFin, estatus);
+				: solicitudRetiroTrazaRepo.findByIdSolicitudInAndFechaAndIdEstatus(solicitudesIds, fechaInicio,fechaFin, estatus);
 		solicitudes.stream().forEach((solicitud) -> {
 			final Optional<SolicitudRetiroTraza> solicitudTraza = solicitudTrazas.stream()
-					.filter(traza -> traza.getIdSolicitud() == solicitud.getIdSolicitud()).findFirst();
+			.filter(traza -> traza.getIdSolicitud().equals(solicitud.getIdSolicitud())).sorted(new SortByIdTraza()).findFirst();
 			if (solicitudTraza.isPresent()) {
 				final SolicitudRetiroTraza traza = solicitudTraza.get();
-				if (solicitud.getAutorizado().getIdTipoAutorizado() == 3) {
+				if (solicitud.getAutorizado().getIdTipoAutorizado().intValue() == 3) {
 					Optional <Transportista> transportista = transportistaRepo.findById(solicitud.getAutorizado().getIdTransportista());
 					solicitud.getAutorizado().setRifEmpresa(transportista.get().getRif());
 					solicitud.getAutorizado().setNombreEmpresa(transportista.get().getTransportista());
@@ -361,7 +364,7 @@ public class SolicitudRetiroController {
 				String estado = (traza.getMotivoRechazo() == null || traza.getMotivoRechazo().getMotivo() == null || traza.getMotivoRechazo().getMotivo().trim().equals("")) ? 
 						traza.getEstatusSolicitudRetiro().getEstatusSolicitud() : traza.getEstatusSolicitudRetiro().getEstatusSolicitud() + " - (" + traza.getMotivoRechazo().getMotivo() + ")";
 				
-				String usuario = (traza.getIdUsuario()==null || traza.getUsuario() == null) ? traza.getCodigoUsuario() : traza.getUsuario().getNombreCompleto();
+				String usuario = (traza.getIdUsuario()== null || traza.getUsuario() == null) ? traza.getCodigoUsuario() : traza.getUsuario().getNombreCompleto();
 				
 				listaSolicitudes.add(new ReporteSolicitudRetiro(solicitud.getIdSolicitud(), solicitud.getCartaPorte(),
 						dateFormat.format(solicitud.getFechaEstimada()), solicitud.getMonto().intValue(),
@@ -629,7 +632,8 @@ public class SolicitudRetiroController {
 			break;
 		case 1:
 			final AutorizadoPersonaNatural autorizadoPersonaNatural = AutorizadoUtils.convertirAutorizadoToAutorizadoPersonaNatural(autorizado);
-			autorizadoPersonaNatural.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenDocumento(), "documentoImg"));
+			if(autorizado.getImagenDocumento() != null &&  !autorizado.getImagenDocumento().isEmpty())
+				autorizadoPersonaNatural.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenDocumento(), "documentoImg"));
 			model.addAttribute("autorizado", autorizadoPersonaNatural);
 			
 			break;
