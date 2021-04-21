@@ -33,6 +33,10 @@ function processForm(accion, form) {
 		success: function(response) {
 			$('#spinnerModal').modal('hide');
 			$('#solicitudesContainer').html(response);
+		},
+		error: function(xhr){
+			$('#spinnerModal').modal('hide');
+			$(location).attr('href', './error');
 		}
 	});
 }
@@ -46,13 +50,20 @@ function editarAutorizado(id) {
 		data: { "idAutorizado": id },
 		success: function(response) {
 			$('#spinnerModal').modal('hide');
+			if(response=='errores')
+				$(location).attr('href', './error');
+			else			
+				$('#solicitudesContainer').html(response);
 			$('#solicitudesContainer').html(response);
+		},
+		error: function(){
+			$('#spinnerModal').modal('hide');
+			$(location).attr('href', './error');
 		}
 	});
 }
 
 function eliminarAutorizado(id) {
-
 	$.ajax({
 		type: "POST",
 		cache: false,
@@ -62,6 +73,9 @@ function eliminarAutorizado(id) {
 			$('#solicitudesContainer').html(response);
 			document.querySelectorAll(".modal-backdrop")[0].remove();
 		},
+		error: function(){
+			$(location).attr('href', './error');
+		}
 	});
 }
 
@@ -84,6 +98,7 @@ function loadImage(event, imageContainer, id, imageId, imgErrorServer, imgErrorC
 };
 
 function processPostForm(accion, form) {
+$('#spinnerModal').modal('show');
 	$.ajax({
 		type: "POST",
 		cache: false,
@@ -92,7 +107,15 @@ function processPostForm(accion, form) {
 		processData: false,
 		contentType: false,
 		success: function(response) {
+		$('#spinnerModal').modal('hide');
+		if(response=='errores')
+			$(location).attr('href', './error');
+		else			
 			$('#solicitudesContainer').html(response);
+		},
+		error: function(xhr){
+			$('#spinnerModal').modal('hide');
+			$(location).attr('href', './error');
 		}
 	});
 }

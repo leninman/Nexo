@@ -18,17 +18,21 @@ public class AutorizadoUtils {
 	public static AutorizadoEmpresaTransporte convertirAutorizadoToAutorizadoEmpresaTransporte(Autorizado autorizado) {
 		final AutorizadoEmpresaTransporte autorizadoEmpresaTransporte = new AutorizadoEmpresaTransporte(
 				autorizado.getIdAutorizado(), autorizado.getIdTipoAutorizado(),
-				autorizado.getRifEmpresa().substring(0, 1), autorizado.getRifEmpresa().substring(1),
-				autorizado.getNombreEmpresa());
+				autorizado.getTransportista().getRif().substring(0, 1), autorizado.getTransportista().getRif().substring(1),
+				autorizado.getTransportista().getTransportista());
+		
 		return autorizadoEmpresaTransporte;
 	}
 
 	public static AutorizadoPersonaNatural convertirAutorizadoToAutorizadoPersonaNatural(Autorizado autorizado) {
 		final AutorizadoPersonaNatural autorizadoPersonaNatural = new AutorizadoPersonaNatural(
 				autorizado.getIdAutorizado(), autorizado.getIdTipoAutorizado(),
-				autorizado.getDocumentoIdentidad().substring(0, 1), autorizado.getDocumentoIdentidad().substring(1),
-				autorizado.getNombreCompleto(), (autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 4) ? autorizado.getTelefonoMovil().substring(0, 4) : autorizado.getTelefonoMovil(),
-				(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 4) ? autorizado.getTelefonoMovil().substring(4) : autorizado.getTelefonoMovil(), autorizado.getEmail(), autorizado.getPlacaVehiculo(),
+				(autorizado.getDocumentoIdentidad()!=null && !autorizado.getDocumentoIdentidad().isEmpty() ? autorizado.getDocumentoIdentidad().substring(0, 1): ""), 
+				(autorizado.getDocumentoIdentidad()!=null && !autorizado.getDocumentoIdentidad().isEmpty() ? autorizado.getDocumentoIdentidad().substring(1): ""),
+				autorizado.getNombreCompleto(), 
+				(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 4) ? autorizado.getTelefonoMovil().substring(0, 4) : "",
+				(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 5) ? autorizado.getTelefonoMovil().substring(4) : "", 
+				autorizado.getEmail(), autorizado.getPlacaVehiculo(),
 				autorizado.getMarcaModeloColorVehiculo(), autorizado.getImagenDocumento());
 
 		autorizadoPersonaNatural.setImagenDocumento(autorizado.getImagenDocumento());
@@ -39,11 +43,14 @@ public class AutorizadoUtils {
 	public static AutorizadoPersonaJuridica convertirAutorizadoToAutorizadoPersonaJuridica(Autorizado autorizado) {
 		final AutorizadoPersonaJuridica autorizadoPersonaJuridica = new AutorizadoPersonaJuridica(
 				autorizado.getIdAutorizado(), autorizado.getIdTipoAutorizado(),
-				autorizado.getDocumentoIdentidad().substring(0, 1), autorizado.getDocumentoIdentidad().substring(1),
-				autorizado.getNombreCompleto(), autorizado.getRifEmpresa().substring(0, 1),
-				autorizado.getRifEmpresa().substring(1), autorizado.getNombreEmpresa(),
-				(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 4) ? autorizado.getTelefonoMovil().substring(0, 4) : autorizado.getTelefonoMovil(),
-						(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 4) ? autorizado.getTelefonoMovil().substring(4) : autorizado.getTelefonoMovil(),
+				(autorizado.getDocumentoIdentidad()!=null && !autorizado.getDocumentoIdentidad().isEmpty() ? autorizado.getDocumentoIdentidad().substring(0, 1): ""), 
+				(autorizado.getDocumentoIdentidad()!=null && !autorizado.getDocumentoIdentidad().isEmpty() ? autorizado.getDocumentoIdentidad().substring(1): ""),
+				autorizado.getNombreCompleto(), 
+				(autorizado.getRifEmpresa()!=null && !autorizado.getRifEmpresa().isEmpty() ? autorizado.getRifEmpresa().substring(0, 1): ""),
+				(autorizado.getRifEmpresa()!=null && !autorizado.getRifEmpresa().isEmpty() ? autorizado.getRifEmpresa().substring(1): ""),			
+				autorizado.getNombreEmpresa(),
+				(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 4) ? autorizado.getTelefonoMovil().substring(0, 4) : "",
+				(autorizado.getTelefonoMovil() != null && autorizado.getTelefonoMovil().length() > 5) ? autorizado.getTelefonoMovil().substring(4) : "",
 				autorizado.getEmail(), autorizado.getCargoEmpresa(), autorizado.getPlacaVehiculo(), autorizado.getMarcaModeloColorVehiculo());
 
 		autorizadoPersonaJuridica.setImagenDocumento(autorizado.getImagenDocumento());

@@ -9,8 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import com.beca.misdivisas.jpa.SolicitudRetiroTraza;
 
 public interface ISolicitudRetiroTrazaRepo extends JpaRepository<SolicitudRetiroTraza, Integer> {
-	public List<SolicitudRetiroTraza> findByIdSolicitudIn(List<Integer> solicitudIds);
+	
+	@Query("SELECT t FROM SolicitudRetiroTraza t where t.idSolicitudRetiroTraza in (SELECT	max(s.idSolicitudRetiroTraza) "
+			+ "FROM	SolicitudRetiroTraza s WHERE s.idSolicitud in (?1) group by s.idSolicitud)")
+	public List<SolicitudRetiroTraza> findByIdSolicitudInOrderByIdSolicitudRetiroTrazaDesc(List<Integer> solicitudIds);
 
+	public List<SolicitudRetiroTraza> findByIdSolicitudIn(List<Integer> solicitudIds);
+	
 	public List<SolicitudRetiroTraza> findByIdSolicitud(Integer solicitudIds);
 
 	@Query("SELECT t FROM SolicitudRetiroTraza t where t.idSolicitudRetiroTraza in (SELECT	max(s.idSolicitudRetiroTraza) "

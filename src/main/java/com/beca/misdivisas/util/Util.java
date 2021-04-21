@@ -194,23 +194,27 @@ public class Util {
 	}
 	
 	public static String salvaArchivo(String archivo, String rutaImg, char tipoDoc, int tamanio) throws IOException, Exception {		
-		String nombreArchivo = getNombreArchivo(tipoDoc); 
+		String nombreArchivo = getNombreArchivo(tipoDoc);
+		ByteArrayInputStream bais = null;
 		try {
 			File file = new File(rutaImg+ nombreArchivo);
 			BufferedImage image = null;
-			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(archivo.getBytes()));
+			bais = new ByteArrayInputStream(Base64.getDecoder().decode(archivo.getBytes()));
 			image= Util.simpleResizeImage(ImageIO.read(bais),tamanio);
 			ImageIO.write(image, "jpeg", file);
+			bais.close();
 		} catch (IOException e) {
 			throw e;
 		} catch (Exception e) {
 			throw e;
+		}finally {
+			bais.close();
 		}
 		
 		return nombreArchivo;
 	}
 	
-	public static String obtenerArchivoStr(String ruta, String archivo) throws IOException {
+	public static String obtenerArchivoStr(String ruta, String archivo){
 		byte[] bytes;
 		String respuesta="";
 		 try {
@@ -219,10 +223,8 @@ public class Util {
 				bytes = Files.readAllBytes(file.toPath());
 				respuesta=Base64.getEncoder().encodeToString(bytes);
 			}
-		} catch (FileNotFoundException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
+		} catch (Exception e) {
+			return null;
 		}
 		return respuesta;		
 	}
@@ -265,6 +267,7 @@ public class Util {
 				width = width > ancho ? ancho : width;
 				image= Util.simpleResizeImage(image, width);
 			}
+			bais.close();
 			return image;
 	}
 		
