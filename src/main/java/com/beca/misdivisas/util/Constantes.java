@@ -155,7 +155,7 @@ public final class Constantes {
 	public static final String OPCION_SELECT ="opcionesSelect";
 	public static final String OPCION_INICIO ="Inicio";
 	public static final String OPCION_AUTORIZACION = "Ver Solicitudes de Autorizacion";
-	public static final String DOMINIO_PROD = "BCEXT001";
+	public static final String DOMINIO_PROD = "bancoexterior.com";
 	public static final String DOMINIO = "dominio";
 	public static final String ROL = "rol";
 	public static final String ROLES = "roles";
@@ -257,6 +257,7 @@ public final class Constantes {
 	public static final String FORMATO_FECHA_DD_MM_YYYY = "dd-MM-yyyy";
 	public static final String FORMATO_FECHA_ddMMYYYY = "ddMMyyyy";
 	public static final String FORMATO_FECHA_D_M_YYYY = "d-M-yyyy";
+	public static final String FORMATO_FECHA_YYYYMMDDHHMMSS = "yyyyMMddhhmmss";
 
 	public static final Pattern CARACTERES_ESPECIALES_PATTERN_I = Pattern.compile("[\\\"%()¡!*$&+.,:;=?¿@#|/{}\\\\]");
 	public static final Pattern CARACTERES_ESPECIALES_PATTERN_E = Pattern.compile("[\\\"%¡!*$&+.,:;=?¿@#|/{}\\\\]");
@@ -308,6 +309,11 @@ public final class Constantes {
 	public static final String ACCION_AGENCIA = "{0} Agencia : NombreAgencia({1});  idAgencia({2}); idUsuario({3}); nombreUsuario({4});";
 	public static final String EDICION_AGENCIA = "Editar agencia";
 
+	public static final String ACTIVA = "Activa";
 	
+	public static final String GENERAR = "generar";
+	public static final String CREATE = "create";
+	public static final String GET = "get";
+	public static final String UPDATE="update";
 	
 }

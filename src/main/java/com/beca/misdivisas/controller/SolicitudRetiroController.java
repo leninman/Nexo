@@ -112,8 +112,9 @@ public class SolicitudRetiroController {
 	@Autowired
 	private ITransportistaRepo transportistaRepo;
 	
-	@PersistenceContext
-	private EntityManager entityManger;
+	//ocasiona error al desplegar en el TomEE
+	//@PersistenceContext
+	private EntityManager entityManager;
 	
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
@@ -327,7 +328,7 @@ public class SolicitudRetiroController {
 					|| (estatusB != null && solicitudTraza.get().getIdEstatusSolicitud().equals(estatusB)))) {
 				
 				if (solicitud.getAutorizado().getIdTipoAutorizado().intValue() == 3) {
-					entityManger.detach(solicitud.getAutorizado());
+					entityManager.detach(solicitud.getAutorizado());
 					Optional <Transportista> transportista = transportistaRepo.findById(solicitud.getAutorizado().getIdTransportista());
 					solicitud.getAutorizado().setRifEmpresa(transportista.get().getRif());
 					solicitud.getAutorizado().setNombreEmpresa(transportista.get().getTransportista());

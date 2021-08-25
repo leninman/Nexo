@@ -29,7 +29,7 @@ public class FormsController {
 	@Autowired
 	private LogService logServ;
 	
-	@Value("${ldap.domain}")
+	@Value("${ldap.torre.dominio}")
 	private String dominio;
 
 	@GetMapping(value = "/envioEfectivo")

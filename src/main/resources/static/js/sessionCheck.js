@@ -1,4 +1,57 @@
 window.onload = function() {
+	initSession();
+}
+
+
+var timeOfLastActivity;
+var timeForCloseSession;
+var timeBeforeWarning = 1000;   // 5 seconds
+var timeBeforeClose = 180000;    // 10 seconds
+var timeBeforeValidation = 20000;
+
+function initSession() {
+	timeOfLastActivity = new Date().getTime();
+	timeForCloseSession = timeOfLastActivity + timeBeforeClose;
+    checkSession();
+}
+
+function checkSession() {
+	//timeOfLastActivity = new Date().getTime();
+	//timeForCloseSession = timeOfLastActivity + timeBeforeClose;
+ 
+    var currentTime = new Date().getTime();
+    if (currentTime < timeForCloseSession) {
+    	
+    	if (currentTime > (timeForCloseSession - timeBeforeValidation)) {
+       		$('#spinnerModal').modal('hide');
+			$('#sessionModal').modal('show');
+		}
+    } else {
+        location.href = 'logout';
+    }
+    setTimeout('checkSession()', timeBeforeWarning);
+    
+}
+
+function extendSession() {
+    jQuery.ajax({ 
+		url: 'activateSession',
+		type: 'POST',
+		success: function() {
+    	
+    	var currentTime = new Date().getTime();
+    	if (currentTime > timeForCloseSession) {
+			window.location.href = 'logout';
+			return;
+		} else 
+			initSession();
+		}				
+	});
+}
+
+
+/*
+window.onload = function() {
 	checkSession();
 }
 
@@ -47,4 +100,4 @@ function getCookie(name) {
 	});
 	return value;
 }
-    
+*/    

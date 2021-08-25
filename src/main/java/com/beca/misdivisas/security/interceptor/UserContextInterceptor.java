@@ -71,9 +71,6 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	@Value("${dias.vencimiento.clave}")
 	private long vencimientoClave;
 
-/*	@Value("${ldap.domain}")
-	private String dominio;
-*/
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {

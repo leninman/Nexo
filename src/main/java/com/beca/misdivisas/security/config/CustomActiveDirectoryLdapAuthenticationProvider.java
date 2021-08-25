@@ -17,14 +17,20 @@ import javax.naming.directory.SearchControls;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.Rdn;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.DefaultDirObjectFactory;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,10 +48,13 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	
 	private static final Pattern SUB_ERROR_CODE = Pattern.compile(".*data\\s([0-9a-f]{3,4}).*");
 
-	private static final int PASSWORD_EXPIRED = 0x532;
-	private static final int ACCOUNT_DISABLED = 0x533;
-	private static final int ACCOUNT_EXPIRED = 0x701;
-	private static final int ACCOUNT_LOCKED = 0x775;
+	private static final int PASSWORD_EXPIRED = 0x532; //1330
+	private static final int ACCOUNT_DISABLED = 0x533; //1331
+	private static final int ACCOUNT_EXPIRED = 0x701; //1793
+	private static final int ACCOUNT_LOCKED = 0x775; //1909
+	private static final int PASSWORD_MUST_CHANGED = 0x773; //1907
+	private static final int USER_NOT_FOUND = 0x525; //1317
+	private static final int BAD_PASSWORD = 0x52e; //1326
 
 	private final String domain;
 	private final String rootDn;
@@ -57,7 +66,18 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private Boolean peticionInterna;
 	
 	ContextFactory contextFactory = new ContextFactory();
-
+	
+	@Autowired
+	private static final Logger logger = LoggerFactory.getLogger(CustomActiveDirectoryLdapAuthenticationProvider.class);
+	
+	public CustomActiveDirectoryLdapAuthenticationProvider(String domain, String ip, String port) {
+		Assert.isTrue(StringUtils.hasText(port), "El puerto es requerido para la conexion via LDAP");
+		Assert.isTrue(StringUtils.hasText(domain), "El dominio es requerido para la conexion via LDAP");
+		this.domain = domain.toLowerCase();
+		this.url = "ldaps://" + (StringUtils.hasText(ip) ? ip : this.domain) + ":"+ port;
+		rootDn = rootDnFromDomain(this.domain);
+	}
+	/*
 	public CustomActiveDirectoryLdapAuthenticationProvider(String domain, String url, String rootDn) {
 		Assert.isTrue(StringUtils.hasText(url), "Url cannot be empty");
 		this.domain = StringUtils.hasText(domain) ? domain.toLowerCase() : null;
@@ -71,7 +91,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		this.url = url;
 		rootDn = this.domain == null ? null : rootDnFromDomain(this.domain);
 	}
-	
+	*/
 
 	@Override
 	public Authentication authenticate(Authentication authentication) {		
@@ -82,7 +102,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	        if (peticionInterna)
 	        	return super.authenticate(authentication);
 	        else
-	        	throw badCredentials();
+	        	throw new InternalAuthenticationServiceException("No se encuentra conectado a la red interna");
 	}
 
 	@Override
@@ -96,7 +116,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 			return searchForUser(ctx, username);
 		} catch (javax.naming.NamingException e) {
 			logger.error(e.getLocalizedMessage());
-			throw badCredentials(e);
+			throw new InternalAuthenticationServiceException("Error del sistema",e);
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}
@@ -104,37 +124,59 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 
 	private DirContext bindAsUser(String username, String password) {
 		final String bindUrl = url;
+		System.setProperty("com.sun.jndi.ldap.object.disableEndpointIdentification", "true");
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
 		String bindPrincipal = createBindPrincipal(username);
 		env.put(Context.SECURITY_PRINCIPAL, bindPrincipal);
 		env.put(Context.PROVIDER_URL, bindUrl);
 		env.put(Context.SECURITY_CREDENTIALS, password);
+		env.put(Context.SECURITY_PROTOCOL, "ssl");
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		
+		env.put("java.naming.ldap.factory.socket", CustomSSLSocketFactory.class.getName());
 		env.put(Context.OBJECT_FACTORIES, DefaultDirObjectFactory.class.getName());
 
 		try {
 			return contextFactory.createContext(env);
 			
 		} catch (javax.naming.NamingException e) {
+			logger.error(e.getLocalizedMessage());
 			if ((e instanceof AuthenticationException) || (e instanceof OperationNotSupportedException)) {
-				handleBindException(bindPrincipal, e);
-				throw badCredentials(e);
+				int subErrorCode = parseSubErrorCode(e.getMessage());
+				if (subErrorCode > 0) {
+					if (convertSubErrorCodesToExceptions) {
+						switch (subErrorCode) {
+							case PASSWORD_EXPIRED:
+								throw new CredentialsExpiredException("ContraseÃ±a expirÃ³", e);
+							case ACCOUNT_DISABLED:
+								throw new DisabledException("Cuenta deshabilitada",	e);
+							case ACCOUNT_EXPIRED:
+								throw new AccountExpiredException("Cuenta expirada", e);
+							case ACCOUNT_LOCKED:
+								throw new LockedException("Cuenta bloqueada", e);
+							case PASSWORD_MUST_CHANGED :
+								throw new CredentialsExpiredException("ContraseÃ±a debe cambiarse", e);
+							case USER_NOT_FOUND :
+								throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado" ,e);
+							case BAD_PASSWORD :
+								throw new BadCredentialsException ("Credenciales incorrectas", e);
+							default:
+								throw new AuthenticationServiceException("Credenciales incorrectas - Error General",e);
+						}
+					}
+					else {
+						throw LdapUtils.convertLdapException(e);
+					}
+				}
+				else {
+					throw LdapUtils.convertLdapException(e);
+				}
+			} else if(e instanceof javax.naming.CommunicationException) {
+				//Error en la comunicacion
+				throw new InternalAuthenticationServiceException("No hay comunicacion con el AD",e);
 			} else {
 				throw LdapUtils.convertLdapException(e);
 			}
-		}
-	}
-
-	private void handleBindException(String bindPrincipal, NamingException exception) {
-
-		int subErrorCode = parseSubErrorCode(exception.getMessage());
-		if (subErrorCode <= 0) {
-			return;
-		}
-		if (convertSubErrorCodesToExceptions) {
-			raiseExceptionForErrorCode(subErrorCode, exception);
 		}
 	}
 
@@ -146,36 +188,9 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		return -1;
 	}
 
-	private void raiseExceptionForErrorCode(int code, NamingException exception) {
-		switch (code) {
-		case PASSWORD_EXPIRED:
-			throw new CredentialsExpiredException("LdapAuthenticationProvider.credentialsExpired"+
-					"User credentials have expired", exception);
-		case ACCOUNT_DISABLED:
-			throw new DisabledException("LdapAuthenticationProvider.disabled" + "User is disabled",
-					exception);
-		case ACCOUNT_EXPIRED:
-			throw new AccountExpiredException(
-					"LdapAuthenticationProvider.expired"+"User account has expired", exception);
-		case ACCOUNT_LOCKED:
-			throw new LockedException(
-					"LdapAuthenticationProvider.locked"+ "User account is locked", exception);
-		default:
-			throw badCredentials(exception);
-		}
-	}
-
-	private BadCredentialsException badCredentials() {
-		return new BadCredentialsException("LdapAuthenticationProvider.badCredentials" + "Bad credentials");
-	}
-
-	private BadCredentialsException badCredentials(Throwable cause) {
-		return (BadCredentialsException) badCredentials().initCause(cause);
-	}
-
 	private DirContextOperations searchForUser(DirContext context, String username) throws javax.naming.NamingException {
 		SearchControls searchControls = new SearchControls();
-		String returnedAtts[] ={ "sn", "givenName", "name", "userPrincipalName", "displayName", "memberOf" };
+		String returnedAtts[] ={ "userPrincipalName", "givenName", "name", "sn", "displayName", "department", "description", "distinguishedName", "memberOf", "l" };
 		searchControls.setReturningAttributes(returnedAtts);
 		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		String bindPrincipal = createBindPrincipal(username);
@@ -190,14 +205,14 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 			// If we found no results, then the username/password did not match
 			UsernameNotFoundException userNameNotFoundException = new UsernameNotFoundException(
 					"User " + username + " not found in directory.", incorrectResults);
-			throw badCredentials(userNameNotFoundException);
+			throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado", userNameNotFoundException);
 		}
 	}
 
 	private String searchRootFromPrincipal(String bindPrincipal) {
 		int atChar = bindPrincipal.lastIndexOf('@');
 		if (atChar < 0) {
-			throw badCredentials();
+			throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado");
 		}
 		return rootDnFromDomain(bindPrincipal.substring(atChar + 1, bindPrincipal.length()));
 	}
@@ -241,12 +256,12 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 		
 		String[] groups = userData.getStringAttributes("memberOf");
 		if (groups == null) {
-			throw badCredentials(new Exception());
+			throw new AuthenticationServiceException("No pertenece a ningun grupo en el AD");
 		}
 		List<GrantedAuthority> authorities = createGrantedAuthoritiesFromLdapGroups(groups);
 		
 		if (authorities == null || authorities.isEmpty()) {
-			throw badCredentials(new Exception());
+			throw new AuthenticationServiceException("No pertenece a ningun grupo en el AD");
 		}
 		return authorities;
 	}
