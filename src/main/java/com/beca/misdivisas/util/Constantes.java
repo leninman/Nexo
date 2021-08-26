@@ -121,6 +121,17 @@ public final class Constantes {
 	public static final String OP_PROCESAMIENTO = "RetiroEfectivo/Procesamiento";
 	public static final String OP_SOLICITUDES_RETIRO_PROCESAR = "solicitudes/retiroEfectivo/procesarMain";
 	public static final String OP_SOLICITUD_RETIRO_VALIDADAS_VIEW = "solicitudes/retiroEfectivo/solicitudRetiroValidadaView";
+	public static final String OP_DEPOSITOS = "depositos/main";
+	public static final String OP_RETIROS = "retiros/main";
+	public static final String OP_DEPOSITOS_FORM = "depositos/deposito";
+	public static final String OP_RETIROS_FORM = "retiros/retiro";
+	public static final String OP_DEPOSITOS_DETALLE_FORM = "depositos/detalle";
+	public static final String OP_RETIROS_DETALLE_FORM = "retiros/detalle";
+	public static final String VOUCHER_DEPOSITO = "depositos/voucherDeposito";
+	public static final String VOUCHER_RETIRO = "retiros/voucherRetiro";
+	
+	
+	
 
 	public static final String CAMBIO_CLAVE = "Cambio de clave";
 	public static final String EDICION_EMPRESA = "Editar empresa";
@@ -155,7 +166,7 @@ public final class Constantes {
 	public static final String OPCION_SELECT ="opcionesSelect";
 	public static final String OPCION_INICIO ="Inicio";
 	public static final String OPCION_AUTORIZACION = "Ver Solicitudes de Autorizacion";
-	public static final String DOMINIO_PROD = "BCEXT001";
+	public static final String DOMINIO_PROD = "bancoexterior.com";
 	public static final String DOMINIO = "dominio";
 	public static final String ROL = "rol";
 	public static final String ROLES = "roles";
@@ -174,7 +185,7 @@ public final class Constantes {
 	public static final String BENEFICIARIO_TRASPASO = "Beneficiario Traspaso";
 	public static final String EMPRESA_TRANSPORTE = "Empresa Transporte";
 	public static final String AUTORIZADO_PERSONA_NATURAL = "Autorizado Persona Natural";
-	public static final String AUTORIZADO_PERSONA_JURIDICA = "Autorizafo Persona Juridica";
+	public static final String AUTORIZADO_PERSONA_JURIDICA = "Autorizado Persona Juridica";
 	public static final String SOLICTUD_RETIRO_ACCION_FROM = "accionFrom";
 
 	public static final String TIPO_PERFIL_I = "I";
@@ -193,6 +204,10 @@ public final class Constantes {
 	public static final String EDITAR = "editar";
 	public static final String SUCCESS = "success";
 	public static final String CREAR = "crear";
+	public static final String CREARDEPOSITO = "creardeposito";
+	public static final String CREARRETIRO = "crearRetiro";
+	public static final String VERDEPOSITO = "verdeposito";
+	public static final String VERVOUCHER = "verVoucher";
 	
 	public static final String INDEX = "index";
 	public static final String GRAFICO = "grafico";
@@ -257,6 +272,7 @@ public final class Constantes {
 	public static final String FORMATO_FECHA_DD_MM_YYYY = "dd-MM-yyyy";
 	public static final String FORMATO_FECHA_ddMMYYYY = "ddMMyyyy";
 	public static final String FORMATO_FECHA_D_M_YYYY = "d-M-yyyy";
+	public static final String FORMATO_FECHA_YYYYMMDDHHMMSS = "yyyyMMddhhmmss";
 
 	public static final Pattern CARACTERES_ESPECIALES_PATTERN_I = Pattern.compile("[\\\"%()¡!*$&+.,:;=?¿@#|/{}\\\\]");
 	public static final Pattern CARACTERES_ESPECIALES_PATTERN_E = Pattern.compile("[\\\"%¡!*$&+.,:;=?¿@#|/{}\\\\]");
@@ -308,6 +324,11 @@ public final class Constantes {
 	public static final String ACCION_AGENCIA = "{0} Agencia : NombreAgencia({1});  idAgencia({2}); idUsuario({3}); nombreUsuario({4});";
 	public static final String EDICION_AGENCIA = "Editar agencia";
 
+	public static final String ACTIVA = "Activa";
 	
+	public static final String GENERAR = "generar";
+	public static final String CREATE = "create";
+	public static final String GET = "get";
+	public static final String UPDATE="update";
 	
 }

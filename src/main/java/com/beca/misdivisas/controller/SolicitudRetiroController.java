@@ -112,8 +112,9 @@ public class SolicitudRetiroController {
 	@Autowired
 	private ITransportistaRepo transportistaRepo;
 	
-	@PersistenceContext
-	private EntityManager entityManger;
+	//ocasiona error al desplegar en el TomEE
+	//@PersistenceContext
+	private EntityManager entityManager;
 	
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
@@ -697,7 +698,8 @@ public class SolicitudRetiroController {
 		modelo.addAttribute("estatusSolicitud", estatus);
 		modelo.addAttribute(Constantes.CLIENTE,
 				Util.formatRif(usuario.getEmpresa().getCaracterRif(), usuario.getEmpresa().getRif()) + " " + usuario.getEmpresa().getEmpresa());
-
+		logServ.registrarLog(Constantes.REPORTE_SOLICITUD_RETIRO, Constantes.REPORTE_SOLICITUD_RETIRO, Constantes.REPORTE_SOLICITUD_RETIRO,
+                true, Util.getRemoteIp(request), usuario);
 		return Constantes.REPORTE_SOLICITUD_RETIRO;
 	}
 
