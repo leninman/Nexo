@@ -283,7 +283,7 @@ public class PerfilController {
 		
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		
+		com.beca.misdivisas.jpa.Perfil perfilEditar = perfilRepo.findById(idPerfil).get();
 		try {
 			model.addAttribute(Constantes.U_SUARIO, usuario);
 			model.addAttribute(Constantes.REVISAR_PERFILES, revisarPerfiles);
@@ -322,6 +322,8 @@ public class PerfilController {
 				
 			}
 			model.addAttribute(Constantes.GESTIONAR_PERFILES, gestionarPerfiles);
+			String detalle = MessageFormat.format(Constantes.ACCION_PERFIL, Constantes.OP_EDICION,	idPerfil, perfilEditar.getPerfil(), perfilEditar.getTipoPerfil(), perfilEditar.getTipoVista(), usuario.getIdEmpresa()!= null ? usuario.getEmpresa().getEmpresa() : "Interno");
+			logServ.registrarLog(Constantes.OP_EDITAR_PERFIL, detalle, Constantes.EDITAR_PERFIL, true, Util.getRemoteIp(request), usuario);
 			
 		} catch (Exception e) {
 			return Constantes.ERROR;

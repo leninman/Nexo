@@ -11,9 +11,14 @@ public class AgenciaModel {
 	
 	@NotBlank(message = "requerido")
 	private String agencia;
+	
+	
 	private Integer nAgencia;
 	
+	@NotBlank(message = "requerido")
 	private String latitud;
+
+	@NotBlank(message = "requerido")
 	private String longitud;
 
 	private String fechaCreacion;

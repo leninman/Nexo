@@ -457,7 +457,9 @@ public class ReportController {
 		Empresa empresa = empresaRepo.findById(id);
 		modelo.addAttribute(Constantes.CLIENTE,
 				Util.formatRif(empresa.getCaracterRif(), empresa.getRif()) + " " + empresa.getEmpresa());
-
+		String detalle = MessageFormat.format(Constantes.TRACKING_REMESAS, id);
+        logServ.registrarLog(Constantes.TRACKING_REMESAS, detalle, Constantes.TRACKING_REMESAS, true,
+        Util.getRemoteIp(request), usuario);
 		return Constantes.REPORTE_TRACK;
 	}
 
@@ -774,7 +776,11 @@ public class ReportController {
 
 		List<Sucursal> sucs = sucursalRepo.findSucursalByEmpId(id);
 		modelo.addAttribute(Constantes.SUCURSALES, sucs);
-
+		
+		String detalle = MessageFormat.format(Constantes.REPORTE_SUCURSAL, id);
+        logServ.registrarLog(Constantes.REPORTE_SUCURSAL, detalle, Constantes.REPORTE_SUCURSAL, true,
+                Util.getRemoteIp(request), usuario);
+		
 		return Constantes.REPORTE_SUCURSAL;
 	}
 

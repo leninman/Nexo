@@ -199,7 +199,7 @@ public class MapController {
 				locacion.setLatitud(Double.parseDouble(agencia.getLatitud()));
 				locacion.setLongitud(Double.parseDouble(agencia.getLongitud()));
 				locacion.setAccion(agencia.getIdAgencia().toString());
-				locacion.setLogo("img/sucursal.png");
+				locacion.setLogo("img/imageBE.png");
 				locacion.setPosicion(i);
 				locaciones.add(locacion);
 				i++;

@@ -363,7 +363,6 @@ function remesasPendientes() {
 		 registrar(accion, detalle, opcion);
 		});
 }
-
 function tablaReporteSucursal(fechaInicio, fechaFin, sucursal, moneda) {
 	$('#tablaReporteSucursal').DataTable().destroy();
 	var accion = "Descargar Reporte por Sucursal";
@@ -600,3 +599,4 @@ function tablaSolicitudesRetiro(fechaInicio, fechaFin, moneda, estatus) {
 		 registrar(accion, detalle, opcion);
 		});
 }
+

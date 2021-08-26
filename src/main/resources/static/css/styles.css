@@ -26,3 +26,70 @@ margin-top: 18px;
 display: inline-block;
 margin-right: 10px;
 }
+
+/*table {
+  width: 80%;
+  text-align:center;
+}
+
+
+
+table>tr>td>input {
+	 border: 1px solid;
+	 border-color: blue;
+	 align-items:center;
+	 align-content: center;
+	 text-align: center;
+	 width:20px;
+	 height:5px;
+}*/
+
+.tablasdivisas{
+	width: 100%;
+	text-align:center;
+
+}
+
+.inputcantidad{
+	
+	align-items:center;
+	align-content: center;
+	text-align: center;
+	width:100px;
+	height:20px;
+	border:0;
+}
+
+td, th {
+	border: 1px solid black;
+	align-content: center;
+   
+  }
+
+h5{
+	text-align: center;
+	
+}
+h6{
+	text-align: center;
+	
+}
+
+#voucherDeposito,#voucherDeposito2{
+	width: 100%;
+	border: none;
+	font-size:x-small;
+	
+}
+
+
+#voucherRetiro,#voucherRetiro2{
+	width: 100%;
+	border: none;
+	font-size:x-small;
+	
+}
+
+
+
+

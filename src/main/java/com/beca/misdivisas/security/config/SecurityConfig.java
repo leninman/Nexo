@@ -22,15 +22,23 @@ import com.beca.misdivisas.interfaces.ILogRepo;
 @EnableAutoConfiguration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Value("${ldap.domain}")
-	private String ldapDomain;
+	@Value("${ldap.oficinas.dominio}")
+	private String ldapOficinasDominio;
 
-	@Value("${ldap.url}")
-	private String ldapUrl;
+	@Value("${ldap.oficinas.ip}")
+	private String ldapOficinasIP;
 	
-	@Value("${ldap.base.dn}")
-	private String ldapBaseDn;
+	@Value("${ldap.oficinas.puerto}")
+	private String ldapOficinasPuerto;
 	
+	@Value("${ldap.torre.dominio}")
+	private String ldapTorreDominio;
+
+	@Value("${ldap.torre.ip}")
+	private String ldapTorreIP;
+	
+	@Value("${ldap.torre.puerto}")
+	private String ldapTorrePuerto;
 	
 	@Autowired
 	private UserDetailsService userDetailsService;	
@@ -60,16 +68,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			//Clientes externos BD
 			auth.authenticationProvider(activeDAOAuthenticationProvider());
 			//Clientes internos LDAP Torre
-			auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider(ldapDomain, ldapUrl, ldapBaseDn));
-			//Clientes internos LDAP Agencias
-			//auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider(ldapDomain, ldapUrl, ldapBaseDn));
+			AuthenticationProvider adTorre = activeDirectoryLdapAuthenticationProviderTorre(ldapTorreDominio, ldapTorreIP, ldapTorrePuerto);
+			auth.authenticationProvider(adTorre);
+			//Clientes internos LDAP Oficinas
+			AuthenticationProvider adOficinas = activeDirectoryLdapAuthenticationProviderOficinas(ldapOficinasDominio, ldapOficinasIP, ldapOficinasPuerto);
+			auth.authenticationProvider(adOficinas);
 	}
 
 	//Cambios JF
 	@Bean
-	public AuthenticationProvider activeDirectoryLdapAuthenticationProvider(String domain, String url, String rootDn) {
+	public AuthenticationProvider activeDirectoryLdapAuthenticationProviderTorre(String domain, String ip, String puerto) {
 		CustomActiveDirectoryLdapAuthenticationProvider provider = new CustomActiveDirectoryLdapAuthenticationProvider(
-				domain, url, rootDn);
+				domain, ip, puerto);
+		provider.setConvertSubErrorCodesToExceptions(true);
+		provider.setUseAuthenticationRequestCredentials(true);
+		//provider.setRoleDao(roleDao);
+		return provider;
+	}
+	
+	@Bean
+	public AuthenticationProvider activeDirectoryLdapAuthenticationProviderOficinas(String domain, String ip, String puerto) {
+		CustomActiveDirectoryLdapAuthenticationProvider provider = new CustomActiveDirectoryLdapAuthenticationProvider(
+				domain, ip, puerto);
 		provider.setConvertSubErrorCodesToExceptions(true);
 		provider.setUseAuthenticationRequestCredentials(true);
 		//provider.setRoleDao(roleDao);

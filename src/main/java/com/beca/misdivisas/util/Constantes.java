@@ -312,6 +312,7 @@ public final class Constantes {
 	public static final String USUARIOS = "Usuarios";
 	public static final String ID_EMPRESA ="idEmpresa";
 	public static final String ID_SUCURSAL = "idSucursal";
+	public static final String CREAR_AGENCIA = "Crear agencia";
 	public static final String U_SUARIO = "usuario";
 	public static final String U_SUARIOS = "usuarios";
 	public static final String CAMBIO_C = "cambioC";

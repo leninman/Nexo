@@ -141,6 +141,11 @@ public class AgenciaController {
 		agencia.setFechaCreacion(ts);
 		agencia.setFechaEstatus(ts);
 		Agencia agenciaNueva = agenciaRepository.save(agencia);
+		
+		String detalle = MessageFormat.format(Constantes.ACCION_AGENCIA, Constantes.OP_CREAR, agencia.getAgencia(),
+                agenciaNueva.getIdAgencia(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+        logServ.registrarLog(Constantes.CREAR_AGENCIA, detalle, Constantes.AGENCIAS,
+                true, Util.getRemoteIp(request), usuario);
 
 		return "redirect:agenciaListar?success";
 	}
@@ -258,9 +263,7 @@ public class AgenciaController {
 				result.rejectValue("agencia", "", "debe tener una longitud m\u00E1xima de 100 caracteres");
 			}
 		}
-		if (agenciaModel.getnAgencia() != null) {
-			result.rejectValue("nAgencia", "", "requerido");
-		}
+	
 		if (agenciaModel.getIdMunicipio() != null && agenciaModel.getIdMunicipio().intValue() == -1) {
 			result.rejectValue("idMunicipio", "", "requerido");
 		}

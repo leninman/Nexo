@@ -55,7 +55,7 @@ public class HomeController {
 	@Autowired
 	private MenuService menuService;
 
-	@Value("${ldap.domain}")
+	@Value("${ldap.torre.dominio}")
 	private String dominio;
 	
 	@Autowired
