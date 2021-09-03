@@ -31,9 +31,9 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			"/agregarAutorizadoPersonaNatural", "/agregarAutorizadoPersonaJuridica", "/autorizadosListar",
 			"/autorizadoEditar", "/autorizadoEliminar", "/solicitudesRetiro", "/nuevaSolicitudRetiro",
 			"/crearSolicitudRetiro", "/editarSolicitudRetiro", "/anularSolicitudRetiro", "/getSolicitudRetiroValidar",
-			"/getSolicitudRetiroAprobar", "/validarSolicitudRetiro", "/procesarSolicitudRetiro",
+			"/getSolicitudRetiroAprobar", "/getSolicitudRetiroEntregar", "/validarSolicitudRetiro", "/procesarSolicitudRetiro",
 			"/getSolicitudRetiroProcesar", "/anularSolicitudesRetiro", "/rechazarSolicitudRetiro",
-			"/anularSolicitudesRetiro", "/aprobarSolicitudRetiro", "/aprobarSolicitudesRetiro", "/listarTipoAutorizado");
+			"/anularSolicitudesRetiro", "/aprobarSolicitudRetiro", "/aprobarSolicitudesRetiro", "/listarTipoAutorizado", "/cancelarSolicitudRetiro");
 
 	private static final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico",
 			"/mainBECA", "/usuarioChange", "/403", "/404", "/405", "/error", "/access-denied", "/errorPage");
@@ -55,7 +55,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			"/sucursalListar", "/sucursalEditar", "/sucursalAgregar", "/sucursalActualizar");
 	
 	private static final List<String> AGENCIA_URLS = Arrays.asList("/crearAgencia", "/agenciaListar", "/agenciaEditar",
-			"/agenciaAgregar", "/agenciaActualizar", "/municipios", "/agencias");
+			"/agenciaAgregar", "/agenciaActualizar", "/municipios", "/agencias", "/agenciaDiaAgregar", "/agenciaDias", "/agenciaDiasResult");
 
 	private static final List<String> PERFIL_URLS = Arrays.asList("/crearPerfilHome", "/crearPerfil",
 			"/editarPerfilHome", "/editarPerfil", "/eliminarPerfil", "/perfiles");
