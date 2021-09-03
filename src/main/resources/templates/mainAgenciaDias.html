@@ -51,8 +51,8 @@
 				<!-- End of Topbar -->
 
 				<!-- Begin Page Content -->
-				<div class="container-fluid" id="empresaContainer">
-					<th:block th:replace="empresa/listaEmpresas :: listaEmpresas" />
+				<div class="container-fluid" id="agenciaDiaContainer">
+					<th:block th:replace="agencia/agenciaDias :: agenciaDias" />
 				</div>
 				<!-- /.container-fluid -->
 			</div>
@@ -74,24 +74,6 @@
 	</a>
 
 
-	<!-- Sucursal Modal-->
-	<div class="modal fade sucursal" id="sucuralModal" tabindex="-1" role="dialog"
-		aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content sucursal-content">
-				<div class="modal-header" style="text-align: right;">
-					<button class="close" type="button" data-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">×</span>
-					</button>
-				</div>
-				<div id="sucursalContainer"></div>
-			</div>
-		</div>
-
-	</div>
-	</div>
-
 	<!-- Bootstrap core JavaScript-->
 	<script src="vendor/jquery/jquery.min.js"
 		th:src="@{/vendor/jquery/jquery.min.js}"></script>
@@ -104,9 +86,8 @@
 
 	<!-- Custom scripts for all pages-->
 	<script src="js/sb-admin-2.min.js" th:src="@{/js/sb-admin-2.min.js}"></script>
-	<script src="js/empresa.js"></script>
+	<script src="js/agenciaDia.js"></script>
 	<script src="js/bootnavbar.js" ></script>
-	<script src="js/filter.js" ></script>
     <script>
         $(function () {
             $('#main_navbar').bootnavbar();

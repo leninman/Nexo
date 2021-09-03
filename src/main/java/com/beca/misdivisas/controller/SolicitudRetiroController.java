@@ -114,7 +114,7 @@ public class SolicitudRetiroController {
 	
 	//ocasiona error al desplegar en el TomEE
 	//@PersistenceContext
-	private EntityManager entityManager;
+//	private EntityManager entityManager;
 	
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
@@ -304,6 +304,44 @@ public class SolicitudRetiroController {
 			return "redirect:solicitudesRetiro?success";
 		}
 	}
+	
+	@PostMapping("cancelarSolicitudRetiro")
+	public String cancelarSolicitudRetiro(@RequestParam("idSolicitud") int id,
+			@ModelAttribute("accionFrom") String accionFrom, Model model) {
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(id);
+		if (solicitudRetiro == null) {
+			if (accionFrom.equalsIgnoreCase(Constantes.OP_ENTREGA))
+				return "redirect:solicitudesRetiroEntregar?error";
+			else
+				return "redirect:solicitudesRetiroProcesar?error";
+
+		} else {
+			final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
+			solicitudRetiroTraza.setIdUsuario(usuario.getIdUsuario());
+			if (usuario.getIdUsuario() == null)
+				solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
+			solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
+			solicitudRetiroTraza.setIdEstatusSolicitud(9);
+			Date date = new Date();
+			long time = date.getTime();
+			Timestamp ts = new Timestamp(time);
+			solicitudRetiroTraza.setFecha(ts);
+			solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
+
+			String detalle = MessageFormat.format(Constantes.ACCION_SOLICITUD_RETIRO_EFECTIVO, Constantes.OP_CANCELAR,
+					solicitudRetiro.getIdSolicitud(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+			logServ.registrarLog(Constantes.CANCELAR_SOLICITUD_RETIRO_EFECTIVO, detalle, accionFrom, true,
+					Util.getRemoteIp(request), usuario);
+
+			if (accionFrom.equalsIgnoreCase(Constantes.OP_ENTREGA))
+				return "redirect:solicitudesRetiroEntregar?success";
+			else
+				return "redirect:solicitudesRetiroProcesar?success";
+
+		}
+	}
+
 
 	@GetMapping("/solicitudesListar")
 	public String listarSolicitudes(Model model) {
@@ -328,7 +366,7 @@ public class SolicitudRetiroController {
 					|| (estatusB != null && solicitudTraza.get().getIdEstatusSolicitud().equals(estatusB)))) {
 				
 				if (solicitud.getAutorizado().getIdTipoAutorizado().intValue() == 3) {
-					entityManager.detach(solicitud.getAutorizado());
+//					entityManager.detach(solicitud.getAutorizado());
 					Optional <Transportista> transportista = transportistaRepo.findById(solicitud.getAutorizado().getIdTransportista());
 					solicitud.getAutorizado().setRifEmpresa(transportista.get().getRif());
 					solicitud.getAutorizado().setNombreEmpresa(transportista.get().getTransportista());
@@ -447,6 +485,29 @@ public class SolicitudRetiroController {
 
 		return Constantes.OP_SOLICITUDES_RETIRO_VALIDAR_PROCESAR;
 	}
+	
+	@GetMapping(value = "/solicitudesRetiroEntregar")
+	public String getSolicitudesRetiroAEntregar(Model modelo) {
+		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		/*modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());*/
+		modelo.addAttribute(Constantes.SOLICTUD_RETIRO_ACCION_FROM, Constantes.OP_ENTREGA);
+
+		final List<SolicitudRetiroModel> listaSolicitudes = getSolicitudesRetiro(null, 7, null);
+
+		modelo.addAttribute("solicitudesRetiro", listaSolicitudes);
+
+		HttpSession session = factory.getObject();
+		logServ.registrarLog(Constantes.LISTAR_SOLICITUD_RETIRO_EFECTIVO,
+				MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Retiro"), Constantes.OP_ENTREGA, true,
+				Util.getRemoteIp(request), (Usuario) session.getAttribute(Constantes.USUARIO));
+
+		//return Constantes.OP_SOLICITUDES_RETIRO_VALIDAR_PROCESAR;
+		return Constantes.OP_SOLICITUDES_RETIRO_PROCESAR_ENTREGAR;
+	} 
 
 	@PostMapping("aprobarSolicitudRetiro")
 	public String aprobarSolicitudRetiro(@RequestParam("idSolicitudAprobar") int id, Model model) {
@@ -596,6 +657,17 @@ public class SolicitudRetiroController {
 		}
 	}
 
+	@GetMapping("/getSolicitudRetiroEntregar")
+	public String getSolicitudRetiroEntregar(@RequestParam("idSolicitud") int id, Model model) throws Exception {
+		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(id);
+		if (solicitudRetiro == null) {
+			return "redirect:solicitudesRetiroEntregar?error";
+		} else {
+			setDatosSolicitudModel(solicitudRetiro, model);
+			return Constantes.OP_SOLICITUD_RETIRO_ENTREGADAS_VIEW;
+		}
+	}
+	
 	private void setDatosSolicitudModel(SolicitudRetiro solicitudRetiro, Model model) throws IOException {
 		
 		final SolicitudRetiroModel solicitudRetiroModel = new SolicitudRetiroModel(solicitudRetiro.getIdSolicitud(),

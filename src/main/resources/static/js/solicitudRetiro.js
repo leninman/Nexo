@@ -174,6 +174,20 @@ function verSolicitudProcesar(id) {
 	});
 }
 
+function verSolicitudEntregar(id) {
+	$('#spinnerModal').modal('show');
+	$.ajax({
+		type: "GET",
+		cache: false,
+		url: "getSolicitudRetiroEntregar",
+		data: { "idSolicitud": id },
+		success: function(response) {
+			$('#spinnerModal').modal('hide');
+			$('#solicitudesRetiroContainer').html(response);
+		}
+	});
+}
+
 function eliminarSolicitudRetiro(id) {
 	$('#spinnerModal').modal('show');
 	$.ajax({

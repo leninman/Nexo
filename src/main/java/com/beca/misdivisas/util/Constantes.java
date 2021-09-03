@@ -92,6 +92,8 @@ public final class Constantes {
 	public static final String OP_VALIDAR = "Validar";
 	public static final String OP_RECHAZAR = "Rechazar";
 	public static final String OP_PROCESAR = "Procesar";
+	public static final String OP_ENTREGAR = "Entregar";
+	public static final String OP_CANCELAR = "Cancelar";
 
 	public static final String OP_DESCARGA = "Descarga";
 	public static final String OP_SOLICITUD = "Solicitud";
@@ -114,13 +116,17 @@ public final class Constantes {
 	public static final String OP_GENERACION = "RetiroEfectivo/Generacion";
 	public static final String OP_SOLICITUDES_RETIRO_APROBAR = "solicitudes/retiroEfectivo/aprobarMain";
 	public static final String OP_APROBACION = "RetiroEfectivo/Aprobacion";
+	public static final String OP_ENTREGA = "RetiroEfectivo/Entrega";
 	public static final String OP_SOLICITUD_RETIRO_VIEW = "solicitudes/retiroEfectivo/solicitudRetiroView";
 	public static final String OP_VALIDACION = "RetiroEfectivo/Validacion";
 	public static final String OP_SOLICITUDES_RETIRO_VALIDAR_PROCESAR = "solicitudes/retiroEfectivo/validarProcesarMain";
+	public static final String OP_SOLICITUDES_RETIRO_PROCESAR_ENTREGAR = "solicitudes/retiroEfectivo/procesarEntregarMain";
 	public static final String OP_SOLICITUD_RETIRO_APROBAR_VIEW = "solicitudes/retiroEfectivo/solicitudRetiroAprobadaView";
 	public static final String OP_PROCESAMIENTO = "RetiroEfectivo/Procesamiento";
 	public static final String OP_SOLICITUDES_RETIRO_PROCESAR = "solicitudes/retiroEfectivo/procesarMain";
 	public static final String OP_SOLICITUD_RETIRO_VALIDADAS_VIEW = "solicitudes/retiroEfectivo/solicitudRetiroValidadaView";
+	public static final String OP_SOLICITUD_RETIRO_PROCESADAS_VIEW = "solicitudes/retiroEfectivo/solicitudRetiroProcesadaView";
+	public static final String OP_SOLICITUD_RETIRO_ENTREGADAS_VIEW = "solicitudes/retiroEfectivo/solicitudRetiroEntregadaView";
 	public static final String OP_DEPOSITOS = "depositos/main";
 	public static final String OP_RETIROS = "retiros/main";
 	public static final String OP_DEPOSITOS_FORM = "depositos/deposito";
@@ -153,6 +159,7 @@ public final class Constantes {
 	public static final String APROBAR_SOLICITUD_RETIRO_EFECTIVO = "Aprobar solic ret efectivo";
 	public static final String VALIDAR_SOLICITUD_RETIRO_EFECTIVO = "Validar solic ret efectivo";
 	public static final String RECHAZAR_SOLICITUD_RETIRO_EFECTIVO = "Rechazar solic ret efectivo";
+	public static final String CANCELAR_SOLICITUD_RETIRO_EFECTIVO = "Cancelar solic ret efectivo";
 	public static final String PROCESAR_SOLICITUD_RETIRO_EFECTIVO = "Procesar solic ret efectivo";
 
 	public static final String OPCION_POSICION = "Posicion Consolidada";
@@ -312,7 +319,6 @@ public final class Constantes {
 	public static final String USUARIOS = "Usuarios";
 	public static final String ID_EMPRESA ="idEmpresa";
 	public static final String ID_SUCURSAL = "idSucursal";
-	public static final String CREAR_AGENCIA = "Crear agencia";
 	public static final String U_SUARIO = "usuario";
 	public static final String U_SUARIOS = "usuarios";
 	public static final String CAMBIO_C = "cambioC";
@@ -321,6 +327,7 @@ public final class Constantes {
 	public static final String TIPO_AUTORIZADO_MODEL = "tipoAutorizadoModel";
 
 	public static final String AGENCIAS = "agencias";
+	public static final String CREAR_AGENCIA = "Crear agencia";
 	public static final String AGENCIA_MODEL = "agenciaModel";
 	public static final String ACCION_AGENCIA = "{0} Agencia : NombreAgencia({1});  idAgencia({2}); idUsuario({3}); nombreUsuario({4});";
 	public static final String EDICION_AGENCIA = "Editar agencia";
@@ -331,5 +338,8 @@ public final class Constantes {
 	public static final String CREATE = "create";
 	public static final String GET = "get";
 	public static final String UPDATE="update";
+
+	public static final String AGENCIA_DIAS = "agenciaDias";
+	public static final String AGENCIA_DIAS_MODEL = "agenciaDiaOperaciones";
 	
 }

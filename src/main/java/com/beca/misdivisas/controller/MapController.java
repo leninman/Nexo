@@ -2,12 +2,17 @@ package com.beca.misdivisas.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -20,11 +25,12 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.beca.misdivisas.interfaces.IAgenciaDiaRepo;
 import com.beca.misdivisas.interfaces.IAgenciaRepo;
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
 import com.beca.misdivisas.interfaces.IRemesaRepo;
 import com.beca.misdivisas.jpa.Agencia;
-
+import com.beca.misdivisas.jpa.AgenciaDia;
 import com.beca.misdivisas.jpa.Empresa;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
@@ -35,6 +41,8 @@ import com.beca.misdivisas.util.Util;
 
 @Controller
 public class MapController {
+	private final static DateFormat simpleDateFormat = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
+
 	@Autowired
 	private ObjectFactory<HttpSession> factory;
 
@@ -43,6 +51,9 @@ public class MapController {
 
 	@Autowired
 	private IAgenciaRepo agenciaRepo;
+
+	@Autowired
+	private IAgenciaDiaRepo agenciaDiaRepo;
 
 	@Autowired
 	private IRemesaRepo remesaRepo;
@@ -106,7 +117,7 @@ public class MapController {
 				locacion.setLogo("img/sucursal.png");
 
 			locacion.setPosicion(i);
-			locaciones.add(locacion);	
+			locaciones.add(locacion);
 			// }
 		}
 
@@ -164,38 +175,45 @@ public class MapController {
 		usuarioModel.setUsuario(usuario);
 		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
-		model.addAttribute(Constantes.TIPO_MAPA, "agencias" );
+		model.addAttribute(Constantes.TIPO_MAPA, "agencias");
 		logServ.registrarLog(Constantes.TEXTO_REPORTE_MAPA, Constantes.TEXTO_REPORTE_MAPA,
 				Constantes.TEXTO_REPORTE_MAPA, true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.MAPA;
 	}
 
-	
-	
-	
-	
 	@GetMapping(path = "/agencias", produces = "application/json")
 	@ResponseBody
 	public List<Locacion> getAgenciaLocation(HttpServletRequest request) {
 		Locacion locacion = null;
 		List<Locacion> locaciones = new ArrayList<>();
 		String descripcion = null;
+		Date date = new Date();
 		int i = 0;
 
-		final List<Agencia> agencias = agenciaRepo.findByAlmacenamientoOrRecaudacion(true,true);
+		final List<Agencia> agencias = agenciaRepo.findByAlmacenamientoOrRecaudacion(true, true);
+		final List<AgenciaDia> agenciaDias = agenciaDiaRepo.findAllFecha(date);
 		for (final Agencia agencia : agencias) {
 			if (agencia.getLatitud() != null && agencia.getLongitud() != null && !agencia.getLatitud().isEmpty()
 					&& !agencia.getLongitud().isEmpty() && agencia.getIdEstatusAgencia() != 2) {
-			
-				if(agencia.getAlmacenamiento() != true && agencia.getRecaudacion() !=false)
-					descripcion = "Recaudación"; else
-				if(agencia.getAlmacenamiento() != false && agencia.getRecaudacion() !=true)
-					descripcion = "Almacenamiento"; else
-				if(agencia.getAlmacenamiento() != false && agencia.getRecaudacion() !=false)
-					descripcion = "Almacenamiento y Recaudación"; 
+				
+				
+				List<String> fecha = agenciaDias.stream().filter((ag) -> ag.getIdAgencia() == agencia.getIdAgencia())
+						.map((agd) -> {
+							return simpleDateFormat.format(agd.getFecha());
+						}).collect(Collectors.toList());
+
+				if (!agencia.getAlmacenamiento() && agencia.getRecaudacion()) {
+					descripcion = "Recaudación";
+				} else if (agencia.getAlmacenamiento() && !agencia.getRecaudacion()) {
+					descripcion = "Almacenamiento";
+				} else if (agencia.getAlmacenamiento() && agencia.getRecaudacion()) {
+					descripcion = "Almacenamiento y Recaudación";
+				}
 				locacion = new Locacion();
-				locacion.setSucursal(agencia.getAgencia() + "<br>" + agencia.getNumeroAgencia() + "<br>" + descripcion);
+				String nAg = String.valueOf(agencia.getNumeroAgencia());
+				locacion.setSucursal(StringUtils.leftPad(nAg, 3, '0') + "-" + agencia.getAgencia() + "<br>"
+						+ descripcion + "<br>" + fecha);
 				locacion.setLatitud(Double.parseDouble(agencia.getLatitud()));
 				locacion.setLongitud(Double.parseDouble(agencia.getLongitud()));
 				locacion.setAccion(agencia.getIdAgencia().toString());
