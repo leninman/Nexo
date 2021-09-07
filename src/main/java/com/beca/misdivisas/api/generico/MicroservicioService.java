@@ -38,7 +38,7 @@ import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
 
 @Service
-public class MicroservicioService {
+public class MicroservicioService implements IMicroservicioService {
 	private static final Logger logger = LoggerFactory.getLogger(MicroservicioService.class);
 	
 	@Autowired

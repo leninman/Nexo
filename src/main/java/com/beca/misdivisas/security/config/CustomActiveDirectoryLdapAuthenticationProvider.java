@@ -64,6 +64,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 
 	private String ipOrigen;
 	private Boolean peticionInterna;
+	private Authentication autenticacion;
 	
 	ContextFactory contextFactory = new ContextFactory();
 	
@@ -94,7 +95,8 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	*/
 
 	@Override
-	public Authentication authenticate(Authentication authentication) {		
+	public Authentication authenticate(Authentication authentication) {
+			autenticacion = authentication;
 			CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) authentication.getDetails();
 	        setIpOrigen(details.getIpOrigen());
 	        peticionInterna = details.isPeticionInterna();
@@ -270,9 +272,10 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	List<String> privileges = new ArrayList<>();		
 	List<String> groupNames = new ArrayList<>(groups.length);
 	
+	CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) autenticacion.getDetails();
+	
 	for (String group : groups) {
-
-		for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
+		for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {					
             if (rdn.getType().equalsIgnoreCase("CN")) {
             	groupNames.add((String) rdn.getValue());
     			String role = getRole((String) rdn.getValue());
@@ -280,6 +283,19 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
     			privileges.add(role);
             }
         }
+	}
+	domain.contains("oficinas");
+	//TODO si esta instancia es para torre no se debe buscar la agencia en los grupos solo setear el valor de 1
+	// si esta instancia es para oficinas alli si buscar la agencia en grupos
+	
+	for (String group : groups) {
+		for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {					
+			//TODO 
+			// recorrer la estructura de cada grupo y si corresponde con la indicada tomar el numero de la agencia
+			// validar que sea un numero
+			// si es un numero, rompen el ciclo y setean en details.setNumeroAgencia(null);
+		}
+		
 	}
 
 

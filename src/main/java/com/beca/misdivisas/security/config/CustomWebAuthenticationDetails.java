@@ -14,8 +14,10 @@ public class CustomWebAuthenticationDetails extends WebAuthenticationDetails {
 	private String ipOrigen;
 	
 	private boolean peticionInterna;
+	
+	private Integer numeroAgencia;
 
-    public CustomWebAuthenticationDetails(HttpServletRequest request) {
+	public CustomWebAuthenticationDetails(HttpServletRequest request) {
         super(request);
         ipOrigen = Util.getRemoteIp(request);
         
@@ -32,4 +34,13 @@ public class CustomWebAuthenticationDetails extends WebAuthenticationDetails {
     public boolean isPeticionInterna() {
     	return peticionInterna;
     }
+    
+    public Integer getNumeroAgencia() {
+		return numeroAgencia;
+	}
+
+	public void setNumeroAgencia(Integer numeroAgencia) {
+		this.numeroAgencia = numeroAgencia;
+	}
+
 }

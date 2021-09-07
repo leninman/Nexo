@@ -29,6 +29,7 @@ import com.beca.misdivisas.jpa.PerfilUsuario;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Login;
 import com.beca.misdivisas.model.Menu;
+import com.beca.misdivisas.security.config.CustomWebAuthenticationDetails;
 import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.services.MenuService;
 import com.beca.misdivisas.util.Constantes;
@@ -86,6 +87,12 @@ public class HomeController {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
 		List<Log> logs = null;
 		LdapUserDetailsImpl principal = (LdapUserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+	   ((CustomWebAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails()).getNumeroAgencia();
+		//TODO
+	   //buscar el id de agencia dado el numero
+	   //setear en sesion ese idagencia
+	   
 		List<Menu> menues = null;
 		
 		try {
