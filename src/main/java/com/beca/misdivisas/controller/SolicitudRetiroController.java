@@ -368,12 +368,14 @@ public class SolicitudRetiroController {
 
 	private List<SolicitudRetiroModel> getSolicitudesRetiro(Integer idEmpresa, Integer estatusA, Integer estatusB) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
-		//usuario.getIdAgencia();
-		//int idAgencia = usuario.getIdAgencia();
-		final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
-		 : solicitudRetiroRepo.findAll();
-		//final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
-		//		: solicitudRetiroRepo.findByIdAgencia(idAgencia);
+		List<SolicitudRetiro> solicitudes = new ArrayList<SolicitudRetiro>();
+		if(usuario.getIdAgencia() == null) {
+			solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
+					 : solicitudRetiroRepo.findAll();
+		}else {
+			int idAgencia = usuario.getIdAgencia();
+			solicitudes = solicitudRetiroRepo.findByIdAgencia(idAgencia);
+		}
 		final List<SolicitudRetiroModel> listaSolicitudes = new ArrayList<SolicitudRetiroModel>();
 		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud)
 				.collect(Collectors.toList());
