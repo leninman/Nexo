@@ -31,7 +31,6 @@ input[type=number] {
 								$('#formulario').on(
 										'submit',
 										function(e) {
-											alert("hola");
 											e.preventDefault();
 											processAgenciaDiaForm(
 													"agenciaDiaAgregar", this);
@@ -50,29 +49,23 @@ input[type=number] {
 									<tr
 										th:each="agenciaDiaOperacionesModel,i : ${agenciaDiaOperaciones.agenciaDiaOperacionesModel}">
 										<td
-											th:text="*{#numbers.formatInteger(agenciaDiaOperacionesModel[__${i.index}__].nAgencia, 3) + ' - ' + agenciaDiaOperacionesModel[__${i.index}__].agencia}"></td>
+											th:text="*{#numbers.formatInteger(agenciaDiaOperacionesModel[__${i.index}__].nAgencia, 3) + ' - ' + agenciaDiaOperacionesModel[__${i.index}__].agencia}"></td>									
 										<td align="center"
 											th:each="agenciaFechaOperaciones,j : ${agenciaDiaOperacionesModel.agenciaFechaOperaciones}">
-											<input type="checkbox" th:field="*{habilitadas}" th:name="idChecked" 
+											<input type="checkbox"  th:name="habilitadas" 
 											th:value="${(agenciaDiaOperacionesModel.IdAgencia) + '-' + agenciaFechaOperaciones.dia}"
-											th:checked="${#bools.isTrue(habilitada)}">
+											th:checked="${(agenciaFechaOperaciones.habilitada)}"/> 	
 										</td>
-
-
 									</tr>
 								</tbody>
 							</table>
-
 							<div class="form-group col-md-8" style="text-align: center;">
-
 								<input type="submit" class="btn btn-primary" value="Guardar">
 								<a class="btn btn-secondary" href="./main">Cancelar</a>
 							</div>
-
 						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-
 </th:block>

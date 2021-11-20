@@ -22,9 +22,14 @@
 				<div class="container my-5">
 					<div>
 						<div class="col-md-12">
-							<table
+							<table id="tabla"
 								class="table table-striped table-responsive-md table-hover">
 								<thead>
+								<tr>
+										<td colspan="9"><input id="buscar" type="text"
+											class="form-control" placeholder="Buscador de Solicitudes de Retiro" />
+										</td>
+									</tr>
 									<tr>
 										<th th:text="#{etq.empresa}"></th>
 										<th th:text="#{etq.retiro.tipo.billete}"></th>

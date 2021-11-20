@@ -3,6 +3,8 @@ package com.beca.misdivisas.jpa;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -66,6 +68,7 @@ public class Agencia implements Serializable {
 
 
 	//bi-directional many-to-one association to Remesa
+	@JsonBackReference
 	@OneToMany(mappedBy="agencia")
 	private List<Remesa> remesas;
 

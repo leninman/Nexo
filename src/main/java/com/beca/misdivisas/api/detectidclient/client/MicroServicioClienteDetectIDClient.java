@@ -46,7 +46,8 @@ public class MicroServicioClienteDetectIDClient extends MicroservicioClient impl
 
 		} catch (RestClientException e) {
 			logger.info(e.getLocalizedMessage());
-			throw e;
+			return response;
+
 		}
 		logger.info(response.toString());
 		return response;
@@ -76,7 +77,10 @@ public class MicroServicioClienteDetectIDClient extends MicroservicioClient impl
 				break;
 				
 			case "delete":
-				cliente.delete(urlDetectId+"/"+operacion, entity);
+//				cliente.delete(urlDetectId+"/"+operacion, entity);
+				result = cliente.exchange(urlDetectId+"/"+operacion, HttpMethod.DELETE, entity, ClientesDetectIdResponseCRUD.class, "");
+				if(result.hasBody())
+					 response= result.getBody();
 				break;
 
 			default:

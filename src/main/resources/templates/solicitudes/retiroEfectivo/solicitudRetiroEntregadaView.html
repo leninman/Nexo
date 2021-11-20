@@ -137,7 +137,7 @@
 									</tr>
 									<tr>
 										<td style="text-align: left;"><b>N&uacute;mero de
-												Solicituuuud:</b></td>
+												Solicitud:</b></td>
 										<td align="right" th:text="${solicitudRetiro.cartaPorte}"></td>
 										<td colspan="3"></td>
 									</tr>
@@ -241,78 +241,31 @@
 					</div>
 					<br>
 					<div>
+
+						<!-- BOTONES PARA PRUEBA DE FORMULARIO AUTORIZADOS PERSONAS CASO 1 Y 2  -->
+
 						<table style="width: 100%; text-align: center;">
 							<tr>
 								<td><input type="button" class="btn btn-primary"
-									data-toggle="modal"
-									th:attr="data-target='#recordAprobarModal'+${solicitudRetiro.idSolicitud}"
+									th:onclick="|entrega('${solicitudRetiro.idSolicitud}')|"
 									value="Enviar Clave de Validaci&oacute;n">
-									<div class="modal fade"
-										th:attr="id='recordAprobarModal'+${solicitudRetiro.idSolicitud}"
-										tabindex="-1" role="dialog"
-										aria-labelledby="recordAprobarModalLabel" aria-hidden="true">
+									<div class="modal fade" id="entregarModal">
 										<div class="modal-dialog modal-dialog-centered"
 											role="document">
 											<div class="modal-content">
 												<div class="modal-header">
-
 													<button class="close" type="button" data-dismiss="modal"
 														aria-label="Close" style="text-align: right;">
 														<i class="far fa-times-circle"></i>
 													</button>
 												</div>
 												<div class="modal-body" style="text-align: center;">
-
-
-													<!--		<label for="clave_validacion" class="col-form-label">Introduzca
-														la Clave:</label> <input type="text" /> -->
-
-													<form role="form">
-														<!--		<div class="form-group">
-															<label for="clave_validacion">Clave:</label> <input type="password"
-																class="form-group" id="clave_validacion">
-														</div>
-														<div class="form-group">
-															<label for="psw">Tiempo restante:</label> <input
-																type="text" class="form-group" id="tiempo_restante">
-														</div> -->
-
-														<div class="form-group">
-															<label for="usrname">Introduzca la clave</label> <input
-																type="password" class="form-control"
-																id="clave_validacion">
-														</div>
-														<div class="form-group">
-															<label id="tiempo">5:00</label>
-														</div>
-
-													</form>
-
-
-													<!-- 					<h5 class="modal-title" id="recordAprobarModalLabel"
-														th:text="#{msj.confirm.procesar.solicitud.retiro}"></h5> -->
-
-
+													<div id="validarOtpContainer"></div>
+													<br />
 												</div>
-
-												<div class="modal-footer"></div>
-												<form method="POST" th:action="@{procesarSolicitudRetiro}"
-													th:attr="id='formAprobar'+${solicitudRetiro.idSolicitud}">
-													<div style="text-align: center;">
-														<input type="hidden" name="idSolicitud" id="idSolicitud"
-															th:value="${solicitudRetiro.idSolicitud}" />
-														<button type="submit" name="submit"
-															class="btn btn-primary"
-															style="height: 40px; width: 100px" th:text="Validar"></button>
-														<button class="btn btn-secondary" type="button"
-															data-dismiss="modal" style="height: 40px; width: 100px"
-															th:text="Cancelar"></button>
-													</div>
-												</form>
-												<br />
 											</div>
 										</div>
-									</div></td>
+									</td>
 								<td><input type="button" class="btn btn-danger"
 									data-toggle="modal"
 									th:attr="data-target='#recordDeleteModal'+${solicitudRetiro.idSolicitud}"
@@ -367,3 +320,6 @@
 		</div>
 	</div>
 </div>
+</div>
+</div>
+

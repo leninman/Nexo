@@ -11,18 +11,21 @@ public class AgenciaDiaOperacionesModel {
 	
 	private Integer nAgencia;
 	
+	private Integer idEstatusAgencia;
+	
 	private Boolean almacenamiento;	
 	
 	private Boolean recaudacion;
 
 	private List<AgenciaFechaOperaciones> agenciaFechaOperaciones;
 
-	public AgenciaDiaOperacionesModel(Integer idAgencia, String agencia, Integer nAgencia, Boolean almacenamiento,
+	public AgenciaDiaOperacionesModel(Integer idAgencia, String agencia, Integer nAgencia, Integer idEstatusAgencia, Boolean almacenamiento,
 			Boolean recaudacion, List<AgenciaFechaOperaciones> agenciaFechaOperaciones) {
 		super();
 		this.idAgencia = idAgencia;
 		this.agencia = agencia;
 		this.nAgencia = nAgencia;
+		this.idEstatusAgencia = idEstatusAgencia;
 		this.almacenamiento = almacenamiento;
 		this.recaudacion = recaudacion;
 		this.agenciaFechaOperaciones = agenciaFechaOperaciones;
@@ -77,6 +80,14 @@ public class AgenciaDiaOperacionesModel {
 
 	public void setAgenciaFechaOperaciones(List<AgenciaFechaOperaciones> agenciaFechaOperaciones) {
 		this.agenciaFechaOperaciones = agenciaFechaOperaciones;
+	}
+
+	public Integer getIdEstatusAgencia() {
+		return idEstatusAgencia;
+	}
+
+	public void setIdEstatusAgencia(Integer idEstatusAgencia) {
+		this.idEstatusAgencia = idEstatusAgencia;
 	}
 
 	

@@ -1,94 +1,124 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="es">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	lang="es">
 <head>
-  <title th:text="#{titulo}"></title>
-  
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-  
-  <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicon.ico}"/>
-  <link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon">
-  
-  <!-- Custom fonts for this template-->
-  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-  <link href="css/fonts-family-nunito.css" rel="stylesheet">
+<title th:text="#{titulo}"></title>
 
-  <!-- Custom styles for this template-->
-  <link href="css/sb-admin-2.min.css" rel="stylesheet">
-  
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+<link rel="shortcut icon" type="image/x-icon"
+	th:href="@{/img/favicon.ico}" />
+<link rel="icon" th:href="@{/img/favicon.ico}" type="image/x-icon">
+
+<!-- Custom fonts for this template-->
+<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet"
+	type="text/css">
+<link href="css/fonts-family-nunito.css" rel="stylesheet">
+
+<!-- Custom styles for this template-->
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
+
 </head>
 
 <body class="bg-dark">
 
-  <div class="container">
+	<div class="container">
 
-    <!-- Outer Row -->
-    <div class="row justify-content-center">
+		<!-- Outer Row -->
+		<div class="row justify-content-center">
 
-      <div class="col-xl-10 col-lg-14 col-md-9">
-        <div class="card o-hidden border-0 shadow-lg my-5">
-          <div class="card-body p-0">
-            <!-- Nested Row within Card Body -->
-            <div class="row">
-              <div class="col-lg-5 d-none d-lg-block bg-login-image"></div>
-              <div class="col-lg-6">
-                <div class="p-5">
-                  <br/>
-                  <br/>
-                  <br/>
-                   <form id="login_form" class="user" th:action="@{/mainBECA}" method="post" th:object="${login}">
-					<div class="form-group col-md-8">
-						<label for="vista" class="col-form-label" th:text="#{etq.vista}"></label>
-						<select th:field="*{vista}" class="form-control" id="select">
-						  <option value="G" selected="selected">General</option> 
-						  <option value="E" >Por Empresa</option>
-						</select>
+			<div class="col-xl-10 col-lg-14 col-md-9">
+				<div class="card o-hidden border-0 shadow-lg my-5">
+					<div class="card-body p-0">
+						<!-- Nested Row within Card Body -->
+						<div class="row">
+							<div class="col-lg-5 d-none d-lg-block bg-login-image"></div>
+							<div class="col-lg-6">
+								<div class="p-5">
+									<br /> <br /> <br />
+
+									<form id="login_form" class="user" th:action="@{/mainBECA}"
+										method="post" th:object="${login}">
+
+
+										<input type="hidden" id="tipoVista" th:value="${tipoVista}" />
+
+										<div th:if="${tipoVista}=='E'" id="tipoDeVistaEmpresa"
+											class="form-group col-md-8">
+											<label for="vista" class="col-form-label"
+												th:text="#{etq.vista}"></label> 
+												<input type="hidden" th:field="*{vista}" class="form-control" id="txtTipoVista" />
+												<input type="text" value="Por Empresa" class="form-control" id="txtTipoVista2" disabled/>
+										</div>
+
+										<div th:if="${tipoVista}!='E'" id="tipoDeVista"
+											class="form-group col-md-8">
+											<label for="vista" class="col-form-label"
+												th:text="#{etq.vista}"></label> <select th:field="*{vista}"
+												class="form-control" id="select">
+												<option value="G">General</option>
+												<option value="E">Por Empresa</option>
+											</select>
+										</div>
+										<br />
+										<div id="vistaEmpresa" class="form-group"
+											style="display: none;">
+											<label for="empresa" class="col-form-label"
+												th:text="#{etq.login.beca.cambiar}"></label> <select
+												th:field="*{empresa.idEmpresa}" class="form-control">
+												<option th:each="empresa : *{empresas}"
+													th:value="${empresa.idEmpresa}"
+													th:utext="${empresa.empresa}" />
+											</select>
+										</div>
+										<br />
+										<div class="form-group" Style="text-align: center;">
+											<input type="submit" class="btn btn-dark btn-user btn-block"
+												th:value="#{bot.login}">
+										</div>
+										<br />
+									</form>
+								</div>
+							</div>
+						</div>
 					</div>
-					<br/>
-                    <div id="vistaEmpresa" class="form-group" style="display: none;">
-                    <label for="empresa" class="col-form-label" th:text="#{etq.login.beca.cambiar}"></label>                   		                        
-			           	<select th:field="*{empresa.idEmpresa}" class="form-control">
-					    	<option th:each="empresa : *{empresas}"
-					        	th:value="${empresa.idEmpresa}"
-					            th:utext="${empresa.empresa}"/>
-					    </select>
-                    </div>
-                    <br/>                    
-                    <div class="form-group" Style="text-align: center;">
-                    	<input type="submit" class="btn btn-dark btn-user btn-block" th:value="#{bot.login}">                        	
-                    </div>
-                    <br/>  
-                 </form>                
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-<th:block th:replace="fragments/modals :: sessionModal" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block th:replace="fragments/modals :: sessionModal" />
 
-  <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!-- Bootstrap core JavaScript-->
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+	<!-- Core plugin JavaScript-->
+	<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 	<script src="js/sessionCheck.js"></script>
-  <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
-  <script type="text/javascript">
-  $("select" ).change(function() {
-	  var seleccion=$("select" ).val();
-	 	if(seleccion =="G"){
-	 		$('#vistaEmpresa').hide();	 		
-	 	}else{
-	 		$("#vistaEmpresa").css("display", "block");
-	 	}
-	});
-  </script>
+	<!-- Custom scripts for all pages-->
+	<script src="js/sb-admin-2.min.js"></script>
+	<script type="text/javascript">
+		$("select").change(function() {
+			var seleccion = $("#select").val();
+			if (seleccion == "G") {
+				$('#vistaEmpresa').hide();
+			} else {
+				$("#vistaEmpresa").css("display", "block");
+			}
+		});
+		$(document).ready(function() {
+			var tv = $("#tipoVista").val();
+			if (tv == "E") {
+				$("#txtTipoVista").val("Por Empresa");
+				$("#vistaEmpresa").css("display", "block");
+			}
+		});
+	</script>
 
 </body>
 

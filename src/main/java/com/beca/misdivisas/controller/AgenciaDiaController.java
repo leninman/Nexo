@@ -9,9 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
+
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.ObjectFactory;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,9 +44,6 @@ public class AgenciaDiaController {
 	private ObjectFactory<HttpSession> factory;
 
 	@Autowired
-	private HttpServletRequest request;
-
-	@Autowired
 	private LogService logServ;
 
 	@Autowired
@@ -69,7 +65,7 @@ public class AgenciaDiaController {
 	@GetMapping("/agenciaDiasResult")
 	public String agenciaDiaResult(Model model) {
 		getAgenciaDias(model);
-		return "agencia/agenciaDias";
+		return Constantes.OP_AGENCIA_DIAS_VIEW;
 
 	}
 
@@ -105,7 +101,12 @@ public class AgenciaDiaController {
 		Date fechaInicial = new Date();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(fechaInicial);
+		calendar.set(Calendar.HOUR, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
 		calendar.add(Calendar.DATE, 1);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		fechaInicial = calendar.getTime();
 		final List<String> listaFeriados = feriadoRepository.findAllFechaMayorQue(new Date()).stream()
 				.map((feriado) -> simpleDateFormat.format(feriado.getFecha())).collect(Collectors.toList());
@@ -139,17 +140,21 @@ public class AgenciaDiaController {
 			agenciaDO.setAgencia(ag.getAgencia() + "  " + descripcion);
 			agenciaDO.setIdAgencia(ag.getIdAgencia());
 			agenciaDO.setnAgencia(ag.getNumeroAgencia());
+			agenciaDO.setIdEstatusAgencia(ag.getIdEstatusAgencia());
 			agenciaDO.setAlmacenamiento(ag.getAlmacenamiento());
 			agenciaDO.setRecaudacion(ag.getRecaudacion());
+			
 			List<AgenciaFechaOperaciones> fechaOperaciones = new ArrayList<>();
 			localDates.stream().forEach(date -> {
-				boolean habilitado = agenciaDia.stream().filter(agd -> agd.getIdAgencia().intValue() == ag.getIdAgencia().intValue()
+				boolean habilitado = agenciaDia.stream().filter(agd -> agd.getIdAgencia().equals(ag.getIdAgencia())
 						&& simpleDateFormat.format(agd.getFecha()).equals(date)).count() > 0;
 				fechaOperaciones.add(new AgenciaFechaOperaciones(date, habilitado));
 			});
 
 			agenciaDO.setAgenciaFechaOperaciones(fechaOperaciones);
+			if(ag.getIdEstatusAgencia() != 2) {
 			agenciaDiaOperacionesList.add(agenciaDO);
+			}
 		});
 
 		AgenciaDiaOperaciones agenciaDiaOperaciones = new AgenciaDiaOperaciones();

@@ -36,6 +36,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.beca.misdivisas.api.detectidclient.client.MicroServicioClienteDetectIDClient;
+import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdRequest;
+import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdResponseCRUD;
+import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdResponseGet;
+import com.beca.misdivisas.api.detectidotp.client.MicroServicioOTPDetectIDClient;
+import com.beca.misdivisas.api.detectidotp.model.OtpRequest;
+import com.beca.misdivisas.api.detectidotp.model.OtpResponse;
 import com.beca.misdivisas.interfaces.IAgenciaRepo;
 import com.beca.misdivisas.interfaces.IAutorizadoRepo;
 import com.beca.misdivisas.interfaces.IEstatusSolicitudRetiroRepo;
@@ -63,6 +70,7 @@ import com.beca.misdivisas.model.AutorizadoPersonaNatural;
 import com.beca.misdivisas.model.ReporteSolicitudRetiro;
 import com.beca.misdivisas.model.SolicitudRetiroModel;
 import com.beca.misdivisas.model.SolicitudTrazaModel;
+import com.beca.misdivisas.model.ValidarOtpModel;
 import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.util.AutorizadoUtils;
 import com.beca.misdivisas.util.Constantes;
@@ -105,17 +113,23 @@ public class SolicitudRetiroController {
 
 	@Autowired
 	private IFeriadoRepo feriadoRepository;
-	
+
 	@Autowired
 	private IEstatusSolicitudRetiroRepo estatusSolicitudRetiroRepo;
-	
+
 	@Autowired
 	private ITransportistaRepo transportistaRepo;
-	
-	//ocasiona error al desplegar en el TomEE
-	//@PersistenceContext
+
+	// ocasiona error al desplegar en el TomEE
+	// @PersistenceContext
 //	private EntityManager entityManager;
-	
+
+	@Autowired
+	private MicroServicioClienteDetectIDClient microServicioClienteDetectIDClient;
+
+	@Autowired
+	private MicroServicioOTPDetectIDClient microServicioOTPDetectIDClient;
+
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
 
@@ -147,7 +161,7 @@ public class SolicitudRetiroController {
 		setModelData(model, usuario.getIdEmpresa());
 
 		model.addAttribute(Constantes.CREAR, true);
-		//model.addAttribute("crearSolicitud", true);
+		// model.addAttribute("crearSolicitud", true);
 		final List<Feriado> listaFeriados = feriadoRepository.findAllFechaMayorQue(new Date());
 		final List<String> feriados = listaFeriados.stream()
 				.map((feriado) -> simpleDateFormat.format(feriado.getFecha())).collect(Collectors.toList());
@@ -174,7 +188,7 @@ public class SolicitudRetiroController {
 
 		final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
 		solicitudRetiroTraza.setIdUsuario(usuario.getIdUsuario());
-		if(usuario.getIdUsuario()==null)
+		if (usuario.getIdUsuario() == null)
 			solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
 		solicitudRetiroTraza.setIdSolicitud(newSolicitudRetiro.getIdSolicitud());
 		solicitudRetiroTraza.setIdEstatusSolicitud(1);
@@ -200,7 +214,8 @@ public class SolicitudRetiroController {
 		} else {
 			setModelData(model, solicitudRetiro.getIdEmpresa());
 			model.addAttribute(Constantes.CREAR, false);
-			final SolicitudRetiroModel solicitudRetiroModel = convertirSolicitudRetiroASolicitudRetiroModel(solicitudRetiro);
+			final SolicitudRetiroModel solicitudRetiroModel = convertirSolicitudRetiroASolicitudRetiroModel(
+					solicitudRetiro);
 			model.addAttribute("solicitudRetiroModel", solicitudRetiroModel);
 			return Constantes.OP_SOLICITUD_RETIRO_FORM;
 		}
@@ -223,7 +238,7 @@ public class SolicitudRetiroController {
 
 		final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
 		solicitudRetiroTraza.setIdUsuario(usuario.getIdUsuario());
-		if(usuario.getIdUsuario()==null)
+		if (usuario.getIdUsuario() == null)
 			solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
 		solicitudRetiroTraza.setIdSolicitud(solicitudRetiroModel.getIdSolicitud());
 		solicitudRetiroTraza.setIdEstatusSolicitud(2);
@@ -255,7 +270,7 @@ public class SolicitudRetiroController {
 		} else {
 			final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
 			solicitudRetiroTraza.setIdUsuario(usuario.getIdUsuario());
-			if(usuario.getIdUsuario()==null)
+			if (usuario.getIdUsuario() == null)
 				solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
 			solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
 			solicitudRetiroTraza.setIdEstatusSolicitud(3);
@@ -291,8 +306,9 @@ public class SolicitudRetiroController {
 			long time = date.getTime();
 			Timestamp ts = new Timestamp(time);
 
-			final List<SolicitudRetiroTraza> solicitudesRetiroTraza = solicitudesRetiro.stream().map(
-					solicitud -> new SolicitudRetiroTraza(solicitud.getIdSolicitud(), 3, usuario.getIdUsuario(), ts,usuario.getIdUsuario()==null?usuario.getNombreUsuario():null))
+			final List<SolicitudRetiroTraza> solicitudesRetiroTraza = solicitudesRetiro.stream()
+					.map(solicitud -> new SolicitudRetiroTraza(solicitud.getIdSolicitud(), 3, usuario.getIdUsuario(),
+							ts, usuario.getIdUsuario() == null ? usuario.getNombreUsuario() : null))
 					.collect(Collectors.toList());
 
 			solicitudRetiroTrazaRepo.saveAll(solicitudesRetiroTraza);
@@ -304,7 +320,7 @@ public class SolicitudRetiroController {
 			return "redirect:solicitudesRetiro?success";
 		}
 	}
-	
+
 	@PostMapping("cancelarSolicitudRetiro")
 	public String cancelarSolicitudRetiro(@RequestParam("idSolicitud") int id,
 			@ModelAttribute("accionFrom") String accionFrom, Model model) {
@@ -322,7 +338,7 @@ public class SolicitudRetiroController {
 			if (usuario.getIdUsuario() == null)
 				solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
 			solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
-			solicitudRetiroTraza.setIdEstatusSolicitud(9);
+			solicitudRetiroTraza.setIdEstatusSolicitud(10);
 			Date date = new Date();
 			long time = date.getTime();
 			Timestamp ts = new Timestamp(time);
@@ -342,74 +358,88 @@ public class SolicitudRetiroController {
 		}
 	}
 
-
 	@GetMapping("/solicitudesListar")
 	public String listarSolicitudes(Model model) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		final List<SolicitudRetiroModel> listaSolicitudes = getSolicitudesRetiro(usuario.getIdEmpresa(), 1, 2);
 		model.addAttribute("solicitudesRetiro", listaSolicitudes);
-
 		return Constantes.OP_SOLICITUDES_RETIRO_LISTA;
 	}
 
 	private List<SolicitudRetiroModel> getSolicitudesRetiro(Integer idEmpresa, Integer estatusA, Integer estatusB) {
-		final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa) : solicitudRetiroRepo.findAll();
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		//usuario.getIdAgencia();
+		//int idAgencia = usuario.getIdAgencia();
+		final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
+		 : solicitudRetiroRepo.findAll();
+		//final List<SolicitudRetiro> solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
+		//		: solicitudRetiroRepo.findByIdAgencia(idAgencia);
 		final List<SolicitudRetiroModel> listaSolicitudes = new ArrayList<SolicitudRetiroModel>();
-		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud).collect(Collectors.toList());
+		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud)
+				.collect(Collectors.toList());
 		final List<SolicitudRetiroTraza> solicitudTrazas = solicitudRetiroTrazaRepo.findByIdSolicitudIn(solicitudesIds);
 
 		solicitudes.stream().forEach((solicitud) -> {
 			final Optional<SolicitudRetiroTraza> solicitudTraza = solicitudTrazas.stream()
-					.filter(traza -> traza.getIdSolicitud().equals(solicitud.getIdSolicitud())).sorted(new SortByIdTraza())
-					.findFirst();
+					.filter(traza -> traza.getIdSolicitud().equals(solicitud.getIdSolicitud()))
+					.sorted(new SortByIdTraza()).findFirst();
 			if (solicitudTraza.isPresent() && (solicitudTraza.get().getIdEstatusSolicitud().equals(estatusA)
 					|| (estatusB != null && solicitudTraza.get().getIdEstatusSolicitud().equals(estatusB)))) {
-				
+
 				if (solicitud.getAutorizado().getIdTipoAutorizado().intValue() == 3) {
 //					entityManager.detach(solicitud.getAutorizado());
-					Optional <Transportista> transportista = transportistaRepo.findById(solicitud.getAutorizado().getIdTransportista());
+					Optional<Transportista> transportista = transportistaRepo
+							.findById(solicitud.getAutorizado().getIdTransportista());
 					solicitud.getAutorizado().setRifEmpresa(transportista.get().getRif());
 					solicitud.getAutorizado().setNombreEmpresa(transportista.get().getTransportista());
 				}
-				
-				listaSolicitudes.add(new SolicitudRetiroModel(solicitud.getIdSolicitud(),
+
+				listaSolicitudes.add(new SolicitudRetiroModel(solicitud.getIdSolicitud(), solicitud.getCartaPorte(),
 						dateFormat.format(solicitud.getFechaEstimada()), solicitud.getMonto(),
 						solicitud.getTipoBillete(), solicitud.getAgencia(), solicitud.getAutorizado(),
-						solicitud.getMoneda(), solicitudTraza.get().getEstatusSolicitudRetiro().getEstatusSolicitud(),solicitud.getEmpresa().getEmpresa()));
+						solicitud.getMoneda(), solicitudTraza.get().getEstatusSolicitudRetiro().getEstatusSolicitud(),
+						solicitud.getEmpresa().getEmpresa()));
 			}
 		});
 
 		return listaSolicitudes;
 	}
 
-	private List<ReporteSolicitudRetiro> getReporteSolicitudesRetiro(Integer idEmpresa, Date fechaInicio, Date fechaFin,Integer idMoneda, Integer estatus) {
+	private List<ReporteSolicitudRetiro> getReporteSolicitudesRetiro(Integer idEmpresa, Date fechaInicio, Date fechaFin,
+			Integer idMoneda, Integer estatus) {
 		final List<SolicitudRetiro> solicitudes = solicitudRetiroRepo.findByIdEmpresaAndIdMoneda(idEmpresa, idMoneda);
 		final List<ReporteSolicitudRetiro> listaSolicitudes = new ArrayList<ReporteSolicitudRetiro>();
 		final List<Integer> solicitudesIds = solicitudes.stream().map(SolicitudRetiro::getIdSolicitud)
 				.collect(Collectors.toList());
 		final List<SolicitudRetiroTraza> solicitudTrazas = estatus.intValue() == -1
 				? solicitudRetiroTrazaRepo.findByIdSolicitudInAndFecha(solicitudesIds, fechaInicio, fechaFin)
-				: solicitudRetiroTrazaRepo.findByIdSolicitudInAndFechaAndIdEstatus(solicitudesIds, fechaInicio,fechaFin, estatus);
+				: solicitudRetiroTrazaRepo.findByIdSolicitudInAndFechaAndIdEstatus(solicitudesIds, fechaInicio,
+						fechaFin, estatus);
 		solicitudes.stream().forEach((solicitud) -> {
 			final Optional<SolicitudRetiroTraza> solicitudTraza = solicitudTrazas.stream()
-			.filter(traza -> traza.getIdSolicitud().equals(solicitud.getIdSolicitud())).sorted(new SortByIdTraza()).findFirst();
+					.filter(traza -> traza.getIdSolicitud().equals(solicitud.getIdSolicitud()))
+					.sorted(new SortByIdTraza()).findFirst();
 			if (solicitudTraza.isPresent()) {
 				final SolicitudRetiroTraza traza = solicitudTraza.get();
 				if (solicitud.getAutorizado().getIdTipoAutorizado().intValue() == 3) {
-					Optional <Transportista> transportista = transportistaRepo.findById(solicitud.getAutorizado().getIdTransportista());
+					Optional<Transportista> transportista = transportistaRepo
+							.findById(solicitud.getAutorizado().getIdTransportista());
 					solicitud.getAutorizado().setRifEmpresa(transportista.get().getRif());
 					solicitud.getAutorizado().setNombreEmpresa(transportista.get().getTransportista());
 				}
-				String estado = (traza.getMotivoRechazo() == null || traza.getMotivoRechazo().getMotivo() == null || traza.getMotivoRechazo().getMotivo().trim().equals("")) ? 
-						traza.getEstatusSolicitudRetiro().getEstatusSolicitud() : traza.getEstatusSolicitudRetiro().getEstatusSolicitud() + " - (" + traza.getMotivoRechazo().getMotivo() + ")";
-				
-				String usuario = (traza.getIdUsuario()== null || traza.getUsuario() == null) ? traza.getCodigoUsuario() : traza.getUsuario().getNombreCompleto();
-				
+				String estado = (traza.getMotivoRechazo() == null || traza.getMotivoRechazo().getMotivo() == null
+						|| traza.getMotivoRechazo().getMotivo().trim().equals(""))
+								? traza.getEstatusSolicitudRetiro().getEstatusSolicitud()
+								: traza.getEstatusSolicitudRetiro().getEstatusSolicitud() + " - ("
+										+ traza.getMotivoRechazo().getMotivo() + ")";
+
+				String usuario = (traza.getIdUsuario() == null || traza.getUsuario() == null) ? traza.getCodigoUsuario()
+						: traza.getUsuario().getNombreCompleto();
+
 				listaSolicitudes.add(new ReporteSolicitudRetiro(solicitud.getIdSolicitud(), solicitud.getCartaPorte(),
 						dateFormat.format(solicitud.getFechaEstimada()), solicitud.getMonto().intValue(),
 						solicitud.getTipoBillete(), solicitud.getAgencia(), solicitud.getAutorizado(),
-						solicitud.getMoneda(), estado,
-						longDateFormat.format(traza.getFecha()),usuario));
+						solicitud.getMoneda(), estado, longDateFormat.format(traza.getFecha()), usuario));
 			}
 		});
 		return listaSolicitudes;
@@ -444,7 +474,7 @@ public class SolicitudRetiroController {
 		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
 		usuarioModel.setUsuario(usuario);
 		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
-		//modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
+		// modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());
 		modelo.addAttribute(Constantes.SOLICTUD_RETIRO_ACCION_FROM, Constantes.OP_VALIDACION);
 		modelo.addAttribute("accion", Constantes.OP_VALIDAR);
 
@@ -485,7 +515,7 @@ public class SolicitudRetiroController {
 
 		return Constantes.OP_SOLICITUDES_RETIRO_VALIDAR_PROCESAR;
 	}
-	
+
 	@GetMapping(value = "/solicitudesRetiroEntregar")
 	public String getSolicitudesRetiroAEntregar(Model modelo) {
 		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
@@ -493,7 +523,7 @@ public class SolicitudRetiroController {
 		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
 		usuarioModel.setUsuario(usuario);
 		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
-		/*modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif());*/
+		/* modelo.addAttribute(Constantes.ID_EMPRESA, usuario.getEmpresa().getRif()); */
 		modelo.addAttribute(Constantes.SOLICTUD_RETIRO_ACCION_FROM, Constantes.OP_ENTREGA);
 
 		final List<SolicitudRetiroModel> listaSolicitudes = getSolicitudesRetiro(null, 7, null);
@@ -505,9 +535,8 @@ public class SolicitudRetiroController {
 				MessageFormat.format(Constantes.OPCION_STR_EFECTIVO, "Retiro"), Constantes.OP_ENTREGA, true,
 				Util.getRemoteIp(request), (Usuario) session.getAttribute(Constantes.USUARIO));
 
-		//return Constantes.OP_SOLICITUDES_RETIRO_VALIDAR_PROCESAR;
 		return Constantes.OP_SOLICITUDES_RETIRO_PROCESAR_ENTREGAR;
-	} 
+	}
 
 	@PostMapping("aprobarSolicitudRetiro")
 	public String aprobarSolicitudRetiro(@RequestParam("idSolicitudAprobar") int id, Model model) {
@@ -518,7 +547,7 @@ public class SolicitudRetiroController {
 		} else {
 			final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
 			solicitudRetiroTraza.setIdUsuario(usuario.getIdUsuario());
-			if(usuario.getIdUsuario()==null)
+			if (usuario.getIdUsuario() == null)
 				solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
 			solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
 			solicitudRetiroTraza.setIdEstatusSolicitud(4);
@@ -576,8 +605,9 @@ public class SolicitudRetiroController {
 			long time = date.getTime();
 			Timestamp ts = new Timestamp(time);
 
-			final List<SolicitudRetiroTraza> solicitudesRetiroTraza = solicitudesRetiro.stream().map(
-					solicitud -> new SolicitudRetiroTraza(solicitud.getIdSolicitud(), 4, usuario.getIdUsuario(), ts,usuario.getIdUsuario()==null?usuario.getNombreUsuario():null))
+			final List<SolicitudRetiroTraza> solicitudesRetiroTraza = solicitudesRetiro.stream()
+					.map(solicitud -> new SolicitudRetiroTraza(solicitud.getIdSolicitud(), 4, usuario.getIdUsuario(),
+							ts, usuario.getIdUsuario() == null ? usuario.getNombreUsuario() : null))
 					.collect(Collectors.toList());
 
 			solicitudRetiroTrazaRepo.saveAll(solicitudesRetiroTraza);
@@ -667,13 +697,114 @@ public class SolicitudRetiroController {
 			return Constantes.OP_SOLICITUD_RETIRO_ENTREGADAS_VIEW;
 		}
 	}
-	
+
+	@GetMapping("/generarOtpEntregaSolicitudRetiro")
+	public String generarOtpEntregaSolicitudRetiro(@RequestParam("idSolicitud") String id, Model model)
+			throws Exception {
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		ValidarOtpModel validarOtpModel = new ValidarOtpModel();
+		String idSolicitud = id;
+		int idS = Integer.parseInt(idSolicitud);
+		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(idS);
+		ClientesDetectIdRequest clientesDetectIdRequest = new ClientesDetectIdRequest();
+		OtpRequest otpRequest = new OtpRequest();
+
+		if (solicitudRetiro.getAutorizado() != null && solicitudRetiro.getAutorizado().getIdTipoAutorizado() != 3) {
+			clientesDetectIdRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
+			ClientesDetectIdResponseGet response = microServicioClienteDetectIDClient
+					.detectIdGet(clientesDetectIdRequest);
+
+			if (response.getDatos() == null) {
+				clientesDetectIdRequest.setIp("0:0:0:0:0:0:0:1");
+				clientesDetectIdRequest.setIpOrigen(Util.getRemoteIp(request));
+				clientesDetectIdRequest.setIdCanal(3);
+				clientesDetectIdRequest.setIdSesion(factory.getObject().getId());
+				clientesDetectIdRequest.setIdCliente("NEXODIVISAS");
+				clientesDetectIdRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
+				clientesDetectIdRequest
+						.setBusinessDescription(solicitudRetiro.getAutorizado().getNombreCompleto().trim());
+				clientesDetectIdRequest.setEmail(solicitudRetiro.getAutorizado().getEmail().trim());
+				clientesDetectIdRequest.setTelefono(solicitudRetiro.getAutorizado().getTelefonoMovil().trim());
+				microServicioClienteDetectIDClient.detectIdCRUD(clientesDetectIdRequest, "create");
+
+			} else if (response.getDatos() != null
+					&& (!response.getDatos().getTelefono().equals(solicitudRetiro.getAutorizado().getTelefonoMovil())
+							|| !response.getDatos().getEmail().equals(solicitudRetiro.getAutorizado().getEmail()))) {
+				clientesDetectIdRequest.setIp("0:0:0:0:0:0:0:1");
+				clientesDetectIdRequest.setIpOrigen(Util.getRemoteIp(request));
+				clientesDetectIdRequest.setIdCanal(3);
+				clientesDetectIdRequest.setIdSesion(factory.getObject().getId());
+				clientesDetectIdRequest.setIdCliente("NEXODIVISAS");
+				clientesDetectIdRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
+				clientesDetectIdRequest
+						.setBusinessDescription(solicitudRetiro.getAutorizado().getNombreCompleto().trim());
+				clientesDetectIdRequest.setEmail(solicitudRetiro.getAutorizado().getEmail().trim());
+				clientesDetectIdRequest.setTelefono(solicitudRetiro.getAutorizado().getTelefonoMovil().trim());
+				microServicioClienteDetectIDClient.detectIdCRUD(clientesDetectIdRequest, "update");
+			}
+			String idUsua = String.valueOf(solicitudRetiro.getAutorizado().getIdAutorizado());
+			otpRequest.setIdCanal(3);
+			otpRequest.setIdSesion(factory.getObject().getId());
+			otpRequest.setIdUsuario(idUsua);
+			otpRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
+			otpRequest.setChannel("NEXODIVISAS");
+			otpRequest.setModulo("EMAIL");
+			otpRequest.setIp("0:0:0:0:0:0:0:1");
+			otpRequest.setProposito("retirar la solicitud");
+			microServicioOTPDetectIDClient.crearValidarOTP(otpRequest, "generar");
+		}
+		validarOtpModel.setIdSolicitud(id);
+		model.addAttribute("validarOtpModel", validarOtpModel);
+		return "modals/validarOtpModal";
+
+	}
+
+	@PostMapping("/validarOtpEntregaSolicitudRetiro")
+	public String validarOtpEntregaSolicitudRetiro(@Valid ValidarOtpModel validarOtpModel, BindingResult result,
+			Model model) throws Exception {
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		boolean invalidOtp = false;
+		int idS = Integer.parseInt(validarOtpModel.getIdSolicitud());
+		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(idS);
+		OtpRequest otpRequest = new OtpRequest();
+		// String idUsua =
+		// String.valueOf(solicitudRetiro.getAutorizado().getIdAutorizado());
+		otpRequest.setIdCanal(3);
+		otpRequest.setIdSesion(factory.getObject().getId());
+		otpRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
+		otpRequest.setChannel("NEXODIVISAS");
+		otpRequest.setModulo("EMAIL");
+		otpRequest.setIp("0:0:0:0:0:0:0:1");
+		otpRequest.setOtp(validarOtpModel.getOtp());
+		otpRequest.setProposito("retirar la solicitud");
+		OtpResponse otpResponse = microServicioOTPDetectIDClient.crearValidarOTP(otpRequest, "validar");
+
+		if (otpResponse.getResultado() == null) {
+			invalidOtp = true;
+			model.addAttribute("validarOtpModel", validarOtpModel);
+			model.addAttribute("error", true);
+			return "modals/validarOtpModal";
+		}
+
+		final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
+		solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
+		solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
+		solicitudRetiroTraza.setIdEstatusSolicitud(9);
+		Date date = new Date();
+		long time = date.getTime();
+		Timestamp ts = new Timestamp(time);
+		solicitudRetiroTraza.setFecha(ts);
+		solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
+		return "redirect:solicitudesRetiroEntregar?success";
+	}
+
 	private void setDatosSolicitudModel(SolicitudRetiro solicitudRetiro, Model model) throws IOException {
-		
+
 		final SolicitudRetiroModel solicitudRetiroModel = new SolicitudRetiroModel(solicitudRetiro.getIdSolicitud(),
 				solicitudRetiro.getCartaPorte(), dateFormat.format(solicitudRetiro.getFechaEstimada()),
 				solicitudRetiro.getMonto(), solicitudRetiro.getTipoBillete(), solicitudRetiro.getAgencia(),
-				solicitudRetiro.getAutorizado(), solicitudRetiro.getMoneda(), solicitudRetiro.getEmpresa().getEmpresa());
+				solicitudRetiro.getAutorizado(), solicitudRetiro.getMoneda(),
+				solicitudRetiro.getEmpresa().getEmpresa());
 		final SolicitudRetiroTraza solicitudTraza = solicitudRetiroTrazaRepo
 				.findByIdSolicitud(solicitudRetiro.getIdSolicitud()).stream().sorted(new SortByIdTraza()).findFirst()
 				.get();
@@ -694,8 +825,9 @@ public class SolicitudRetiroController {
 		model.addAttribute(Constantes.CREAR, false);
 		switch (tipoAutorizacion) {
 		case 3:
-			final AutorizadoEmpresaTransporte autorizadoEmpresaTransporte = AutorizadoUtils.convertirAutorizadoToAutorizadoEmpresaTransporte(autorizado);
-			
+			final AutorizadoEmpresaTransporte autorizadoEmpresaTransporte = AutorizadoUtils
+					.convertirAutorizadoToAutorizadoEmpresaTransporte(autorizado);
+
 			model.addAttribute("autorizado", autorizadoEmpresaTransporte);
 			break;
 		case 4:
@@ -704,20 +836,26 @@ public class SolicitudRetiroController {
 			model.addAttribute("autorizado", autorizadoBeneficioTraspaso);
 			break;
 		case 1:
-			final AutorizadoPersonaNatural autorizadoPersonaNatural = AutorizadoUtils.convertirAutorizadoToAutorizadoPersonaNatural(autorizado);
-			if(autorizado.getImagenDocumento() != null &&  !autorizado.getImagenDocumento().isEmpty())
-				autorizadoPersonaNatural.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenDocumento(), "documentoImg"));
+			final AutorizadoPersonaNatural autorizadoPersonaNatural = AutorizadoUtils
+					.convertirAutorizadoToAutorizadoPersonaNatural(autorizado);
+			if (autorizado.getImagenDocumento() != null && !autorizado.getImagenDocumento().isEmpty())
+				autorizadoPersonaNatural.setImagenDocumento(
+						Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(), "documentoImg"));
 			model.addAttribute("autorizado", autorizadoPersonaNatural);
-			
+
 			break;
 		case 2:
-			final AutorizadoPersonaJuridica autorizadoPersonaJuridica = AutorizadoUtils.convertirAutorizadoToAutorizadoPersonaJuridica(autorizado);
-			if(autorizado.getImagenDocumento()!=null && !autorizado.getImagenDocumento().isEmpty())
-				autorizadoPersonaJuridica.setImagenDocumento(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenDocumento(), "documentoImg"));
-			if(autorizado.getImagenRif() != null && !autorizado.getImagenRif().isEmpty())
-				autorizadoPersonaJuridica.setImagenDocumentoRif(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenRif(), "documentoRifImg"));
-			if(autorizado.getImagenAdicional()!= null && !autorizado.getImagenAdicional().isEmpty())
-				autorizadoPersonaJuridica.setImagenDocumentoAdicional(Util.obtenerArchivoStr(rutaImg+autorizado.getImagenAdicional(), "documentoAdicionalImg"));
+			final AutorizadoPersonaJuridica autorizadoPersonaJuridica = AutorizadoUtils
+					.convertirAutorizadoToAutorizadoPersonaJuridica(autorizado);
+			if (autorizado.getImagenDocumento() != null && !autorizado.getImagenDocumento().isEmpty())
+				autorizadoPersonaJuridica.setImagenDocumento(
+						Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(), "documentoImg"));
+			if (autorizado.getImagenRif() != null && !autorizado.getImagenRif().isEmpty())
+				autorizadoPersonaJuridica.setImagenDocumentoRif(
+						Util.obtenerArchivoStr(rutaImg + autorizado.getImagenRif(), "documentoRifImg"));
+			if (autorizado.getImagenAdicional() != null && !autorizado.getImagenAdicional().isEmpty())
+				autorizadoPersonaJuridica.setImagenDocumentoAdicional(
+						Util.obtenerArchivoStr(rutaImg + autorizado.getImagenAdicional(), "documentoAdicionalImg"));
 			model.addAttribute("autorizado", autorizadoPersonaJuridica);
 			break;
 		}
@@ -765,35 +903,38 @@ public class SolicitudRetiroController {
 		usuarioModel.setUsuario(usuario);
 		modelo.addAttribute(Constantes.U_SUARIO, usuarioModel);
 		modelo.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
-		
-		final List <EstatusSolicitudRetiro> estatus = estatusSolicitudRetiroRepo.findAll();
+
+		final List<EstatusSolicitudRetiro> estatus = estatusSolicitudRetiroRepo.findByIdEstatusSolicitud();
 		modelo.addAttribute("estatusSolicitud", estatus);
 		modelo.addAttribute(Constantes.CLIENTE,
-				Util.formatRif(usuario.getEmpresa().getCaracterRif(), usuario.getEmpresa().getRif()) + " " + usuario.getEmpresa().getEmpresa());
-		logServ.registrarLog(Constantes.REPORTE_SOLICITUD_RETIRO, Constantes.REPORTE_SOLICITUD_RETIRO, Constantes.REPORTE_SOLICITUD_RETIRO,
-                true, Util.getRemoteIp(request), usuario);
+				Util.formatRif(usuario.getEmpresa().getCaracterRif(), usuario.getEmpresa().getRif()) + " "
+						+ usuario.getEmpresa().getEmpresa());
+		logServ.registrarLog(Constantes.REPORTE_SOLICITUD_RETIRO, Constantes.REPORTE_SOLICITUD_RETIRO,
+				Constantes.REPORTE_SOLICITUD_RETIRO, true, Util.getRemoteIp(request), usuario);
 		return Constantes.REPORTE_SOLICITUD_RETIRO;
 	}
 
 	@GetMapping(path = "/detalleSolicitudesRetiro/{fechaI}/{fechaF}/{moneda}/{estatus}", produces = "application/json")
 	@ResponseBody
-	public List<ReporteSolicitudRetiro> getDetalleSolicitudesRetiro(@PathVariable String fechaI, @PathVariable String fechaF,
-			@PathVariable String moneda, @PathVariable String estatus) {
+	public List<ReporteSolicitudRetiro> getDetalleSolicitudesRetiro(@PathVariable String fechaI,
+			@PathVariable String fechaF, @PathVariable String moneda, @PathVariable String estatus) {
 		DateFormat formato2 = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMMSS);
 
 		List<ReporteSolicitudRetiro> reporte = new ArrayList<>();
-		
+
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
 		try {
-		reporte = getReporteSolicitudesRetiro(usuario.getIdEmpresa(), formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
-				formato2.parse(fechaF + Constantes.FORMATO_HORA_235959), Integer.valueOf(moneda), Integer.valueOf(estatus));
+			reporte = getReporteSolicitudesRetiro(usuario.getIdEmpresa(),
+					formato2.parse(fechaI + Constantes.FORMATO_HORA_0),
+					formato2.parse(fechaF + Constantes.FORMATO_HORA_235959), Integer.valueOf(moneda),
+					Integer.valueOf(estatus));
 		} catch (ParseException e) {
-			logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, e.getLocalizedMessage(), Constantes.POSICION_CONSOLIDADA,
-					false, Util.getRemoteIp(request), usuario);
+			logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, e.getLocalizedMessage(),
+					Constantes.POSICION_CONSOLIDADA, false, Util.getRemoteIp(request), usuario);
 		}
 		String detalle = MessageFormat.format(Constantes.CONSULTA_POR_PARAMETROS, fechaI, fechaF, moneda);
-		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, detalle, Constantes.POSICION_CONSOLIDADA,
-				true, Util.getRemoteIp(request), usuario);
+		logServ.registrarLog(Constantes.POSICION_CONSOLIDADA, detalle, Constantes.POSICION_CONSOLIDADA, true,
+				Util.getRemoteIp(request), usuario);
 
 		return reporte;
 	}
@@ -818,9 +959,10 @@ public class SolicitudRetiroController {
 	private SolicitudRetiroModel convertirSolicitudRetiroASolicitudRetiroModel(final SolicitudRetiro solicitudRetiro)
 			throws Exception {
 		final SolicitudRetiroModel solicitudRetiroModel = new SolicitudRetiroModel(solicitudRetiro.getIdSolicitud(),
-				dateFormat.format(solicitudRetiro.getFechaEstimada()), solicitudRetiro.getMonto().setScale(0, BigDecimal.ROUND_FLOOR),
-				solicitudRetiro.getTipoBillete(), solicitudRetiro.getAgencia().getIdAgencia(),
-				solicitudRetiro.getAutorizado().getIdAutorizado(), solicitudRetiro.getMoneda().getIdMoneda());
+				dateFormat.format(solicitudRetiro.getFechaEstimada()),
+				solicitudRetiro.getMonto().setScale(0, BigDecimal.ROUND_FLOOR), solicitudRetiro.getTipoBillete(),
+				solicitudRetiro.getAgencia().getIdAgencia(), solicitudRetiro.getAutorizado().getIdAutorizado(),
+				solicitudRetiro.getMoneda().getIdMoneda());
 
 		return solicitudRetiroModel;
 	}
@@ -838,23 +980,25 @@ public class SolicitudRetiroController {
 	}
 
 	private void setModelData(Model model, int idEmpresa) throws Exception {
-		final List<Autorizado> autorizados = autorizadoRepository.findByidTipoAutorizadoInAndEstadoAndIdEmpresaOrderByIdTipoAutorizadoAscDocumentoIdentidadAsc(tiposAutorizado, Constantes.ACTIVO, idEmpresa);
+		final List<Autorizado> autorizados = autorizadoRepository
+				.findByidTipoAutorizadoInAndEstadoAndIdEmpresaOrderByIdTipoAutorizadoAscDocumentoIdentidadAsc(
+						tiposAutorizado, Constantes.ACTIVO, idEmpresa);
 		final List<AutorizadoModel> autorizadosBanco = autorizados.stream().map(autorizado -> {
 			if (autorizado.getIdTipoAutorizado() == 3) {
-				
-				Optional <Transportista> transportista = transportistaRepo.findById(autorizado.getIdTransportista());
-				
+
+				Optional<Transportista> transportista = transportistaRepo.findById(autorizado.getIdTransportista());
+
 				return new AutorizadoModel(autorizado.getIdAutorizado(),
 						transportista.get().getRif() + " " + transportista.get().getTransportista());
-			} else if (autorizado.getIdTipoAutorizado() == 1) { 
+			} else if (autorizado.getIdTipoAutorizado() == 1) {
 				return new AutorizadoModel(autorizado.getIdAutorizado(),
 						autorizado.getDocumentoIdentidad() + " " + autorizado.getNombreCompleto());
-			} else if (autorizado.getIdTipoAutorizado() == 2) { 
+			} else if (autorizado.getIdTipoAutorizado() == 2) {
 				return new AutorizadoModel(autorizado.getIdAutorizado(),
-						autorizado.getDocumentoIdentidad() + " " + autorizado.getNombreCompleto() + " " + autorizado.getRifEmpresa() + " " + autorizado.getNombreEmpresa());
-			}
-			else {
-				return new AutorizadoModel(autorizado.getIdAutorizado(),autorizado.getNombreCompleto());
+						autorizado.getDocumentoIdentidad() + " " + autorizado.getNombreCompleto() + " "
+								+ autorizado.getRifEmpresa() + " " + autorizado.getNombreEmpresa());
+			} else {
+				return new AutorizadoModel(autorizado.getIdAutorizado(), autorizado.getNombreCompleto());
 			}
 		}).collect(Collectors.toList());
 		model.addAttribute("autorizados", autorizadosBanco);

@@ -26,6 +26,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -307,4 +308,27 @@ public class Util {
 		}
 		return resp;
 	}
+	
+	/*public static List<String> invertirArreglo(List<String> arreglo) {
+	
+	String temporal; // El elemento temporal del arreglo que vamos a intercambiar
+	
+	int longitudDeArreglo = arreglo.size();
+	 // Nota: al dividir entre 2, si es flotante, se pasa al entero anterior. P. ej.
+    // 5 / 2 = 2
+	
+	
+    for (int i = 0; i < longitudDeArreglo/ 2; i++) {
+    	 // Guardar el actual
+        temporal = arreglo.get(i);
+        // El índice de la otra mitad
+        int indiceContrario = longitudDeArreglo - i - 1;
+        // El valor actual es el valor contrario, el de la otra mitad
+        arreglo.get(i) = arreglo[indiceContrario];
+        
+    }
+
+    return n;
+	
+}*/
 }

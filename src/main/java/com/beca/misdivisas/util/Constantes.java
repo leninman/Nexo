@@ -95,6 +95,7 @@ public final class Constantes {
 	public static final String OP_ENTREGAR = "Entregar";
 	public static final String OP_CANCELAR = "Cancelar";
 
+
 	public static final String OP_DESCARGA = "Descarga";
 	public static final String OP_SOLICITUD = "Solicitud";
 	public static final String OP_CREAR_PERFIL = "crearPerfil";
@@ -112,7 +113,10 @@ public final class Constantes {
 	public static final String OP_AUTORIZADOS_PER_JURIDICA = "solicitudes/autorizacion/personaJuridica";
 	public static final String OP_SOLICITUDES_RETIRO = "solicitudes/retiroEfectivo/main";
 	public static final String OP_SOLICITUDES_RETIRO_LISTA = "solicitudes/retiroEfectivo/lista";
+	//public static final String OP_SOLICITUDES_RETIRO_LISTA_ENTREGAR = "solicitudes/retiroEfectivo/listaSolicitudesAprobadasValidadasEntregar";
+	public static final String OP_SOLICITUDES_RETIRO_ENTREGAR = "solicitudes/retiroEfectivo/Entregar";
 	public static final String OP_SOLICITUD_RETIRO_FORM = "solicitudes/retiroEfectivo/retiroEfectivo";
+	
 	public static final String OP_GENERACION = "RetiroEfectivo/Generacion";
 	public static final String OP_SOLICITUDES_RETIRO_APROBAR = "solicitudes/retiroEfectivo/aprobarMain";
 	public static final String OP_APROBACION = "RetiroEfectivo/Aprobacion";
@@ -133,6 +137,8 @@ public final class Constantes {
 	public static final String OP_RETIROS_FORM = "retiros/retiro";
 	public static final String OP_DEPOSITOS_DETALLE_FORM = "depositos/detalle";
 	public static final String OP_RETIROS_DETALLE_FORM = "retiros/detalle";
+	public static final String OP_AGENCIA_DIAS_VIEW = "agencia/agenciaDias";
+	public static final String OP_DISPONIBILIDAD_AGENCIA_DIAS_VIEW = "agencia/disponibilidadAgenciaDias";
 	public static final String VOUCHER_DEPOSITO = "depositos/voucherDeposito";
 	public static final String VOUCHER_RETIRO = "retiros/voucherRetiro";
 	
@@ -215,6 +221,7 @@ public final class Constantes {
 	public static final String CREARRETIRO = "crearRetiro";
 	public static final String VERDEPOSITO = "verdeposito";
 	public static final String VERVOUCHER = "verVoucher";
+	public static final String VERRETIRO = "verretiro";
 	
 	public static final String INDEX = "index";
 	public static final String GRAFICO = "grafico";
@@ -222,6 +229,7 @@ public final class Constantes {
 	public static final String ESTADOS = "estados";
 	public static final String MUNICIPIOS = "municipios";
 	public static final String MAPA = "mapa";
+	public static final String MAPA_AGENCIA_DIA= "mapaAgenciaDia";
 	public static final String MAPA_AGENCIA = "agencia/mapaAgencia";
 	public static final String TIPO_MAPA = "tipoMapa";
 	public static final String VISTA_GENERAL = "Vista general";
@@ -341,5 +349,7 @@ public final class Constantes {
 
 	public static final String AGENCIA_DIAS = "agenciaDias";
 	public static final String AGENCIA_DIAS_MODEL = "agenciaDiaOperaciones";
+
+	
 	
 }

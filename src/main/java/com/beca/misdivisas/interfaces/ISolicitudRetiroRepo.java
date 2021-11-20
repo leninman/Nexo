@@ -11,4 +11,5 @@ public interface ISolicitudRetiroRepo extends JpaRepository<SolicitudRetiro, Int
 	public List<SolicitudRetiro> findByIdEmpresa(int idEmpresa);
 	public List<SolicitudRetiro> findByIdAutorizado(int idAutorizado);
 	public List<SolicitudRetiro> findByIdEmpresaAndIdMoneda(int idEmpresa, int idMoneda);
+	public List<SolicitudRetiro> findByIdAgencia(int idAgencia);
 }

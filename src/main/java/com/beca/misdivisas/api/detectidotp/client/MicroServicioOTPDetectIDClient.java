@@ -41,7 +41,8 @@ public class MicroServicioOTPDetectIDClient extends MicroservicioClient implemen
 			response = cliente.postForObject(urlOtp+"/"+operacion, entity, OtpResponse.class);
 		} catch (RestClientException e) {
 			logger.info(e.getLocalizedMessage());
-			throw e;
+			//throw e;
+			return response;
 		}
 		logger.info(response.toString());
 		return response;

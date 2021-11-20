@@ -20,35 +20,41 @@
 				<div class="container my-5">
 					<div>
 						<div class="col-md-12">
-							<table
+							<table id="tabla"
 								class="table table-striped table-responsive-md table-hover">
 								<thead>
+								<tr>
+										<td colspan="10"><input id="buscar" type="text"
+											class="form-control" placeholder="Buscador de Solicitudes de Retiro" />
+										</td>
+									</tr>
 									<tr>
 										<th th:text="#{etq.empresa}"></th>
+								  		<th th:text="#{etq.carta.porte}"></th>  
 										<th th:text="#{etq.retiro.tipo.billete}"></th>
 										<th style="width: 12%;" th:text="#{etq.retiro.fecha.estimada}"></th>
-										<th th:text="#{etq.retiro.agencia}"></th>
+								<!--  	<th th:text="#{etq.retiro.agencia}"></th> -->	
  										<th th:text="#{etq.retiro.tipo.autorizado}"></th>
 										<th th:text="#{etq.retiro.autorizado}"></th>
 										<th th:text="#{etq.retiro.moneda}"></th>
 										<th th:text="#{etq.retiro.monto}"></th>
-										<th th:text="#{etq.retiro.estatus}"></th>
+								<!--  	<th th:text="#{etq.retiro.estatus}"></th> -->
 										<th th:text="#{etq.acciones}"></th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr th:each="solicitud : ${solicitudesRetiro}">
 										<td th:text="${solicitud.nombreEmpresa}"></td>
+										<td th:text="${solicitud.cartaPorte}"></td>  
 										<td th:text="${solicitud.tipoBillete}"></td>
 										<td th:text="${solicitud.fechaEstimada}"></td>
-										<td
-											th:text="${#numbers.formatInteger(solicitud.agencia.numeroAgencia, 3) + ' - ' + solicitud.agencia.agencia}"></td>
+							<!--    	<td th:text="${#numbers.formatInteger(solicitud.agencia.numeroAgencia, 3) + ' - ' + solicitud.agencia.agencia}"></td>  -->	
 										<td th:text="${solicitud.autorizado.tipoAutorizado.tipoAutorizado}"></td> 
 										<td th:text="${solicitud.nombreAutorizado}"></td>
 										<td th:text="${solicitud.moneda.moneda}"></td>
 										<td
 											th:text="${#numbers.formatDecimal(solicitud.monto, 0, 'POINT', 2, 'COMMA')}"></td>
-										<td th:text="${solicitud.estatus}"></td>
+								<!--   <td th:text="${solicitud.estatus}"></td> -->		
 								  	<td>
 											<button type="button" name="editar" class="btn btn-secondary"
 												th:title="#{msj.solicitud.retiro.revisar}"

@@ -31,17 +31,24 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			"/agregarAutorizadoPersonaNatural", "/agregarAutorizadoPersonaJuridica", "/autorizadosListar",
 			"/autorizadoEditar", "/autorizadoEliminar", "/solicitudesRetiro", "/nuevaSolicitudRetiro",
 			"/crearSolicitudRetiro", "/editarSolicitudRetiro", "/anularSolicitudRetiro", "/getSolicitudRetiroValidar",
-			"/getSolicitudRetiroAprobar", "/getSolicitudRetiroEntregar", "/validarSolicitudRetiro", "/procesarSolicitudRetiro",
-			"/getSolicitudRetiroProcesar", "/anularSolicitudesRetiro", "/rechazarSolicitudRetiro",
-			"/anularSolicitudesRetiro", "/aprobarSolicitudRetiro", "/aprobarSolicitudesRetiro", "/listarTipoAutorizado", "/cancelarSolicitudRetiro");
+			"/getSolicitudRetiroAprobar", "/getSolicitudRetiroEntregar", "/validarSolicitudRetiro",
+			"/procesarSolicitudRetiro", "/getSolicitudRetiroProcesar", "/anularSolicitudesRetiro",
+			"/rechazarSolicitudRetiro", "/anularSolicitudesRetiro", "/aprobarSolicitudRetiro",
+			"/aprobarSolicitudesRetiro", "/listarTipoAutorizado", "/cancelarSolicitudRetiro", "/mapaAgenciaResult",
+			"/entregarSolicitudRetiro", "/validarOtpEntregaSolicitudRetiro", "/depositos", "/nuevoDeposito",
+			"/detalleDeposito", "/autorizarReverso", "/ejecutarReverso", "/agregarDeposito", "/voucher", "/retiros",
+			"/nuevoRetiro", "/detalleRetiro", "/autorizarReversoRetiro", "/ejecutarReversoRetiro", "/agregarRetiro",
+			"/voucherRetiro", "/solicitudesMasivas", "/cargarSolicitudRetiro", "/solicitudesMasivas",
+			"/crearSolicitudesDeRetiro");
 
 	private static final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico",
 			"/mainBECA", "/usuarioChange", "/403", "/404", "/405", "/error", "/access-denied", "/errorPage");
 
 	private static final List<String> REPORTES_URL = Arrays.asList("/remesa", "/remesaNoApta", "/irregularidades",
-			"/remesabycartaporte", "/totalPorSucursal", "/remesaEntregaPendiente", "/remesasPendientes", "/reporteSolicitudRetiro");
+			"/remesabycartaporte", "/totalPorSucursal", "/remesaEntregaPendiente", "/remesasPendientes",
+			"/reporteSolicitudRetiro");
 
-	private static final List<String> MAPA_URLS = Arrays.asList("/sucursales", "/agencias");
+	private static final List<String> MAPA_URLS = Arrays.asList("/sucursales", "/agencias", "/mapaAgenciaResult");
 
 	private static final List<String> USER_URLS = Arrays.asList("/usuarioMainAgregar", "/usuarioListar",
 			"/resultadoCambio", "/usuarioEditar", "/usuarioAgregar", "/usuarioUpdate", "/usuarioEliminar", "/cert",
@@ -53,9 +60,10 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 	private static final List<String> EMPRESA_URLS = Arrays.asList("/crearEmpresa", "/empresaListar", "/empresaEditar",
 			"/empresaAgregar", "/empresaActualizar", "/municipios", "/sucursalHome", "/sucursalCrear",
 			"/sucursalListar", "/sucursalEditar", "/sucursalAgregar", "/sucursalActualizar");
-	
+
 	private static final List<String> AGENCIA_URLS = Arrays.asList("/crearAgencia", "/agenciaListar", "/agenciaEditar",
-			"/agenciaAgregar", "/agenciaActualizar", "/municipios", "/agencias", "/agenciaDiaAgregar", "/agenciaDias", "/agenciaDiasResult");
+			"/agenciaAgregar", "/agenciaActualizar", "/municipios", "/agencias", "/agenciaDiaAgregar", "/agenciaDias",
+			"/agenciaDiasResult");
 
 	private static final List<String> PERFIL_URLS = Arrays.asList("/crearPerfilHome", "/crearPerfil",
 			"/editarPerfilHome", "/editarPerfil", "/eliminarPerfil", "/perfiles");
@@ -125,7 +133,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 				response.sendRedirect(request.getContextPath() + "/cambiarContrasena");
 				return false;
 			}
-			//request.getSession().setAttribute(Constantes.DOMINIO_PROD, dominio);
+			// request.getSession().setAttribute(Constantes.DOMINIO_PROD, dominio);
 			final List<Menu> menues = ((List<Menu>) factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 			final List<String> urlMenues = getMenuPath(menues);
 			urlMenues.addAll(menues.stream().flatMap(menu -> menu.getSubMenu().stream())
@@ -145,7 +153,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			if (urlMenues.stream().anyMatch((menu) -> USER_URLS.contains(menu)) && USER_URLS.contains(servletPath)) {
 				return true;
 			}
-			if (FORM_PATHS.contains(servletPath)){
+			if (FORM_PATHS.contains(servletPath)) {
 				return true;
 			}
 

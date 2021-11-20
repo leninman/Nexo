@@ -32,6 +32,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.tika.Tika;
 
+import com.beca.misdivisas.api.detectidclient.client.MicroServicioClienteDetectIDClient;
+import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdRequest;
+import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdResponseGet;
 import com.beca.misdivisas.interfaces.IAutorizadoRepo;
 import com.beca.misdivisas.interfaces.ISolicitudRetiroRepo;
 import com.beca.misdivisas.interfaces.ISolicitudRetiroTrazaRepo;
@@ -57,7 +60,7 @@ import com.beca.misdivisas.util.ValidationUtils;
 
 @Controller
 public class AutorizadoController {
-	private final static List<Integer> ESTATUS_SOLICITUD_ACTIVA = Arrays.asList(1, 2, 4, 5);
+	private final static List<Integer> ESTATUS_SOLICITUD_ACTIVA = Arrays.asList(1, 2, 4, 5, 7);
 
 	@Autowired
 	private HttpServletRequest request;
@@ -82,6 +85,9 @@ public class AutorizadoController {
 
 	@Autowired
 	private ISolicitudRetiroTrazaRepo solicitudRetiroTrazaRepo;
+	
+	@Autowired
+	private MicroServicioClienteDetectIDClient microServicioClienteDetectIDClient;
 
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
@@ -147,6 +153,7 @@ public class AutorizadoController {
 		final int tipoAutorizacion = tipoAutorizacionModel.getIdTipoAutorizado();
 		model.addAttribute("tipoAutorizacion", tipoAutorizacion);
 		model.addAttribute(Constantes.CREAR, true);
+		
 		switch (tipoAutorizacion) {
 		case 3:
 			final AutorizadoEmpresaTransporte autorizadoEmpresaTransporte = new AutorizadoEmpresaTransporte();
@@ -160,11 +167,13 @@ public class AutorizadoController {
 			return Constantes.OP_AUTORIZADOS_BENEF_TRASPASO;*/
 		case 1:
 			final AutorizadoPersonaNatural autorizadoPersonaNatural = new AutorizadoPersonaNatural();
+				
 			autorizadoPersonaNatural.setIdTipoAutorizado(tipoAutorizacion);
 			model.addAttribute("autorizadoPersonaNatural", autorizadoPersonaNatural);
 			return Constantes.OP_AUTORIZADOS_PER_NATURAL;
 		case 2:
 			final AutorizadoPersonaJuridica autorizadoPersonaJuridica = new AutorizadoPersonaJuridica();
+				
 			autorizadoPersonaJuridica.setIdTipoAutorizado(tipoAutorizacion);
 			model.addAttribute("autorizadoPersonaJuridica", autorizadoPersonaJuridica);
 			return Constantes.OP_AUTORIZADOS_PER_JURIDICA;
@@ -241,8 +250,7 @@ public class AutorizadoController {
 		if (autorizadoEmpresaTransporte.getIdAutorizado() == null) {
 			autorizado.setFechaCreacion(ts);
 		} else {
-			final Autorizado autorizadoToUpdate = autorizadoRepository
-					.findById(autorizadoEmpresaTransporte.getIdAutorizado()).get();
+			final Autorizado autorizadoToUpdate = autorizadoRepository.findById(autorizadoEmpresaTransporte.getIdAutorizado()).get();
 			autorizado.setFechaCreacion(autorizadoToUpdate.getFechaCreacion());
 		}
 		autorizado.setFechaActualizacion(ts);
@@ -422,11 +430,10 @@ public class AutorizadoController {
 		} else {
 			autorizado.setFechaCreacion(autorizadoToUpdate.getFechaCreacion());
 		}
-
+		
 		autorizado.setFechaActualizacion(ts);
 		autorizadoRepository.save(autorizado);
-
-		if (autorizadoPersonaJuridica.getIdAutorizado() == null) {
+			if (autorizadoPersonaJuridica.getIdAutorizado() == null) {
 			String detalle = MessageFormat.format(Constantes.ACCION_CREAR_AUTORIZADO, "Aurotizado Persona Juridica",
 					Constantes.OP_CREAR, usuario.getIdUsuario(), usuario.getNombreUsuario());
 			logServ.registrarLog(Constantes.CREAR_AUTORIZADO, detalle, Constantes.AUTORIZADO_PERSONA_JURIDICA, true,
@@ -470,15 +477,15 @@ public class AutorizadoController {
 			case 1:
 				final AutorizadoPersonaNatural autorizadoPersonaNatural = AutorizadoUtils
 						.convertirAutorizadoToAutorizadoPersonaNatural(autorizado);
+								
 				try {
 					
-					if(autorizado.getImagenDocumento()!=null && !autorizado.getImagenDocumento().isEmpty()){
+					if(autorizado.getImagenDocumento()!=null && !autorizado.getImagenDocumento().isEmpty() ){
 						String imagenDocumento = Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(), "documentoImg");
 						autorizadoPersonaNatural.setImagenDocumento(imagenDocumento);
-						autorizadoPersonaNatural.setImgDocumentoAutorizado(imagenDocumento);
-						
+						autorizadoPersonaNatural.setImgDocumentoAutorizado(imagenDocumento);	
 					}
-
+					
 				} catch (Exception e) {
 					return Constantes.ERRORES;
 				}
@@ -487,6 +494,7 @@ public class AutorizadoController {
 			case 2:
 				final AutorizadoPersonaJuridica autorizadoPersonaJuridica = AutorizadoUtils
 						.convertirAutorizadoToAutorizadoPersonaJuridica(autorizado);
+					
 				try {
 					if (autorizado.getImagenDocumento() != null && !autorizado.getImagenDocumento().isEmpty()) {
 						String imagenDocumento = Util.obtenerArchivoStr(rutaImg + autorizado.getImagenDocumento(),
@@ -520,7 +528,7 @@ public class AutorizadoController {
 
 	@PostMapping("autorizadoEliminar")
 	public String autorizadoEliminar(@RequestParam("idAutorizado") int id, Model model,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes) throws Exception {
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		Autorizado autorizadoAEliminar = autorizadoRepository.findById(id);
@@ -542,12 +550,21 @@ public class AutorizadoController {
 					Util.eliminarArchivo(rutaImg, autorizadoAEliminar.getImagenRif());
 				if(autorizadoAEliminar.getImagenAdicional()!= null && !autorizadoAEliminar.getImagenAdicional().isEmpty())
 					Util.eliminarArchivo(rutaImg, autorizadoAEliminar.getImagenAdicional());
+				
 				Date date = new Date();
 				long time = date.getTime();
 				Timestamp ts = new Timestamp(time);
 				autorizadoAEliminar.setEstado("I");
-				autorizadoAEliminar.setFechaActualizacion(ts);
+				autorizadoAEliminar.setFechaActualizacion(ts);				
 				autorizadoRepository.save(autorizadoAEliminar);
+				
+				ClientesDetectIdRequest clientesDetectIdRequest = new ClientesDetectIdRequest ();
+				clientesDetectIdRequest.setSharedKey(autorizadoAEliminar.getDocumentoIdentidad().trim());
+				ClientesDetectIdResponseGet response = microServicioClienteDetectIDClient.detectIdGet(clientesDetectIdRequest);
+				
+				if(response.getDatos() != null && response.getDatos().getSharedKey().equals(autorizadoAEliminar.getDocumentoIdentidad())) {	
+					microServicioClienteDetectIDClient.detectIdCRUD(clientesDetectIdRequest, "delete");
+				}
 				String detalle = MessageFormat.format(Constantes.ACCION_EDITAR_AUTORIZADO, "Autorizado Persona Juridica",
 						autorizadoAEliminar.getIdAutorizado(), autorizadoAEliminar.getIdTipoAutorizado(),
 						usuario.getIdUsuario(), usuario.getNombreUsuario());
@@ -559,7 +576,6 @@ public class AutorizadoController {
 			return "redirect:autorizados?error";
 		}
 	}
-	
 	
 	@GetMapping("/autorizadosListar")
 	public String autorizadosListar(Model model) {

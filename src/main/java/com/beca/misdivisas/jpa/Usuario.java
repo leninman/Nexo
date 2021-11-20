@@ -96,6 +96,9 @@ public class Usuario implements Serializable {
 	@Transient
 	private String tipoUsuario;
 	
+	@Transient
+	private Integer idAgencia;
+
 	//bi-directional many-to-one association to Empresa
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "\"id_empresa\"", insertable = false, updatable = false)
@@ -356,5 +359,14 @@ public class Usuario implements Serializable {
 	public boolean equals(Object obj) {
 		return this.idUsuario == ((Usuario) obj).getIdUsuario();
 	}
+	
+	public Integer getIdAgencia() {
+		return idAgencia;
+	}
+
+	public void setIdAgencia(Integer idAgencia) {
+		this.idAgencia = idAgencia;
+	}
+
 
 }

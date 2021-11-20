@@ -3,11 +3,11 @@ package com.beca.misdivisas.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -23,6 +23,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.beca.misdivisas.interfaces.IAgenciaDiaRepo;
@@ -168,6 +170,29 @@ public class MapController {
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(logo);
 	}
 
+	@GetMapping ("/mapaAgenciaResult")
+	public String mapaAgencia (Model model) {
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);  
+		model.addAttribute(Constantes.U_SUARIO, usuario);
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		return Constantes.OP_DISPONIBILIDAD_AGENCIA_DIAS_VIEW;
+	}
+	
+	@PostMapping (value = "/mapaAgenciaDia", produces = "application/json")
+	public String mapaAgenciaDia(@RequestParam("fechaS") String fechaS, Model model)  {
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
+		com.beca.misdivisas.model.Usuario usuarioModel = new com.beca.misdivisas.model.Usuario();
+		usuarioModel.setUsuario(usuario);
+		model.addAttribute(Constantes.U_SUARIO, usuarioModel);
+		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
+		model.addAttribute(Constantes.TIPO_MAPA, "agencias");
+		model.addAttribute("fecha", fechaS);
+
+
+		return Constantes.MAPA_AGENCIA_DIA;
+		
+	}
+
 	@GetMapping(value = "/mapaAgencias", produces = "application/json")
 	public String mapaAgencia(Model model, HttpServletRequest request) {
 		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);
@@ -184,24 +209,28 @@ public class MapController {
 
 	@GetMapping(path = "/agencias", produces = "application/json")
 	@ResponseBody
-	public List<Locacion> getAgenciaLocation(HttpServletRequest request) {
+	public List<Locacion> getAgenciaLocation(@RequestParam("fecha") String fecha, HttpServletRequest request, Model model ) throws ParseException {
 		Locacion locacion = null;
 		List<Locacion> locaciones = new ArrayList<>();
 		String descripcion = null;
-		Date date = new Date();
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+		String fechaS = fecha;
+		Date date = formatter.parse(fechaS);
+		
+		
 		int i = 0;
 
 		final List<Agencia> agencias = agenciaRepo.findByAlmacenamientoOrRecaudacion(true, true);
 		final List<AgenciaDia> agenciaDias = agenciaDiaRepo.findAllFecha(date);
 		for (final Agencia agencia : agencias) {
-			if (agencia.getLatitud() != null && agencia.getLongitud() != null && !agencia.getLatitud().isEmpty()
+			boolean habilitado = agenciaDias.stream().filter(agd -> agd.getIdAgencia().equals(agencia.getIdAgencia())).count() > 0;
+					
+			if (habilitado && agencia.getLatitud() != null && agencia.getLongitud() != null && !agencia.getLatitud().isEmpty()
 					&& !agencia.getLongitud().isEmpty() && agencia.getIdEstatusAgencia() != 2) {
 				
 				
-				List<String> fecha = agenciaDias.stream().filter((ag) -> ag.getIdAgencia() == agencia.getIdAgencia())
-						.map((agd) -> {
-							return simpleDateFormat.format(agd.getFecha());
-						}).collect(Collectors.toList());
+						
 
 				if (!agencia.getAlmacenamiento() && agencia.getRecaudacion()) {
 					descripcion = "Recaudación";
@@ -213,7 +242,7 @@ public class MapController {
 				locacion = new Locacion();
 				String nAg = String.valueOf(agencia.getNumeroAgencia());
 				locacion.setSucursal(StringUtils.leftPad(nAg, 3, '0') + "-" + agencia.getAgencia() + "<br>"
-						+ descripcion + "<br>" + fecha);
+						+ descripcion);
 				locacion.setLatitud(Double.parseDouble(agencia.getLatitud()));
 				locacion.setLongitud(Double.parseDouble(agencia.getLongitud()));
 				locacion.setAccion(agencia.getIdAgencia().toString());
@@ -224,5 +253,5 @@ public class MapController {
 			}
 		}
 		return locaciones;
-	}
+	}	
 }

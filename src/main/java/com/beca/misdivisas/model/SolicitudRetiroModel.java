@@ -68,9 +68,10 @@ public class SolicitudRetiroModel implements Serializable,Comparable<SolicitudRe
 		this.nombreEmpresa = nombreEmpresa;
 	}
 
-	public SolicitudRetiroModel(Integer idSolicitud, String fechaEstimada, BigDecimal monto, String tipoBillete,
+	public SolicitudRetiroModel(Integer idSolicitud, String cartaPorte, String fechaEstimada, BigDecimal monto, String tipoBillete,
 			Agencia agencia, Autorizado autorizado, Moneda moneda, String estatus, String nombreEmpresa) {		
 		this.idSolicitud = idSolicitud;
+		this.cartaPorte = cartaPorte;
 		this.fechaEstimada = fechaEstimada;
 		this.monto = monto;
 		this.tipoBillete = tipoBillete.equalsIgnoreCase("A") ? "Apto" : "No Apto";
@@ -94,7 +95,7 @@ public class SolicitudRetiroModel implements Serializable,Comparable<SolicitudRe
 			@NotEmpty(message = "requerido") String fechaEstimada, @NotNull(message = "requerido") BigDecimal monto,
 			String tipoBillete, Agencia agencia, Autorizado autorizado, Moneda moneda, String estatus,
 			String fechaStatus, String nombreEmpresa) {
-		this(idSolicitud, fechaEstimada, monto, tipoBillete, agencia, autorizado, moneda, estatus, nombreEmpresa);
+		this(idSolicitud, cartaPorte, fechaEstimada, monto, tipoBillete, agencia, autorizado, moneda, estatus, nombreEmpresa);
 		this.cartaPorte = cartaPorte;
 		this.fechaStatus = fechaStatus;
 	}

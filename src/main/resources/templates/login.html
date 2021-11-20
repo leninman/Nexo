@@ -16,7 +16,7 @@
 
   <!-- Custom styles for this template-->
   <link href="css/sb-admin-2.min.css" rel="stylesheet">
-	<script src="js/seal.min.js"   th:src="@{/js/seal.min.js}" ></script>
+<!--	<script src="js/seal.min.js"   th:src="@{/js/seal.min.js}" ></script>  -->
 	<script src="js/seal.js"   th:src="@{/js/seal.js}" ></script>
 	<script src="vendor/jquery/jquery.min.js" th:src="@{/vendor/jquery/jquery.min.js}"></script>
 </head>
@@ -59,7 +59,7 @@
 						<p class="text-primary" th:text="#{msj.sesion.finalizada}"></p></div>
 					<br/>					
 					<!-- Begin DigiCert site seal HTML and JavaScript  -->
-					<div id="DigiCertClickID_X6HouWUF" data-language="en" th:class="!${dominio} ? 'allow-test-seal' : ''">						
+					<div id="DigiCertClickID_X6HouWUF" lang="es">						
 					</div>
 					<!-- End DigiCert site seal HTML and JavaScript -->	
                  </form>                

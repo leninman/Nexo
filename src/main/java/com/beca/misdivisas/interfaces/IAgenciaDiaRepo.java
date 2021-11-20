@@ -16,7 +16,7 @@ public interface IAgenciaDiaRepo extends JpaRepository<AgenciaDia, Integer>{
 	@Query("SELECT DISTINCT (ad) FROM AgenciaDia ad WHERE ad.fecha >= ?1 AND ad.fecha <= ?2")
 	public List<AgenciaDia> findAllByFecha(Date fechaInicial, Date fechaFin);
 	
-	@Query("SELECT ad FROM AgenciaDia ad WHERE ad.fecha >= ?1")
+	@Query("SELECT ad FROM AgenciaDia ad WHERE ad.fecha = ?1")
 	public List<AgenciaDia> findAllFecha(Date fecha);
 	
 	@Transactional

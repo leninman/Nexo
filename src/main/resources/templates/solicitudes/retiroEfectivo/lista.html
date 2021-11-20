@@ -23,8 +23,13 @@
 					<div class="col-md-12">
 						<h5 th:case="null" th:title="#{msj.solicitud.vacia}"></h5>
 						<div th:case="*">
-							<table class="table table-striped table-responsive-md table-hover">
+							<table id="tabla" class="table table-striped table-responsive-md table-hover">
 								<thead>
+								<tr>
+										<td colspan="10"><input id="buscar" type="text"
+											class="form-control" placeholder="Buscador de Solicitudes de Retiro" />
+										</td>
+									</tr>
 									<tr>
 										<th th:text="#{etq.retiro.tipo.billete}"></th>
 										<th style="width: 12%;" th:text="#{etq.retiro.fecha.estimada}"></th>

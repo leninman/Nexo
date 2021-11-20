@@ -18,8 +18,13 @@
 				<div class="container my-5">
 					<div>
 						<div  class="table-responsive-sm">
-							<table class="table">
+							<table id="tabla" class="table">
 								<thead>
+								<tr>
+										<td colspan="11"><input id="buscar" type="text"
+											class="form-control" placeholder="Buscador de Solicitudes de Retiro" />
+										</td>
+									</tr>
 									<tr>
 										<th></th>
 										<th th:text="#{etq.retiro.tipo.billete}"></th>

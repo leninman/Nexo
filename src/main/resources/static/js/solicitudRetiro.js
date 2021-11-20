@@ -1,30 +1,28 @@
-/* document.querySelector("#buscarRetiro").onkeyup = function(){
-        $TableFilter("#tableListRetiros", this.value);
-    }
+/*// document.querySelector("#buscarRetiro").onkeyup = function(){
+		$TableFilter("#tableListRetiros", this.value);
+	}
     
-    $TableFilter = function(id, value){
-        var rows = document.querySelectorAll(id + ' tbody tr');
-        
-        for(var i = 0; i < rows.length; i++){
-            var showRow = false;
-            
-            var row = rows[i];
-            row.style.display = 'none';
-            
-            for(var x = 0; x < row.childElementCount; x++){
-                if(row.children[x].textContent.toLowerCase().indexOf(value.toLowerCase().trim()) > -1){
-                    showRow = true;
-                    break;
-                }
-            }
-            
-            if(showRow){
-                row.style.display = null;
-            }
-        }
-    }*/
-
-
+	$TableFilter = function(id, value){
+		var rows = document.querySelectorAll(id + ' tbody tr');
+	    
+		for(var i = 0; i < rows.length; i++){
+			var showRow = false;
+		    
+			var row = rows[i];
+			row.style.display = 'none';
+		    
+			for(var x = 0; x < row.childElementCount; x++){
+				if(row.children[x].textContent.toLowerCase().indexOf(value.toLowerCase().trim()) > -1){
+					showRow = true;
+					break;
+				}
+			}
+		    
+			if(showRow){
+				row.style.display = null;
+			}
+		}
+	}*/
 
 function getFormulario(url) {
 	$('#spinnerModal').modal('show');
@@ -38,7 +36,7 @@ function getFormulario(url) {
 			$(document).ready(function() {
 				$("#autorizado").select2();
 			});
-			
+
 		}
 	})
 }
@@ -57,7 +55,7 @@ function processGetForm(accion, form) {
 }
 
 function processForm(accion, form) {
-	var montoErrado=false;	
+	var montoErrado = false;
 	if ($("#fechaEstimada").val() === "") {
 		document.getElementById("fechaEstimadaError").style.display = "block";
 	} else {
@@ -67,26 +65,26 @@ function processForm(accion, form) {
 		document.getElementById("montoError").innerText = "requerido";
 		document.getElementById("montoError").style.display = "block";
 	} else {
-		if($("#moneda").val()==2){
+		if ($("#moneda").val() == 2) {
 			var monto = $("#monto").val();
-			if(monto % 5 != 0){
+			if (monto % 5 != 0) {
 				montoErrado = true;
 				document.getElementById("montoError").innerText = "Para la moneda seleccionada el monto deber ser m\u00FAltiplo de 5";
 				document.getElementById("montoError").style.display = "block";
-			}else{
+			} else {
 				document.getElementById("montoError").style.display = "none";
 			}
-		}else{		
+		} else {
 			document.getElementById("montoError").style.display = "none";
 		}
 	}
-	if($("#autorizado").val()== null){
+	if ($("#autorizado").val() == null) {
 		document.getElementById("autorizadoError").style.display = "block";
-	}else{
+	} else {
 		document.getElementById("autorizadoError").style.display = "none";
 	}
-	
-	if ($("#fechaEstimada").val() === "" || $("#monto").val() === "" || $("#autorizado").val()== null || montoErrado) {
+
+	if ($("#fechaEstimada").val() === "" || $("#monto").val() === "" || $("#autorizado").val() == null || montoErrado) {
 		return;
 	}
 
@@ -99,19 +97,19 @@ function processForm(accion, form) {
 		data: form.serialize(),
 		success: function(response) {
 			$('#duplicadaTitulo').text(response);
-			$('#duplicadaModal').modal('show');	
-			if(response=='0')
+			$('#duplicadaModal').modal('show');
+			if (response == '0')
 				$('#divError').show();
 			if (accion != 'actualizarSolicitudRetiro')
 				pintarTabla();
 			else
 				$('#solicitudesRetiroContainer').html(response);
 		},
-		error: function (response) {
+		error: function(response) {
 			$('#duplicadaTitulo').text(response);
-			$('#duplicadaModal').modal('show');		
-    }
-		
+			$('#duplicadaModal').modal('show');
+		}
+
 	});
 }
 
@@ -227,12 +225,12 @@ function checkSolicitud() {
 	}
 }
 
-function limpiar(){
+function limpiar() {
 	$("#tipoBillete option:selected").removeAttr("selected");
 	$("#autorizado option:selected").removeAttr("selected");
 	$("#moneda option:selected").removeAttr("selected");
 	$("#agencia option:selected").removeAttr("selected");
-	
+
 	$('#fechaEstimada').val('');
 	$('#monto').val('');
 	$('#crearSolicitud').val('true');
@@ -241,31 +239,33 @@ function limpiar(){
 	$("#montoError").hide();
 }
 
-function editarSolicitudRet(id){
+function editarSolicitudRet(id) {
 	limpiar();
 	$.ajax({
-	type: "GET",
-	cache: false,
-	url: "editSolicitudRetiro",
-	data: { "idSolicitud": id,
-			"crearSolicitud": false },
-	success: function(response) {
-		$('#tipoBillete').val(response.tipoBillete);		
-		$('#fechaEstimada').val(response.fechaEstimada);
-		$('#autorizado').val(response.idAutorizado);		
-		$('#monto').val(response.monto);		
-		$('#moneda').val(response.idMoneda);	
-		$('#agencia').val(response.idAgencia);
-		$('#idSolicitud').val(response.idSolicitud);
-	},
+		type: "GET",
+		cache: false,
+		url: "editSolicitudRetiro",
+		data: {
+			"idSolicitud": id,
+			"crearSolicitud": false
+		},
+		success: function(response) {
+			$('#tipoBillete').val(response.tipoBillete);
+			$('#fechaEstimada').val(response.fechaEstimada);
+			$('#autorizado').val(response.idAutorizado);
+			$('#monto').val(response.monto);
+			$('#moneda').val(response.idMoneda);
+			$('#agencia').val(response.idAgencia);
+			$('#idSolicitud').val(response.idSolicitud);
+		},
 	});
-	$( "#monto" ).focus();
+	$("#monto").focus();
 	$('#crearSolicitud').val('false');
 	$('#botonAgregar').val('Actualizar');
 
 }
 
-function pintarTabla(){
+function pintarTabla() {
 	$('#divtabla').show();
 	tablaCargaMasiva();
 	limpiar();
@@ -279,29 +279,29 @@ function agregarSolicitud(accion, form) {
 		cache: false,
 		url: accion,
 		data: form.serialize(),
-		success: function(response) {			
-			pintarTabla();			
+		success: function(response) {
+			pintarTabla();
 		}
 	});
 }
 
 async function cargaMasiva() {
-$('#errorFile').hide();
-  let formData = new FormData(); 
-  formData.append("file", archivo.files[0]);
-  let response = await fetch('./cargaMasiva', {
-    method: "POST", 
-    body: formData
-  	});
-  	if (response.status == 200) {
-    	pintarTabla();
+	$('#errorFile').hide();
+	let formData = new FormData();
+	formData.append("file", archivo.files[0]);
+	let response = await fetch('./cargaMasiva', {
+		method: "POST",
+		body: formData
+	});
+	if (response.status == 200) {
+		pintarTabla();
 		$('#fileContainer').hide();
 		verSolicitudes();
 		verErrores();
 		$('#confirmacionModal').modal('show');
-  	}else{
-		var texto= $('.file-message').text();
-		if(texto =='')
+	} else {
+		var texto = $('.file-message').text();
+		if (texto == '')
 			$('#errorFile').show();
 	}
 }
@@ -318,8 +318,8 @@ function versolicitudesMasivas() {
 	});
 }
 
-function eliminarSolicitudPost(id){
-		$.ajax({
+function eliminarSolicitudPost(id) {
+	$.ajax({
 		type: "POST",
 		cache: false,
 		url: "eliminarSolicitudRetiro",
@@ -332,38 +332,39 @@ function eliminarSolicitudPost(id){
 	});
 }
 
-function guardarCargaMasiva(){
+function guardarCargaMasiva() {
 	$('#spinnerModal').modal('show');
 	var request = $.ajax({
-	method: "POST",
-	cache: false,
-	url: "crearSolicitudesDeRetiro",
-	data: {} });
-	
-	request.done(function( msg ) {
-		$('#spinnerModal').modal('hide');	
+		method: "POST",
+		cache: false,
+		url: "crearSolicitudesDeRetiro",
+		data: {}
+	});
+
+	request.done(function(msg) {
+		$('#spinnerModal').modal('hide');
 		$(location).attr('href', './solicitudesRetiro?success');
-	 });
-	
-	request.fail(function( jqXHR, textStatus ) {		
-		$(location).attr('href', './solicitudesRetiro?error'); 
+	});
+
+	request.fail(function(jqXHR, textStatus) {
+		$(location).attr('href', './solicitudesRetiro?error');
 	});
 }
 
 
-function eliminarSolicitud(id){
-	$('#submitBtn').attr('onClick','eliminarSolicitudPost(\''+id+'\')');
-	$('#solicitudDeleteModal').modal('show');	
+function eliminarSolicitud(id) {
+	$('#submitBtn').attr('onClick', 'eliminarSolicitudPost(\'' + id + '\')');
+	$('#solicitudDeleteModal').modal('show');
 }
 
-function verSolicitudes(){
-		$.ajax({
+function verSolicitudes() {
+	$.ajax({
 		type: "GET",
 		cache: false,
 		url: "./nroSolicitudesMasivas",
-		data: { },
+		data: {},
 		success: function(response) {
-			if(response>0){
+			if (response > 0) {
 				$('#exitoDiv').show();
 				$('#nroSolicitudes').text(response);
 			}
@@ -371,40 +372,121 @@ function verSolicitudes(){
 	});
 }
 
-function verErrores(){
-	var arr='';
+function verErrores() {
+	var arr = '';
 	$.ajax({
-	type: "GET",
-	cache: false,
-	url: "./erroresSolicitudesMasivas",
-	data: { },
-	success: function(response) {
-		$('#listErrorDiv').html('');
-		if(response.length>0){
-			$('#errorDiv').show();
-			$('#nroErrores').text(response.length);
-			$.each(response, function(index, value){
-				var res =value.toString().split(',');
-				arr += res[0]+'<br/> ' + res[1]+ '<br/>';
-			});
-			$('#listErrorDiv').html(arr);
-		}
-	},
+		type: "GET",
+		cache: false,
+		url: "./erroresSolicitudesMasivas",
+		data: {},
+		success: function(response) {
+			$('#listErrorDiv').html('');
+			if (response.length > 0) {
+				$('#errorDiv').show();
+				$('#nroErrores').text(response.length);
+				$.each(response, function(index, value) {
+					var res = value.toString().split(',');
+					arr += res[0] + '<br/> ' + res[1] + '<br/>';
+				});
+				$('#listErrorDiv').html(arr);
+			}
+		},
 	});
 }
 
-function habilitarGuardarBtn(){
+function habilitarGuardarBtn() {
 	$.ajax({
-	type: "GET",
-	cache: false,
-	url: "./solicitudesMasivas",
-	data: { },
-	success: function(response) {
-		if(response.length>0){
-			$('#btnCargaMasiva').attr("disabled", false);
-		}else{
-			$('#btnCargaMasiva').attr("disabled", true);
-	}
-	}
+		type: "GET",
+		cache: false,
+		url: "./solicitudesMasivas",
+		data: {},
+		success: function(response) {
+			if (response.length > 0) {
+				$('#btnCargaMasiva').attr("disabled", false);
+			} else {
+				$('#btnCargaMasiva').attr("disabled", true);
+			}
+		}
 	});
 }
+
+function getEntregaForm(url) {
+	$.ajax({
+		url: url,
+		cache: false,
+		async: true,
+		success: function(response) {
+			$('#solicitudesRetiroContainer').html(response);
+		}
+	})
+}
+
+function SolicitudEntregarForm(id) {
+	$('#spinnerModal').modal('show');
+	$.ajax({
+		type: "GET",
+		cache: false,
+		url: "generarOtpEntregaSolicitudRetiro",
+		data: { "idSolicitud": id },
+		success: function(response) {
+			$('#entregarModal').modal('show');
+			$('#spinnerModal').modal('hide');
+			$('#validarOtpContainer').html(response);
+
+		}
+	});
+}
+
+function entrega(id) {
+	SolicitudEntregarForm(id);
+}
+
+function processvalidarOtpForm(accion, form) {
+	var form = $(form);
+	$.ajax({
+		type: "POST",
+		cache: false,
+		url: accion,
+		data: form.serialize(),
+		success: function(response) {
+			if ($(response).find('.text-danger').length) {
+				$('#validarOtpContainer').html(response);
+			} else {
+				$('#entregarModal').modal('hide');
+				$('#spinnerModal').modal('hide');
+				$('#solicitudesRetiroContainer').html(response);
+			}
+		}
+	});
+}
+
+var t = new Date();
+t.setMinutes(t.getMinutes() + 3);
+
+countDownDate = t.getTime();
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+	// Get today's date and time
+	var now = new Date().getTime();
+
+	// Find the distance between now and the count down date
+	var distance = countDownDate - now;
+	// Time calculations for days, hours, minutes and seconds
+	var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+	var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+	if (seconds < 10) {
+		seconds = '0' + seconds;
+	}
+
+	$('#timer').html('0' + minutes + ':' + seconds);
+
+	// If the count down is finished, write some text
+	if (distance < 0) {
+		clearInterval(x);
+		$('#timer').html('00:00');
+		var url = $('#back').attr('href');
+		location.replace(url);
+	}
+}, 1000);

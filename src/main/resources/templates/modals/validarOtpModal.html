@@ -1,0 +1,43 @@
+<form action="#" method="POST" th:objet="${validarOtpModel}">
+	<script>
+		$('form').on('submit', function(e) {
+			e.preventDefault();
+			processvalidarOtpForm("validarOtpEntregaSolicitudRetiro", this);
+		});
+	</script>
+
+	<div style="text-align: center;">
+		<div class="form-group">
+			<label>Introduzca la clave</label> <input type="text"
+				class="form-control" id="otp" name="otp">
+			 						<div th:if="${error}">
+			 	
+			<span 
+				class="text-danger">otp inv&aacute;lido</span> 
+				</div>
+		</div>
+
+		<div class="form-group">
+			<span id="timer">03:00</span>
+		</div>
+		<div style="text-align: center;">
+			<input type="submit" class="btn btn-primary" data-toggle="modal"
+				id="idSolicitud" value="Entregar Solicitud" disabled> <input
+				type="hidden" name="idSolicitud" id="idSolicitud"
+				th:value="${validarOtpModel.idSolicitud}" />
+			<button class="btn btn-secondary" type="button" data-dismiss="modal"
+				style="height: 40px; width: 100px" id="back"
+				href="./solicitudesRetiroEntregar" th:text="#{bot.cancelar}"></button>
+		</div>
+	</div>
+</form>
+<script type="text/javascript">
+	$("#otp").keyup(function() {
+		var otp = $("#otp").val();
+		if (otp.length > 0) {
+			$("#idSolicitud").prop("disabled", false);
+		} else {
+			$("#idSolicitud").prop("disabled", true);
+		}
+	});
+</script>

@@ -124,12 +124,14 @@ public class UsuarioService implements UserDetailsService {
 				intentos = 1;
 			}
 			
-			if(intentos == 3) {
+			if(intentos >= 3) {
 				usuario.setHabilitado(false);
 				repo.save(usuario);
+				session.removeAttribute(Constantes.USUARIO);
 			}
 			else {
 				session.removeAttribute(Constantes.INTENTOS);
+				session.removeAttribute(Constantes.USUARIO);
 				session.setAttribute(Constantes.INTENTOS, intentos);
 			}
 		}

@@ -16,6 +16,16 @@ public class CustomWebAuthenticationDetails extends WebAuthenticationDetails {
 	private boolean peticionInterna;
 	
 	private Integer numeroAgencia;
+	
+	private Integer idAgencia;
+
+	public Integer getIdAgencia() {
+		return idAgencia;
+	}
+
+	public void setIdAgencia(Integer idAgencia) {
+		this.idAgencia = idAgencia;
+	}
 
 	public CustomWebAuthenticationDetails(HttpServletRequest request) {
         super(request);
