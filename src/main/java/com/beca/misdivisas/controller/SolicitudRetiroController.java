@@ -322,7 +322,7 @@ public class SolicitudRetiroController {
 					idsSolicitudAnular, usuario.getIdUsuario(), usuario.getNombreUsuario());
 			logServ.registrarLog(Constantes.ANULAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_GENERACION, true,
 					Util.getRemoteIp(request), usuario);
-			return "redirect:solicitudesRetiro?success";
+			return "redirect:solicitudesRetiroAprobar?success";
 		}
 	}
 

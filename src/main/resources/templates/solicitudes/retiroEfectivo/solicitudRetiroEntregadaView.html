@@ -269,7 +269,7 @@
 								<td><input type="button" class="btn btn-danger"
 									data-toggle="modal"
 									th:attr="data-target='#recordDeleteModal'+${solicitudRetiro.idSolicitud}"
-									value="Rechazar">
+									value="Cancelar">
 									<div class="modal fade"
 										th:attr="id='recordDeleteModal'+${solicitudRetiro.idSolicitud}"
 										tabindex="-1" role="dialog"
@@ -309,7 +309,7 @@
 										</div>
 									</div></td>
 								<td><a class="btn btn-secondary"
-									href="./solicitudesRetiroEntregar" th:text="#{bot.cancelar}"></a>
+									href="./solicitudesRetiroEntregar" th:text="#{bot.regresar}"></a>
 								</td>
 
 							</tr>

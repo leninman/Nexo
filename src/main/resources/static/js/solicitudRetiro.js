@@ -55,62 +55,62 @@ function processGetForm(accion, form) {
 }
 
 function processForm(accion, form) {
-	var montoErrado = false;
-	if ($("#fechaEstimada").val() === "") {
-		document.getElementById("fechaEstimadaError").style.display = "block";
-	} else {
-		document.getElementById("fechaEstimadaError").style.display = "none";
-	}
-	if ($("#monto").val() === "") {
-		document.getElementById("montoError").innerText = "requerido";
-		document.getElementById("montoError").style.display = "block";
-	} else {
-		if ($("#moneda").val() == 2) {
-			var monto = $("#monto").val();
-			if (monto % 5 != 0) {
-				montoErrado = true;
-				document.getElementById("montoError").innerText = "Para la moneda seleccionada el monto deber ser m\u00FAltiplo de 5";
-				document.getElementById("montoError").style.display = "block";
-			} else {
-				document.getElementById("montoError").style.display = "none";
-			}
-		} else {
-			document.getElementById("montoError").style.display = "none";
-		}
-	}
-	if ($("#autorizado").val() == null) {
-		document.getElementById("autorizadoError").style.display = "block";
-	} else {
-		document.getElementById("autorizadoError").style.display = "none";
-	}
-
-	if ($("#fechaEstimada").val() === "" || $("#monto").val() === "" || $("#autorizado").val() == null || montoErrado) {
-		return;
-	}
-
-	var form = $(form);
-	$.ajax({
-		type: "POST",
-		cache: false,
-		url: accion,
-		async: false,
-		data: form.serialize(),
-		success: function(response) {
-			$('#duplicadaTitulo').text(response);
-			$('#duplicadaModal').modal('show');
-			if (response == '0')
-				$('#divError').show();
-			if (accion != 'actualizarSolicitudRetiro')
-				pintarTabla();
-			else
-				$('#solicitudesRetiroContainer').html(response);
-		},
-		error: function(response) {
-			$('#duplicadaTitulo').text(response);
-			$('#duplicadaModal').modal('show');
-		}
-
-	});
+    var montoErrado = false;
+    if ($("#fechaEstimada").val() === "") {
+        document.getElementById("fechaEstimadaError").style.display = "block";
+    } else {
+        document.getElementById("fechaEstimadaError").style.display = "none";
+    }
+    if ($("#monto").val() === "") {
+        document.getElementById("montoError").innerText = "requerido";
+        document.getElementById("montoError").style.display = "block";
+    } else {
+        if ($("#moneda").val() == 2) {
+            var monto = $("#monto").val();
+            if (monto % 5 != 0) {
+                montoErrado = true;
+                document.getElementById("montoError").innerText = "Para la moneda seleccionada el monto deber ser m\u00FAltiplo de 5";
+                document.getElementById("montoError").style.display = "block";
+            } else {
+                document.getElementById("montoError").style.display = "none";
+            }
+        } else {
+            document.getElementById("montoError").style.display = "none";
+        }
+    }
+    if ($("#autorizado").val() == null) {
+        document.getElementById("autorizadoError").style.display = "block";
+    } else {
+        document.getElementById("autorizadoError").style.display = "none";
+    }
+ 
+    if ($("#fechaEstimada").val() === "" || $("#monto").val() === "" || $("#autorizado").val() == null || montoErrado) {
+        return;
+    }
+ 
+    var form = $(form);
+    $.ajax({
+        type: "POST",
+        cache: false,
+        url: accion,
+        async: false,
+        data: form.serialize(),
+        success: function(response) {
+            $('#duplicadaTitulo').text(response);
+            $('#duplicadaModal').modal('show');
+            if (response == '0')
+                $('#divError').show();
+            if (accion != 'actualizarSolicitudRetiro')
+                pintarTabla();
+            else
+                $('#solicitudesRetiroContainer').html(response);
+        },
+        error: function(response) {
+            $('#duplicadaTitulo').text(response);
+            $('#duplicadaModal').modal('show');
+        }
+ 
+    });
 }
 
 function editarSolicitud(id) {

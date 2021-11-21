@@ -6,8 +6,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -30,10 +32,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.beca.misdivisas.interfaces.IAgenciaDiaRepo;
 import com.beca.misdivisas.interfaces.IAgenciaRepo;
 import com.beca.misdivisas.interfaces.IEmpresaRepo;
+import com.beca.misdivisas.interfaces.IFeriadoRepo;
 import com.beca.misdivisas.interfaces.IRemesaRepo;
 import com.beca.misdivisas.jpa.Agencia;
 import com.beca.misdivisas.jpa.AgenciaDia;
 import com.beca.misdivisas.jpa.Empresa;
+import com.beca.misdivisas.jpa.Feriado;
 import com.beca.misdivisas.jpa.Sucursal;
 import com.beca.misdivisas.jpa.Usuario;
 import com.beca.misdivisas.model.Locacion;
@@ -56,6 +60,9 @@ public class MapController {
 
 	@Autowired
 	private IAgenciaDiaRepo agenciaDiaRepo;
+	
+	@Autowired
+	private IFeriadoRepo feriadoRepo;
 
 	@Autowired
 	private IRemesaRepo remesaRepo;
@@ -172,7 +179,11 @@ public class MapController {
 
 	@GetMapping ("/mapaAgenciaResult")
 	public String mapaAgencia (Model model) {
-		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO);  
+		Usuario usuario = (Usuario) factory.getObject().getAttribute(Constantes.USUARIO); 
+		final List<Feriado> listaFeriados = feriadoRepo.findAllFechaMayorQue(new Date());
+		final List<String> feriados = listaFeriados.stream()
+				.map((feriado) -> simpleDateFormat.format(feriado.getFecha())).collect(Collectors.toList());
+		model.addAttribute("feriados", feriados);
 		model.addAttribute(Constantes.U_SUARIO, usuario);
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		return Constantes.OP_DISPONIBILIDAD_AGENCIA_DIAS_VIEW;
