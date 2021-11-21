@@ -369,7 +369,7 @@ public class SolicitudRetiroController {
 	private List<SolicitudRetiroModel> getSolicitudesRetiro(Integer idEmpresa, Integer estatusA, Integer estatusB) {
 		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
 		List<SolicitudRetiro> solicitudes = new ArrayList<SolicitudRetiro>();
-		if(usuario.getIdAgencia() == null) {
+		if(usuario.getIdAgencia() == null || (usuario.getIdAgencia() != null && estatusA != 7)) {
 			solicitudes = idEmpresa != null ? solicitudRetiroRepo.findByIdEmpresa(idEmpresa)
 					 : solicitudRetiroRepo.findAll();
 		}else {
