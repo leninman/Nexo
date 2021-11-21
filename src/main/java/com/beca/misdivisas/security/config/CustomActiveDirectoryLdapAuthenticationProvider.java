@@ -285,6 +285,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 
 		if (!domain.contains("oficinas")) {
 			details.setNumeroAgencia(1);
+			numeroAgencia = 1;
 		} else {
 			// TODO si esta instancia es para torre no se debe buscar la agencia en los
 			// grupos solo setear el valor de 1
@@ -351,21 +352,20 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 					details.setNumeroAgencia(numeroAgencia);
 					break;
 				}
-			}
-			
-			if(numeroAgencia!=0) {
-				for (String group : groups) {
-					for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
-						if (rdn.getType().equalsIgnoreCase("CN")) {
-							groupNames.add((String) rdn.getValue());
-							String role = getRole((String) rdn.getValue());
-							if (!role.isEmpty())
-								privileges.add(role);
-						}
+			}				
+		}
+		
+		if(numeroAgencia!=0) {
+			for (String group : groups) {
+				for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
+					if (rdn.getType().equalsIgnoreCase("CN")) {
+						groupNames.add((String) rdn.getValue());
+						String role = getRole((String) rdn.getValue());
+						if (!role.isEmpty())
+							privileges.add(role);
 					}
 				}
 			}
-				
 		}
 
 		String DEFAULT_ROLE_PREFIX = Constantes.ROL_PRE;
