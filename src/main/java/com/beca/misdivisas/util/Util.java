@@ -309,6 +309,11 @@ public class Util {
 		return resp;
 	}
 	
+	public static String formatoFecha(String formato) {
+		DateFormat formatoFecha = new SimpleDateFormat(formato);
+		return formatoFecha.format(new Date());
+	}
+	
 	/*public static List<String> invertirArreglo(List<String> arreglo) {
 	
 	String temporal; // El elemento temporal del arreglo que vamos a intercambiar

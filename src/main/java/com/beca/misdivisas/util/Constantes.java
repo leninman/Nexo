@@ -350,6 +350,9 @@ public final class Constantes {
 	public static final String AGENCIA_DIAS = "agenciaDias";
 	public static final String AGENCIA_DIAS_MODEL = "agenciaDiaOperaciones";
 
-	
-	
+	public static final String FORMATO_FECHA_EMAIL = "dd/MM/yyyy 'a las' hh:mm:ss a";
+	public static final String ASUNTO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Solicitud de Retiro Procesada en Exterior NEXO Divisas";
+	public static final String ENCABEZADO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Estimado(a) ";
+	public static final String CUERPO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Le informamos que en fecha {0} ha sido procesada la solicitud de retiro identificada con el Carta Porte <b>{1}</b>. <br/><br/> Esta solicitud fue generada para usted, por la empresa {2}, quienes le autorizan a presentarse el día {3} en nuestra agencia {4}. <br/><br/> Recuerde traer sus documentos de identificación y su teléfono celular.";
+	public static final String PIE_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Este es un mail informativo que no requiere ser respondido.";
 }

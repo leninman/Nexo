@@ -283,17 +283,6 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 
 		CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) autenticacion.getDetails();
 
-		for (String group : groups) {
-			for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
-				if (rdn.getType().equalsIgnoreCase("CN")) {
-					groupNames.add((String) rdn.getValue());
-					String role = getRole((String) rdn.getValue());
-					if (!role.isEmpty())
-						privileges.add(role);
-				}
-			}
-		}
-
 		if (!domain.contains("oficinas")) {
 			details.setNumeroAgencia(1);
 		} else {
@@ -363,6 +352,20 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 					break;
 				}
 			}
+			
+			if(numeroAgencia!=0) {
+				for (String group : groups) {
+					for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
+						if (rdn.getType().equalsIgnoreCase("CN")) {
+							groupNames.add((String) rdn.getValue());
+							String role = getRole((String) rdn.getValue());
+							if (!role.isEmpty())
+								privileges.add(role);
+						}
+					}
+				}
+			}
+				
 		}
 
 		String DEFAULT_ROLE_PREFIX = Constantes.ROL_PRE;

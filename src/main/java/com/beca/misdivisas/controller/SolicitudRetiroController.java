@@ -72,6 +72,7 @@ import com.beca.misdivisas.model.SolicitudRetiroModel;
 import com.beca.misdivisas.model.SolicitudTrazaModel;
 import com.beca.misdivisas.model.ValidarOtpModel;
 import com.beca.misdivisas.services.LogService;
+import com.beca.misdivisas.services.SolicitudRetiroService;
 import com.beca.misdivisas.util.AutorizadoUtils;
 import com.beca.misdivisas.util.Constantes;
 import com.beca.misdivisas.util.Util;
@@ -130,6 +131,10 @@ public class SolicitudRetiroController {
 	@Autowired
 	private MicroServicioOTPDetectIDClient microServicioOTPDetectIDClient;
 
+	
+	@Autowired
+	private SolicitudRetiroService solicitudRetiroService;
+	
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
 
@@ -652,6 +657,14 @@ public class SolicitudRetiroController {
 					true, Util.getRemoteIp(request), usuario);
 
 			redirectAttributes.addFlashAttribute("cartaPorte", cartaPorte);
+			if (solicitudRetiro.getAutorizado() != null && solicitudRetiro.getAutorizado().getEmail() != null && !solicitudRetiro.getAutorizado().getEmail().trim().equals("")) {
+				String cuerpo ="";
+				DateFormat dateFormat = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYY);
+				cuerpo= MessageFormat.format(Constantes.CUERPO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO, Util.formatoFecha(Constantes.FORMATO_FECHA_EMAIL), cartaPorte, solicitudRetiro.getEmpresa().getEmpresa(), dateFormat.format(solicitudRetiro.getFechaEstimada()), solicitudRetiro.getAgencia().getAgencia());
+				
+				solicitudRetiroService.enviarCorreoAutorizado(solicitudRetiro.getAutorizado().getEmail(), Constantes.ASUNTO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO, 
+						Constantes.ENCABEZADO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO + solicitudRetiro.getAutorizado().getNombreCompleto(), cuerpo, Constantes.PIE_CORREO_SOLICITUD_PROCESADA_AUTORIZADO, true, Util.getRemoteIp(request));
+			}
 			return "redirect:solicitudesRetiroProcesar";
 		}
 	}
