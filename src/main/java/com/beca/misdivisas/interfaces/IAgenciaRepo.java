@@ -9,7 +9,10 @@ import com.beca.misdivisas.jpa.Agencia;
 
 public interface IAgenciaRepo extends JpaRepository<Agencia, Integer>{
 	
+	@Query("SELECT a FROM Agencia a WHERE a.almacenamiento = ?1 and a.idEstatusAgencia=1 order by a.numeroAgencia asc")
 	public List<Agencia> findByAlmacenamiento(Boolean almacenamiento);
+	
+	@Query("SELECT a FROM Agencia a WHERE a.almacenamiento = ?1 and a.recaudacion = ?2 and a.idEstatusAgencia=1 order by a.numeroAgencia asc")
 	public List<Agencia> findByAlmacenamientoOrRecaudacion(Boolean almacenamiento, Boolean recaudacion);
 	
 	public List<Agencia> findByNumeroAgencia(Integer numeroAgencia);
@@ -19,10 +22,10 @@ public interface IAgenciaRepo extends JpaRepository<Agencia, Integer>{
 	
 	public Agencia findById(int id);
 	
-	@Query("SELECT e FROM Agencia e WHERE e.numeroAgencia = ?1 order by e.idEstatusAgencia asc")
+	@Query("SELECT a FROM Agencia a WHERE a.numeroAgencia = ?1 order by a.idEstatusAgencia asc")
 	public List<Agencia> findAllActiveOrderByName(Integer idEstatusAgencia);
 	
-	@Query("SELECT e FROM Agencia e order by e.idAgencia asc")
+	@Query("SELECT a FROM Agencia a order by a.idAgencia asc")
 	public List<Agencia> findAllOrderByName();
 	
 	/*

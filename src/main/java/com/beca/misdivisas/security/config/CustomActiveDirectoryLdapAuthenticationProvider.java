@@ -20,6 +20,7 @@ import javax.naming.ldap.Rdn;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.ThrowsAdvice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -44,6 +45,7 @@ import org.springframework.security.ldap.authentication.AbstractLdapAuthenticati
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.beca.misdivisas.services.AgenciaService;
 import com.beca.misdivisas.util.Constantes;
 
 public final class CustomActiveDirectoryLdapAuthenticationProvider extends AbstractLdapAuthenticationProvider {
@@ -76,6 +78,9 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 	private String ou;
 
 	ContextFactory contextFactory = new ContextFactory();
+	
+	@Autowired
+	private AgenciaService agenciaService;
 
 	@Autowired
 	private static final Logger logger = LoggerFactory.getLogger(CustomActiveDirectoryLdapAuthenticationProvider.class);
@@ -305,8 +310,7 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 			}
 			
 			for (String group : groups) {
-				valoresOU.clear();
-				valoresCN.clear();
+
 				for (Rdn rdn : LdapUtils.newLdapName(group).getRdns()) {
 					// TODO
 					// recorrer la estructura de cada grupo y si corresponde con la indicada tomar
@@ -342,7 +346,9 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 					int slashPosition = valorCN.lastIndexOf("-");
 					if(slashPosition != -1) {
 						try {
-							numeroAgencia = Integer.valueOf(valorCN.substring(slashPosition + 1).trim());	
+							numeroAgencia = Integer.valueOf(valorCN.substring(slashPosition + 1).trim());
+							if (!agenciaService.estaActiva(numeroAgencia.intValue()))
+								throw new Exception ("Agencia Inactiva");
 						} catch (Exception e) {
 							numeroAgencia = 0;
 						}
@@ -351,6 +357,11 @@ public final class CustomActiveDirectoryLdapAuthenticationProvider extends Abstr
 				if(numeroAgencia!=0) {
 					details.setNumeroAgencia(numeroAgencia);
 					break;
+				}
+				else {
+					validOU = false;
+					valoresOU.clear();
+					valoresCN.clear();
 				}
 			}				
 		}
