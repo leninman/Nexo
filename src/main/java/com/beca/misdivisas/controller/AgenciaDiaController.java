@@ -105,7 +105,7 @@ public class AgenciaDiaController {
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		calendar.add(Calendar.DATE, 1);
+		calendar.add(Calendar.DATE, 0);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		fechaInicial = calendar.getTime();
 		final List<String> listaFeriados = feriadoRepository.findAllFechaMayorQue(new Date()).stream()

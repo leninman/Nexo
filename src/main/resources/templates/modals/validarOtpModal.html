@@ -8,12 +8,14 @@
 
 	<div style="text-align: center;">
 		<div class="form-group">
-			<label>Introduzca la clave</label> <input type="text"
+			<label>Introduzca la clave de validaci&oacute;n</label> <input type="text"
 				class="form-control" id="otp" name="otp">
 			 						<div th:if="${error}">
-			 	
-			<span 
-				class="text-danger">otp inv&aacute;lido</span> 
+			 	<small  id="invalidOtp" th:if="${invalidOtp}" class="text-danger">Clave Inv&aacute;lida</small>
+			 	<small  id="excessOtp" th:if="${excessOtp}" class="text-danger">Usted excedio los limites de intentos, debe enviar una nueva clave de validaci&oacute;n</small>
+			 	<small  id="expiredOtp" th:if="${expiredOtp}" class="text-danger">Su clave de validaci&oacute;n ha expirado, debe enviar una nueva</small>
+		<!--  	<span 
+				class="text-danger">otp inv&aacute;lido</span>  -->
 				</div>
 		</div>
 

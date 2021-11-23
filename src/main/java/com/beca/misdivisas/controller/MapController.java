@@ -224,11 +224,12 @@ public class MapController {
 		Locacion locacion = null;
 		List<Locacion> locaciones = new ArrayList<>();
 		String descripcion = null;
-		
+		String fechaS = fecha;
+		Date date = new SimpleDateFormat("dd/MM/yyyy").parse(fechaS);
+		/*
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 		String fechaS = fecha;
-		Date date = formatter.parse(fechaS);
-		
+		Date date = formatter.parse(fechaS);*/
 		
 		int i = 0;
 

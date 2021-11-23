@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import com.beca.misdivisas.api.detectidotp.model.OtpRequest;
 import com.beca.misdivisas.api.detectidotp.model.OtpResponse;
 import com.beca.misdivisas.api.generico.MicroservicioClient;
+import com.beca.misdivisas.api.generico.model.Resultado;
+import com.beca.misdivisas.util.Constantes;
 import com.google.gson.Gson;
 
 
@@ -30,6 +32,7 @@ public class MicroServicioOTPDetectIDClient extends MicroservicioClient implemen
 		OtpResponse response = new OtpResponse();
         RestTemplate cliente = getTemplate();
 		HttpHeaders headers = new HttpHeaders();
+		Resultado resultado = new Resultado();
 
 		JSONObject body = new JSONObject();
 	    Gson gson = new Gson();
@@ -40,9 +43,26 @@ public class MicroServicioOTPDetectIDClient extends MicroservicioClient implemen
 		try {
 			response = cliente.postForObject(urlOtp+"/"+operacion, entity, OtpResponse.class);
 		} catch (RestClientException e) {
-			logger.info(e.getLocalizedMessage());
-			//throw e;
-			return response;
+			
+			if(e.getLocalizedMessage().contains("902")) {
+				resultado.setCodigo("902");
+				response.setResultado(resultado);
+				return response;
+			}else if(e.getLocalizedMessage().contains("904")||e.getLocalizedMessage().contains("422")) {
+				resultado.setCodigo("904");
+				response.setResultado(resultado);
+				return response;
+			}
+			if(e.getLocalizedMessage().contains("938")) {
+				resultado.setCodigo("938");
+				response.setResultado(resultado);
+				return response;
+			}	
+			else
+				throw e;
+			/*logger.info(e.getLocalizedMessage());
+			throw e;
+			return response;*/
 		}
 		logger.info(response.toString());
 		return response;

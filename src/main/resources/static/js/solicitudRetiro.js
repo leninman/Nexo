@@ -454,7 +454,8 @@ function processvalidarOtpForm(accion, form) {
 			} else {
 				$('#entregarModal').modal('hide');
 				$('#spinnerModal').modal('hide');
-				$('#solicitudesRetiroContainer').html(response);
+			//	$('#solicitudesRetiroContainer').html(response);
+				$(location).attr('href', './solicitudesRetiroEntregar?success');
 			}
 		}
 	});

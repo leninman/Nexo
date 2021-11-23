@@ -239,7 +239,7 @@ public class HomeController {
 				session.removeAttribute(Constantes.USUARIO_MENUES);
 				session.setAttribute(Constantes.USUARIO_MENUES, menues);
 
-			} else {
+			} /*else {
 
 				if (usuario.getIdUsuario() == null) {
 					logs = logRepository.findLogByNombreUsuarioAndAccionAndResultado(usuario.getNombreUsuario(),
@@ -254,7 +254,22 @@ public class HomeController {
 					String ultimoIngreso = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMM).format(date);
 					model.addAttribute(Constantes.ULTIMO_INGRESO, ultimoIngreso);
 				}
-			}
+			}*/
+			
+			if (usuario.getIdUsuario() == null) {
+                logs = logRepository.findLogByNombreUsuarioAndAccionAndResultado(usuario.getNombreUsuario().toUpperCase(),
+                        Constantes.OPCION_LOGIN, true);
+            } else {
+                logs = logRepository.findLogByIdUsuarioAndAccionAndResultado(usuario.getIdUsuario(),
+                        Constantes.OPCION_LOGIN, true);
+            }
+            if (logs.size() > 1) {
+                Date date = new Date();
+                date.setTime(logs.get(1).getFecha().getTime());
+                String ultimoIngreso = new SimpleDateFormat(Constantes.FORMATO_FECHA_DDMMYYYYHHMM).format(date);
+                model.addAttribute(Constantes.ULTIMO_INGRESO, ultimoIngreso);
+            }
+            
 			logServ.registrarLog(Constantes.MAIN, Constantes.MAIN, Constantes.OPCION_INICIO, true,
 					Util.getRemoteIp(request), usuario);
 			if (menues != null) {

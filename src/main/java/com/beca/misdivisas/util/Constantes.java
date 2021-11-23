@@ -355,4 +355,10 @@ public final class Constantes {
 	public static final String ENCABEZADO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Estimado(a) ";
 	public static final String CUERPO_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Le informamos que en fecha {0} ha sido procesada la solicitud de retiro identificada con el Carta Porte <b>{1}</b>. <br/><br/> Esta solicitud fue generada para usted, por la empresa {2}, quienes le autorizan a presentarse el día {3} en nuestra agencia {4}. <br/><br/> Recuerde traer sus documentos de identificación y su teléfono celular.";
 	public static final String PIE_CORREO_SOLICITUD_PROCESADA_AUTORIZADO = "Este es un mail informativo que no requiere ser respondido.";
+
+	public static final String EXITO = "Validación Exitosa";
+	public static final String OTP_INVALIDO = "Otp Invalido";
+	public static final String OTP_EXCEDIDO ="Excedio el numero de intentos";
+	public static final String COD_0000 = "0000";
+	
 }

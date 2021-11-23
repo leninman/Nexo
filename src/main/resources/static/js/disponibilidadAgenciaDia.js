@@ -35,7 +35,7 @@ function verAgencias(){
 	const fechaIni = document.getElementsByName("fechaI")[0];
 	formData.append('fechaS', fechaIni.value);
 	
-	//$('#spinnerModal').modal('show');
+	$('#spinnerModal').modal('show');
 	$.ajax({
 		type: "POST",
 		cache: false,
@@ -44,8 +44,9 @@ function verAgencias(){
 		processData: false,
 		contentType: false,
 		success: function(response) {
-			$('#disponibilidadAgenciaDiaContainer').html(response);
 			$('#spinnerModal').modal('hide');
+			$('#disponibilidadAgenciaDiaContainer').html(response);
+			
 		}
 	});
 

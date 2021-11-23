@@ -51,6 +51,7 @@ input[type=number] {
 		
 				        var dmy = date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear();
 				        var day = date.getDay();
+				     
 				        if ($.inArray(dmy, feriados) === -1 && day !== 0 && day !== 6) {
 				            return [true, ""];
 				        } else {

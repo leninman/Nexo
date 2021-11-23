@@ -24,4 +24,6 @@ public interface IAgenciaDiaRepo extends JpaRepository<AgenciaDia, Integer>{
 	@Query("DELETE FROM AgenciaDia ad WHERE ad.fecha >= ?1 AND ad.fecha <=?2")
 	void deleteByFecha(Date fechaInicial, Date fechaFin);
 	
+	//@Query("SELECT setval('table_id_seq', (SELECT MAX(id) FROM table))");
+	
 }

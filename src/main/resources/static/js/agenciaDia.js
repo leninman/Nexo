@@ -21,7 +21,7 @@ function processAgenciaDiaForm(accion, form) {
 	
 	}
 	//alert("selectedChecks" + selectedChecks);
-
+	//$('#spinnerModal').modal('show');
 	$.ajax({
 		type: "POST",
 		cache: false,
@@ -30,6 +30,7 @@ function processAgenciaDiaForm(accion, form) {
 		processData: false,
 		contentType: false,
 		success: function(response) {
+		//	$('#spinnerModal').modal('hide');
 			$('#agenciaDiaContainer').html(response);
 		}
 	});
