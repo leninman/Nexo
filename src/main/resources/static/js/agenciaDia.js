@@ -20,7 +20,7 @@ function processAgenciaDiaForm(accion, form) {
 		}
 	
 	}
-	//alert("selectedChecks" + selectedChecks);
+	
 	//$('#spinnerModal').modal('show');
 	$.ajax({
 		type: "POST",
@@ -32,9 +32,11 @@ function processAgenciaDiaForm(accion, form) {
 		success: function(response) {
 		//	$('#spinnerModal').modal('hide');
 			$('#agenciaDiaContainer').html(response);
+			window.scrollTo(0,0);
 		}
 	});
 }
+
 
 function agenciaDiaAgregar(id) {
 	$.ajax({
