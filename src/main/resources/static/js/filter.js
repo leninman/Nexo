@@ -1,3 +1,4 @@
+/*
   document.querySelector("#buscar").onkeyup = function(){
         $TableFilter("#tabla", this.value);
     }
@@ -22,4 +23,4 @@
                 row.style.display = null;
             }
         }
-    }
+    }*/
