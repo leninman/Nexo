@@ -35,11 +35,11 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			"/procesarSolicitudRetiro", "/getSolicitudRetiroProcesar", "/anularSolicitudesRetiro",
 			"/rechazarSolicitudRetiro", "/anularSolicitudesRetiro", "/aprobarSolicitudRetiro",
 			"/aprobarSolicitudesRetiro", "/listarTipoAutorizado", "/cancelarSolicitudRetiro", "/mapaAgenciaResult",
-			"/entregarSolicitudRetiro", "/validarOtpEntregaSolicitudRetiro", "/depositos", "/nuevoDeposito",
+			"/validarOtpEntregaSolicitudRetiro", "/depositos", "/nuevoDeposito",
 			"/detalleDeposito", "/autorizarReverso", "/ejecutarReverso", "/agregarDeposito", "/voucher", "/retiros",
 			"/nuevoRetiro", "/detalleRetiro", "/autorizarReversoRetiro", "/ejecutarReversoRetiro", "/agregarRetiro",
 			"/voucherRetiro", "/solicitudesMasivas", "/cargarSolicitudRetiro", "/solicitudesMasivas",
-			"/crearSolicitudesDeRetiro");
+			"/crearSolicitudesDeRetiro", "/generarOtpEntregaSolicitudRetiro");
 
 	private static final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico",
 			"/mainBECA", "/usuarioChange", "/403", "/404", "/405", "/error", "/access-denied", "/errorPage");

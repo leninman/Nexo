@@ -12,7 +12,7 @@ public interface IAgenciaRepo extends JpaRepository<Agencia, Integer>{
 	@Query("SELECT a FROM Agencia a WHERE a.almacenamiento = ?1 and a.idEstatusAgencia=1 order by a.numeroAgencia asc")
 	public List<Agencia> findByAlmacenamiento(Boolean almacenamiento);
 	
-	@Query("SELECT a FROM Agencia a WHERE a.almacenamiento = ?1 and a.recaudacion = ?2 and a.idEstatusAgencia=1 order by a.numeroAgencia asc")
+	@Query("SELECT a FROM Agencia a WHERE a.almacenamiento = ?1 or a.recaudacion = ?2 and a.idEstatusAgencia=1 order by a.numeroAgencia asc")
 	public List<Agencia> findByAlmacenamientoOrRecaudacion(Boolean almacenamiento, Boolean recaudacion);
 	
 	public List<Agencia> findByNumeroAgencia(Integer numeroAgencia);
