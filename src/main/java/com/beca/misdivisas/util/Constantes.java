@@ -63,7 +63,8 @@ public final class Constantes {
 	public static final String TEXTO_REPORTE_SUCURSAL= "Reporte por sucursal";
 	public static final String CAMBIO_EMPRESA= "Cambio de Empresa";
 	public static final String TEXTO_ADMINISTRAR_EMPRESAS = "Administracion Empresas";
-	public static final String TEXTO_ADMINISTRAR_SUCURSALES = "Administracion Sucursales";	
+	public static final String TEXTO_ADMINISTRAR_SUCURSALES = "Administracion Sucursales";
+	public static final String TEXTO_ADMINISTRAR_AGENCIAS = "Administracion Agencias";
 	
 	public static final String CONSULTA_POR_PARAMETROS = "Consulta: fecha inicio({0}); fecha fin({1}); moneda({2})";
 	public static final String CONSULTA_POR_CARTAPORTE ="Consulta de Remesas por Cart Porte: fecha inicio({0}); fecha fin({1}); carta porte({2})";
@@ -82,6 +83,7 @@ public final class Constantes {
 	public static final String ACCION_LISTAR_PERFILES = "Se listaron los perfiles de la empresa {0}";
 	public static final String ACCION_SOLICITUD_RETIRO_EFECTIVO = "{0} Solicitud Retiro Efectivo : idSolicitud({1}); idUsuario({2}); nombreUsuario({3});";
 	public static final String ACCION_LOGIN="Se intenta ingresar con el nombre de usuario ({0}) desde la ip ({1})";
+	public static final String ACCION_AGENCIA_DIA="Consulta mapa disponibilidad agencia";
 	
 	public static final String OP_CONSULTA = "Consulta";
 	public static final String OP_EDICION = "Edicion";
@@ -200,7 +202,8 @@ public final class Constantes {
 	public static final String AUTORIZADO_PERSONA_NATURAL = "Autorizado Persona Natural";
 	public static final String AUTORIZADO_PERSONA_JURIDICA = "Autorizado Persona Juridica";
 	public static final String SOLICTUD_RETIRO_ACCION_FROM = "accionFrom";
-
+	public static final String AGENCIA_DIA = "Agencia Dia";
+	
 	public static final String TIPO_PERFIL_I = "I";
 	public static final String TIPO_PERFIL_E = "E";
 	public static final String ROL_PRE = "ROLE_";
@@ -335,6 +338,7 @@ public final class Constantes {
 	public static final String TIPO_AUTORIZADO_MODEL = "tipoAutorizadoModel";
 
 	public static final String AGENCIAS = "agencias";
+	public static final String LISTAR_AGENCIA = "Listar agencias";
 	public static final String CREAR_AGENCIA = "Crear agencia";
 	public static final String AGENCIA_MODEL = "agenciaModel";
 	public static final String ACCION_AGENCIA = "{0} Agencia : NombreAgencia({1});  idAgencia({2}); idUsuario({3}); nombreUsuario({4});";

@@ -3,6 +3,7 @@ package com.beca.misdivisas.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,6 +73,9 @@ public class MapController {
 
 	@Autowired
 	private LogService logServ;
+	
+	@Autowired
+	private HttpServletRequest request;
 
 	@GetMapping(value = "/mapa", produces = "application/json")
 	public String mapa(Model model, HttpServletRequest request) {
@@ -198,7 +202,9 @@ public class MapController {
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		model.addAttribute(Constantes.TIPO_MAPA, "agencias");
 		model.addAttribute("fecha", fechaS);
-
+		String detalle = MessageFormat.format(Constantes.ACCION_AGENCIA_DIA, Constantes.OP_CONSULTA, usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.OP_CONSULTA, detalle, Constantes.AGENCIA_DIA,
+				true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.MAPA_AGENCIA_DIA;
 		
@@ -264,6 +270,7 @@ public class MapController {
 				i++;
 			}
 		}
+		
 		return locaciones;
 	}	
 }

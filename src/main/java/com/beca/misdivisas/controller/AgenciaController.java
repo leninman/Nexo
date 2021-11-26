@@ -86,7 +86,8 @@ public class AgenciaController {
 		if (agenciaModel.isEmpty())
 			agenciaModel = null;
 		model.addAttribute(Constantes.AGENCIAS, agenciaModel);
-
+		logServ.registrarLog(Constantes.LISTAR_AGENCIA, Constantes.TEXTO_ADMINISTRAR_AGENCIAS,
+				Constantes.AGENCIAS, true, Util.getRemoteIp(request), usuario);
 		return "mainAgencias";
 	}
 
