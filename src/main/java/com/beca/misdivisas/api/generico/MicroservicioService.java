@@ -58,7 +58,8 @@ public class MicroservicioService implements IMicroservicioService {
 	private String remitente;
 	@Value("${canal.detectid}")
 	private String canalDetectid;
-	
+	@Value("${modulo.detectid}")
+	private String moduloDetectid;
 	
 		
 	public List<CuentaConsultarCuentas> consultarCuentas(String docCliente, String ipOrigen) throws Exception{
@@ -179,7 +180,7 @@ public class MicroservicioService implements IMicroservicioService {
 		return null;
 	}
 	
-	public String solicitarValidarOTP(String sharedKey, String otp, String ipOrigen, String modulo, String proposito, String operacion) throws Exception{
+	public String solicitarValidarOTP(String sharedKey, String otp, String ipOrigen, String proposito, String operacion) throws Exception{
 		DateFormat formatoFecha = new SimpleDateFormat(Constantes.FORMATO_FECHA_YYYYMMDDHHMMSS);
 		OtpRequest request = new OtpRequest();
 		request.setIdCanal(Integer.parseInt(canal));
@@ -187,7 +188,7 @@ public class MicroservicioService implements IMicroservicioService {
 		request.setIdUsuario(canalDetectid);
 		request.setSharedKey(sharedKey);
 		request.setChannel(canalDetectid);
-		request.setModulo(modulo);
+		request.setModulo(moduloDetectid);
 		request.setIp(ipOrigen);
 		request.setProposito(proposito);
 		String resultado ="Exito";
@@ -201,13 +202,16 @@ public class MicroservicioService implements IMicroservicioService {
 			if(response!=null && response.getResultado() != null) {
 				switch (response.getResultado().getCodigo()) {
 				case "0000"://exitoso
-					resultado = "Exito";
+					resultado = "000";
 					break;
 				case "902"://
-					resultado = "OTP invalido";
+					resultado = "902"; //"OTP invalido"
 					break;
 				case "904":
-					resultado = "Excedio el numero de intentos";
+					resultado = "904"; //"Excedio el numero de intentos"
+					break;
+				case "938":
+					resultado = "938"; //"OTP Expirado"
 					break;
 				default:
 					break;
@@ -215,9 +219,9 @@ public class MicroservicioService implements IMicroservicioService {
 			}						
 		} catch (Exception e) {
 			if(e.getLocalizedMessage().contains("902"))
-				return "OTP invalido";
+				return "902";
 			else if(e.getLocalizedMessage().contains("904"))
-				return "Excedio el numero de intentos";
+				return "904";
 			else
 				throw e;
 		}
@@ -226,7 +230,7 @@ public class MicroservicioService implements IMicroservicioService {
 	}
 	
 	
-	public boolean enviarOTP(String tipoDocumento, String nroDocumento, String nombre,String telefono, String correo, String modulo, String proposito, String ipOrigen) throws Exception{
+	public boolean enviarOTP(String tipoDocumento, String nroDocumento, String nombre,String telefono, String correo, String proposito, String ipOrigen) throws Exception{
 		boolean existe= false, generado= false, creado = false;
 		ClientesDetectIdResponseCRUD response=null;
 		DatosClientesDetectIdCRUD datos;
@@ -252,7 +256,7 @@ public class MicroservicioService implements IMicroservicioService {
 			if(!existe)
 				response = detectIdCRUD(nombre, tipoDocumento+nroDocumento,telefono, correo, ipOrigen, Constantes.CREATE);
 	
-			resp = solicitarValidarOTP(tipoDocumento+nroDocumento, null, ipOrigen, modulo, proposito, Constantes.GENERAR);
+			resp = solicitarValidarOTP(tipoDocumento+nroDocumento, null, ipOrigen, proposito, Constantes.GENERAR);
 			generado=resp.equalsIgnoreCase("Exito");
 		} catch (Exception e) {
 			logger.info(e.getLocalizedMessage());

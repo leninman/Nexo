@@ -36,13 +36,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.beca.misdivisas.api.detectidclient.client.MicroServicioClienteDetectIDClient;
 import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdRequest;
 import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdResponseCRUD;
 import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdResponseGet;
-import com.beca.misdivisas.api.detectidotp.client.MicroServicioOTPDetectIDClient;
+import com.beca.misdivisas.api.detectidclient.model.DatosClientesDetectIdGet;
 import com.beca.misdivisas.api.detectidotp.model.OtpRequest;
 import com.beca.misdivisas.api.detectidotp.model.OtpResponse;
+import com.beca.misdivisas.api.generico.IMicroservicioService;
 import com.beca.misdivisas.interfaces.IAgenciaRepo;
 import com.beca.misdivisas.interfaces.IAutorizadoRepo;
 import com.beca.misdivisas.interfaces.IEstatusSolicitudRetiroRepo;
@@ -126,10 +126,7 @@ public class SolicitudRetiroController {
 //	private EntityManager entityManager;
 
 	@Autowired
-	private MicroServicioClienteDetectIDClient microServicioClienteDetectIDClient;
-
-	@Autowired
-	private MicroServicioOTPDetectIDClient microServicioOTPDetectIDClient;
+	private IMicroservicioService microServicioService;
 
 	@Autowired
 	private SolicitudRetiroService solicitudRetiroService;
@@ -728,52 +725,15 @@ public class SolicitudRetiroController {
 		String idSolicitud = id;
 		int idS = Integer.parseInt(idSolicitud);
 		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(idS);
-		ClientesDetectIdRequest clientesDetectIdRequest = new ClientesDetectIdRequest();
-		OtpRequest otpRequest = new OtpRequest();
-
+		
 		if (solicitudRetiro.getAutorizado() != null && solicitudRetiro.getAutorizado().getIdTipoAutorizado() != 3) {
-			clientesDetectIdRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
-			ClientesDetectIdResponseGet response = microServicioClienteDetectIDClient
-					.detectIdGet(clientesDetectIdRequest);
-
-			if (response.getDatos() == null) {
-				clientesDetectIdRequest.setIp("0:0:0:0:0:0:0:1");
-				clientesDetectIdRequest.setIpOrigen(Util.getRemoteIp(request));
-				clientesDetectIdRequest.setIdCanal(3);
-				clientesDetectIdRequest.setIdSesion(factory.getObject().getId());
-				clientesDetectIdRequest.setIdCliente("NEXODIVISAS");
-				clientesDetectIdRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
-				clientesDetectIdRequest
-						.setBusinessDescription(solicitudRetiro.getAutorizado().getNombreCompleto().trim());
-				clientesDetectIdRequest.setEmail(solicitudRetiro.getAutorizado().getEmail().trim());
-				clientesDetectIdRequest.setTelefono(solicitudRetiro.getAutorizado().getTelefonoMovil().trim());
-				microServicioClienteDetectIDClient.detectIdCRUD(clientesDetectIdRequest, "create");
-
-			} else if (response.getDatos() != null
-					&& (!response.getDatos().getTelefono().equals(solicitudRetiro.getAutorizado().getTelefonoMovil())
-							|| !response.getDatos().getEmail().equals(solicitudRetiro.getAutorizado().getEmail()))) {
-				clientesDetectIdRequest.setIp("0:0:0:0:0:0:0:1");
-				clientesDetectIdRequest.setIpOrigen(Util.getRemoteIp(request));
-				clientesDetectIdRequest.setIdCanal(3);
-				clientesDetectIdRequest.setIdSesion(factory.getObject().getId());
-				clientesDetectIdRequest.setIdCliente("NEXODIVISAS");
-				clientesDetectIdRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
-				clientesDetectIdRequest
-						.setBusinessDescription(solicitudRetiro.getAutorizado().getNombreCompleto().trim());
-				clientesDetectIdRequest.setEmail(solicitudRetiro.getAutorizado().getEmail().trim());
-				clientesDetectIdRequest.setTelefono(solicitudRetiro.getAutorizado().getTelefonoMovil().trim());
-				microServicioClienteDetectIDClient.detectIdCRUD(clientesDetectIdRequest, "update");
-			}
-			String idUsua = String.valueOf(solicitudRetiro.getAutorizado().getIdAutorizado());
-			otpRequest.setIdCanal(3);
-			otpRequest.setIdSesion(factory.getObject().getId());
-			otpRequest.setIdUsuario(idUsua);
-			otpRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
-			otpRequest.setChannel("NEXODIVISAS");
-			otpRequest.setModulo("EMAIL");
-			otpRequest.setIp("0:0:0:0:0:0:0:1");
-			otpRequest.setProposito("retirar la solicitud");
-			microServicioOTPDetectIDClient.crearValidarOTP(otpRequest, "generar");
+			String nombre = solicitudRetiro.getAutorizado().getNombreCompleto() != null ? solicitudRetiro.getAutorizado().getNombreCompleto().trim() : "";
+			String telefono = solicitudRetiro.getAutorizado().getTelefonoMovil() != null ? solicitudRetiro.getAutorizado().getTelefonoMovil().trim() : "";
+			String email = solicitudRetiro.getAutorizado().getEmail() != null ? solicitudRetiro.getAutorizado().getEmail().trim() : ""; 
+			
+			microServicioService.enviarOTP(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(0, 1), 
+					solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(1), nombre, 
+					telefono, email, "retirar la solicitud", Util.getRemoteIp(request));
 		}
 		validarOtpModel.setIdSolicitud(id);
 		model.addAttribute("validarOtpModel", validarOtpModel);
@@ -790,40 +750,31 @@ public class SolicitudRetiroController {
 		boolean expiredOtp = false;
 		int idS = Integer.parseInt(validarOtpModel.getIdSolicitud());
 		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(idS);
-		OtpRequest otpRequest = new OtpRequest();
-		// String idUsua =
-		// String.valueOf(solicitudRetiro.getAutorizado().getIdAutorizado());
-		otpRequest.setIdCanal(3);
-		otpRequest.setIdSesion(factory.getObject().getId());
-		otpRequest.setSharedKey(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim());
-		otpRequest.setChannel("NEXODIVISAS");
-		otpRequest.setModulo("EMAIL");
-		otpRequest.setIp("0:0:0:0:0:0:0:1");
-		otpRequest.setOtp(validarOtpModel.getOtp());
-		otpRequest.setProposito("retirar la solicitud");
-		OtpResponse otpResponse = microServicioOTPDetectIDClient.crearValidarOTP(otpRequest, "validar");
-		String resultado = null;
+		
+		String resultado = microServicioService.solicitarValidarOTP(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim(), validarOtpModel.getOtp(), 
+				Util.getRemoteIp(request), "retirar la solicitud", Constantes.VALIDAR);
+			
 
-		if (otpResponse.getResultado().getCodigo().equals("902")) {
+		if (resultado.equals("902")) {
 			invalidOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("invalidOtp", invalidOtp);
-			model.addAttribute("resultado", resultado);
+			//model.addAttribute("resultado", resultado);
 			return "modals/validarOtpModal";
-		} else if (otpResponse.getResultado().getCodigo().equals("904")) {
+		} else if (resultado.equals("904")) {
 			excessOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("excessOtp", excessOtp);
-			model.addAttribute("resultado", resultado);
+			//model.addAttribute("resultado", resultado);
 			return "modals/validarOtpModal";
-		} else if (otpResponse.getResultado().getCodigo().equals("938")) {
+		} else if (resultado.equals("938")) {
 			expiredOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("expiredOtp", expiredOtp);
-			model.addAttribute("resultado", resultado);
+			//model.addAttribute("resultado", resultado);
 			return "modals/validarOtpModal";
 		}
 

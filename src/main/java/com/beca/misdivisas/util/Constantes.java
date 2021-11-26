@@ -349,7 +349,9 @@ public final class Constantes {
 	public static final String GENERAR = "generar";
 	public static final String CREATE = "create";
 	public static final String GET = "get";
-	public static final String UPDATE="update";
+	public static final String UPDATE= "update";
+	public static final String VALIDAR = "validar";
+	public static final String DELETE = "delete";
 
 	public static final String AGENCIA_DIAS = "agenciaDias";
 	public static final String AGENCIA_DIAS_MODEL = "agenciaDiaOperaciones";

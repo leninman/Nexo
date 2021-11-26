@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,12 +31,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.tika.Tika;
 
-import com.beca.misdivisas.api.detectidclient.client.MicroServicioClienteDetectIDClient;
-import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdRequest;
-import com.beca.misdivisas.api.detectidclient.model.ClientesDetectIdResponseGet;
+import com.beca.misdivisas.api.detectidclient.model.DatosClientesDetectIdGet;
+import com.beca.misdivisas.api.generico.IMicroservicioService;
 import com.beca.misdivisas.interfaces.IAutorizadoRepo;
 import com.beca.misdivisas.interfaces.ISolicitudRetiroRepo;
 import com.beca.misdivisas.interfaces.ISolicitudRetiroTrazaRepo;
@@ -46,11 +45,11 @@ import com.beca.misdivisas.jpa.SolicitudRetiroTraza;
 import com.beca.misdivisas.jpa.TipoAutorizado;
 import com.beca.misdivisas.jpa.Transportista;
 import com.beca.misdivisas.jpa.Usuario;
+import com.beca.misdivisas.model.AutorizadoBeneficioTraspaso;
+import com.beca.misdivisas.model.AutorizadoEmpresaTransporte;
 import com.beca.misdivisas.model.AutorizadoModel;
 import com.beca.misdivisas.model.AutorizadoPersonaJuridica;
 import com.beca.misdivisas.model.AutorizadoPersonaNatural;
-import com.beca.misdivisas.model.AutorizadoBeneficioTraspaso;
-import com.beca.misdivisas.model.AutorizadoEmpresaTransporte;
 import com.beca.misdivisas.model.TipoAutorizadoModel;
 import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.util.AutorizadoUtils;
@@ -87,7 +86,7 @@ public class AutorizadoController {
 	private ISolicitudRetiroTrazaRepo solicitudRetiroTrazaRepo;
 	
 	@Autowired
-	private MicroServicioClienteDetectIDClient microServicioClienteDetectIDClient;
+	private IMicroservicioService microServicioService;
 
 	@Value("${ruta.img.autorizados}")
 	private String rutaImg;
@@ -558,12 +557,12 @@ public class AutorizadoController {
 				autorizadoAEliminar.setFechaActualizacion(ts);				
 				autorizadoRepository.save(autorizadoAEliminar);
 				
-				ClientesDetectIdRequest clientesDetectIdRequest = new ClientesDetectIdRequest ();
-				clientesDetectIdRequest.setSharedKey(autorizadoAEliminar.getDocumentoIdentidad().trim());
-				ClientesDetectIdResponseGet response = microServicioClienteDetectIDClient.detectIdGet(clientesDetectIdRequest);
+				DatosClientesDetectIdGet response = microServicioService.obtenerClienteDetectId(autorizadoAEliminar.getDocumentoIdentidad().trim(), null, null, Util.getRemoteIp(request)); 
 				
-				if(response.getDatos() != null && response.getDatos().getSharedKey().equals(autorizadoAEliminar.getDocumentoIdentidad())) {	
-					microServicioClienteDetectIDClient.detectIdCRUD(clientesDetectIdRequest, "delete");
+				if(response != null && response.getSharedKey().equals(autorizadoAEliminar.getDocumentoIdentidad())) {
+					
+					microServicioService.detectIdCRUD(null, autorizadoAEliminar.getDocumentoIdentidad().trim(), 
+							null, null, Util.getRemoteIp(request), Constantes.DELETE);
 				}
 				String detalle = MessageFormat.format(Constantes.ACCION_EDITAR_AUTORIZADO, "Autorizado Persona Juridica",
 						autorizadoAEliminar.getIdAutorizado(), autorizadoAEliminar.getIdTipoAutorizado(),

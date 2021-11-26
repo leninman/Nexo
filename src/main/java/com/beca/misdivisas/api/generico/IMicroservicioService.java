@@ -16,8 +16,8 @@ public interface IMicroservicioService {
 		
 	public DatosClientesDetectIdGet obtenerClienteDetectId(String sharedKey, String telefono, String email, String ipOrigen) throws Exception;
 	
-	public String solicitarValidarOTP(String sharedKey, String otp, String ipOrigen, String modulo, String proposito, String operacion) throws Exception;
+	public String solicitarValidarOTP(String sharedKey, String otp, String ipOrigen, String proposito, String operacion) throws Exception;
 		
-	public boolean enviarOTP(String tipoDocumento, String nroDocumento, String nombre,String telefono, String correo, String modulo, String proposito, String ipOrigen) throws Exception;
+	public boolean enviarOTP(String tipoDocumento, String nroDocumento, String nombre,String telefono, String correo, String proposito, String ipOrigen) throws Exception;
 		
 }
