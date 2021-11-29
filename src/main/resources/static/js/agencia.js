@@ -64,6 +64,7 @@ function processAgenciaForm(accion, form) {
 		data: form.serialize(),
 		success: function(response) {
 			$('#agenciaContainer').html(response);
+			window.scrollTo(0,0);
 		}
 	});
 }

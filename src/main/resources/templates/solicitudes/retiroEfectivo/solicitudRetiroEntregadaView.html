@@ -241,12 +241,10 @@
 					</div>
 					<br>
 					<div>
-
-						<!-- BOTONES PARA PRUEBA DE FORMULARIO AUTORIZADOS PERSONAS CASO 1 Y 2  -->
-
 						<table style="width: 100%; text-align: center;">
 							<tr>
-								<td><input type="button" class="btn btn-primary"
+								<td th:if="${tipoAutorizacion}!='3'"><input type="button"
+									class="btn btn-primary"
 									th:onclick="|entrega('${solicitudRetiro.idSolicitud}')|"
 									value="Enviar Clave de Validaci&oacute;n">
 									<div class="modal fade" id="entregarModal">
@@ -264,8 +262,45 @@
 													<br />
 												</div>
 											</div>
+										</div></div></td>
+								<td th:if="${tipoAutorizacion}=='3'"><input type="button"
+									class="btn btn-primary" data-toggle="modal"
+									th:attr="data-target='#recordAprobarModal'+${solicitudRetiro.idSolicitud}"
+									value="Entregar">
+									<div class="modal fade"
+										th:attr="id='recordAprobarModal'+${solicitudRetiro.idSolicitud}"
+										tabindex="-1" role="dialog"
+										aria-labelledby="recordAprobarModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered"
+											role="document">
+											<div class="modal-content">
+												<div class="modal-header" style="text-align: right;">
+													<h5 class="modal-title" id="recordAprobarModalLabel"
+														th:text="#{msj.confirm.entregar.solicitud.retiro}"></h5>
+													<button class="close" type="button" data-dismiss="modal"
+														aria-label="Close">
+														<i class="far fa-times-circle"></i>
+													</button>
+												</div>
+												<div class="modal-body"></div>
+												<form method="POST"
+													th:action="@{entregarSolicitudRetiroEmpresaTransportista}"
+													th:attr="id='formAprobar'+${solicitudRetiro.idSolicitud}">
+													<div style="text-align: center;">
+														<button class="btn btn-secondary" type="button"
+															data-dismiss="modal" style="height: 40px; width: 100px"
+															th:text="#{msj.no}"></button>
+														<input type="hidden" name="idSolicitud" id="idSolicitud"
+															th:value="${solicitudRetiro.idSolicitud}" />
+														<button type="submit" name="submit"
+															class="btn btn-primary"
+															style="height: 40px; width: 100px" th:text="#{msj.si}"></button>
+													</div>
+												</form>
+												<br />
+											</div>
 										</div>
-									</td>
+									</div></td>
 								<td><input type="button" class="btn btn-danger"
 									data-toggle="modal"
 									th:attr="data-target='#recordDeleteModal'+${solicitudRetiro.idSolicitud}"

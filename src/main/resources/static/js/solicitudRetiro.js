@@ -23,7 +23,6 @@
 			}
 		}
 	}*/
-
 function getFormulario(url) {
 	$('#spinnerModal').modal('show');
 	$.ajax({
@@ -421,6 +420,7 @@ function getEntregaForm(url) {
 	})
 }
 
+
 function SolicitudEntregarForm(id) {
 	$('#spinnerModal').modal('show');
 	$.ajax({
@@ -432,12 +432,14 @@ function SolicitudEntregarForm(id) {
 			$('#entregarModal').modal('show');
 			$('#spinnerModal').modal('hide');
 			$('#validarOtpContainer').html(response);
-
+			modalContador();
+			extendSession();
 		}
 	});
 }
 
 function entrega(id) {
+	//extendSession();
 	SolicitudEntregarForm(id);
 }
 
@@ -460,7 +462,7 @@ function processvalidarOtpForm(accion, form) {
 		}
 	});
 }
-
+function modalContador(){
 var t = new Date();
 t.setMinutes(t.getMinutes() + 3);
 
@@ -487,7 +489,9 @@ var x = setInterval(function() {
 	if (distance < 0) {
 		clearInterval(x);
 		$('#timer').html('00:00');
-		var url = $('#back').attr('href');
-		location.replace(url);
+		$('#entregarModal').modal('hide');
 	}
 }, 1000);
+
+}
+

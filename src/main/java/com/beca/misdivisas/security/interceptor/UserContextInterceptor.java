@@ -39,7 +39,7 @@ public class UserContextInterceptor extends HandlerInterceptorAdapter {
 			"/detalleDeposito", "/autorizarReverso", "/ejecutarReverso", "/agregarDeposito", "/voucher", "/retiros",
 			"/nuevoRetiro", "/detalleRetiro", "/autorizarReversoRetiro", "/ejecutarReversoRetiro", "/agregarRetiro",
 			"/voucherRetiro", "/solicitudesMasivas", "/cargarSolicitudRetiro", "/solicitudesMasivas",
-			"/crearSolicitudesDeRetiro", "/generarOtpEntregaSolicitudRetiro");
+			"/crearSolicitudesDeRetiro", "/generarOtpEntregaSolicitudRetiro", "/entregarSolicitudRetiroEmpresaTransportista");
 
 	private static final List<String> OTROS_PATHS = Arrays.asList("/totalPorSucursal", "/index", "/grafico",
 			"/mainBECA", "/usuarioChange", "/403", "/404", "/405", "/error", "/access-denied", "/errorPage");

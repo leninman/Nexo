@@ -1,3 +1,4 @@
+<th:block th:fragment="validarOtpModal">
 <form action="#" method="POST" th:objet="${validarOtpModel}">
 	<script>
 		$('form').on('submit', function(e) {
@@ -33,6 +34,7 @@
 		</div>
 	</div>
 </form>
+
 <script type="text/javascript">
 	$("#otp").keyup(function() {
 		var otp = $("#otp").val();
@@ -42,4 +44,8 @@
 			$("#idSolicitud").prop("disabled", true);
 		}
 	});
+	
+	
 </script>
+
+</th:block>

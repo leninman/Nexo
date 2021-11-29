@@ -725,15 +725,22 @@ public class SolicitudRetiroController {
 		String idSolicitud = id;
 		int idS = Integer.parseInt(idSolicitud);
 		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(idS);
-		
+
 		if (solicitudRetiro.getAutorizado() != null && solicitudRetiro.getAutorizado().getIdTipoAutorizado() != 3) {
-			String nombre = solicitudRetiro.getAutorizado().getNombreCompleto() != null ? solicitudRetiro.getAutorizado().getNombreCompleto().trim() : "";
-			String telefono = solicitudRetiro.getAutorizado().getTelefonoMovil() != null ? solicitudRetiro.getAutorizado().getTelefonoMovil().trim() : "";
-			String email = solicitudRetiro.getAutorizado().getEmail() != null ? solicitudRetiro.getAutorizado().getEmail().trim() : ""; 
-			
-			microServicioService.enviarOTP(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(0, 1), 
-					solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(1), nombre, 
-					telefono, email, "retirar la solicitud", Util.getRemoteIp(request));
+			String nombre = solicitudRetiro.getAutorizado().getNombreCompleto() != null
+					? solicitudRetiro.getAutorizado().getNombreCompleto().trim()
+					: "";
+			String telefono = solicitudRetiro.getAutorizado().getTelefonoMovil() != null
+					? solicitudRetiro.getAutorizado().getTelefonoMovil().trim()
+					: "";
+			String email = solicitudRetiro.getAutorizado().getEmail() != null
+					? solicitudRetiro.getAutorizado().getEmail().trim()
+					: "";
+
+			microServicioService.enviarOTP(
+					solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(0, 1),
+					solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(1), nombre, telefono,
+					email, "retirar la solicitud", Util.getRemoteIp(request));
 		}
 		validarOtpModel.setIdSolicitud(id);
 		model.addAttribute("validarOtpModel", validarOtpModel);
@@ -750,31 +757,31 @@ public class SolicitudRetiroController {
 		boolean expiredOtp = false;
 		int idS = Integer.parseInt(validarOtpModel.getIdSolicitud());
 		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(idS);
-		
-		String resultado = microServicioService.solicitarValidarOTP(solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim(), validarOtpModel.getOtp(), 
+
+		String resultado = microServicioService.solicitarValidarOTP(
+				solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim(), validarOtpModel.getOtp(),
 				Util.getRemoteIp(request), "retirar la solicitud", Constantes.VALIDAR);
-			
 
 		if (resultado.equals("902")) {
 			invalidOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("invalidOtp", invalidOtp);
-			//model.addAttribute("resultado", resultado);
+			// model.addAttribute("resultado", resultado);
 			return "modals/validarOtpModal";
 		} else if (resultado.equals("904")) {
 			excessOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("excessOtp", excessOtp);
-			//model.addAttribute("resultado", resultado);
+			// model.addAttribute("resultado", resultado);
 			return "modals/validarOtpModal";
 		} else if (resultado.equals("938")) {
 			expiredOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("expiredOtp", expiredOtp);
-			//model.addAttribute("resultado", resultado);
+			// model.addAttribute("resultado", resultado);
 			return "modals/validarOtpModal";
 		}
 
@@ -788,6 +795,31 @@ public class SolicitudRetiroController {
 		solicitudRetiroTraza.setFecha(ts);
 		solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
 		return "modals/pruebaOTP";
+	}
+
+	@PostMapping("/entregarSolicitudRetiroEmpresaTransportista")
+	public String entregarSolicitudRetiroEmpresaTransportista(@RequestParam("idSolicitud") int id, Model model) {
+		Usuario usuario = ((Usuario) factory.getObject().getAttribute(Constantes.USUARIO));
+		final SolicitudRetiro solicitudRetiro = solicitudRetiroRepo.findById(id);
+		if (solicitudRetiro == null) {
+			return "redirect:solicitudesRetiroEntregar?error";
+		} else {
+			final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
+			solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
+			solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
+			solicitudRetiroTraza.setIdEstatusSolicitud(9);
+			Date date = new Date();
+			long time = date.getTime();
+			Timestamp ts = new Timestamp(time);
+			solicitudRetiroTraza.setFecha(ts);
+			solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
+
+			String detalle = MessageFormat.format(Constantes.ACCION_SOLICITUD_RETIRO_EFECTIVO, Constantes.OP_ENTREGAR,
+					solicitudRetiro.getIdSolicitud(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+			logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGAR, true,
+					Util.getRemoteIp(request), usuario);
+			return "redirect:solicitudesRetiroEntregar?success";
+		}
 	}
 
 	private void setDatosSolicitudModel(SolicitudRetiro solicitudRetiro, Model model) throws IOException {

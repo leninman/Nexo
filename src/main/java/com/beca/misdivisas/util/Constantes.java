@@ -169,7 +169,7 @@ public final class Constantes {
 	public static final String RECHAZAR_SOLICITUD_RETIRO_EFECTIVO = "Rechazar solic ret efectivo";
 	public static final String CANCELAR_SOLICITUD_RETIRO_EFECTIVO = "Cancelar solic ret efectivo";
 	public static final String PROCESAR_SOLICITUD_RETIRO_EFECTIVO = "Procesar solic ret efectivo";
-
+	public static final String ENTREGAR_SOLICITUD_RETIRO_EFECTIVO = "Entregar solic ret efectivo";
 	public static final String OPCION_POSICION = "Posicion Consolidada";
 	public static final String OPCION_BNA = "Billetes No Aptos";
 	public static final String OPCION_TRACKING = "Tracking de Remesas";

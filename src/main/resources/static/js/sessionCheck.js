@@ -43,8 +43,9 @@ function extendSession() {
     	if (currentTime > timeForCloseSession) {
 			window.location.href = 'logout';
 			return;
-		} else 
+		} else {
 			initSession();
+		}
 		}				
 	});
 }
