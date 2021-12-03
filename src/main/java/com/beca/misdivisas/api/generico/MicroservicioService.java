@@ -242,6 +242,8 @@ public class MicroservicioService implements IMicroservicioService {
 					existe=true;
 					if(response.getDatos()!=null) {
 						datos=response.getDatos();
+						if(datos.getEmail() == null)
+							datos.setEmail("");
 						if(!datos.getTelefono().equalsIgnoreCase(telefono)||!datos.getEmail().equalsIgnoreCase(correo)) {
 							response = detectIdCRUD(nombre, tipoDocumento+nroDocumento, telefono, correo, ipOrigen, Constantes.UPDATE);
 						}
@@ -249,7 +251,8 @@ public class MicroservicioService implements IMicroservicioService {
 				}
 			} catch (Exception e) {
 				logger.info(e.getLocalizedMessage());
-				if(e.getMessage().contains("404")) {
+				
+				if(e.getMessage() != null && e.getMessage().contains("404")) {
 					existe = false;
 				}
 			}			
