@@ -150,13 +150,12 @@
 				$("#fechaI").datepicker({
 					
 					minDate: "0d",
-					maxDate: "35d",
+					maxDate: "7d",
 					dateFormat: 'dd/mm/yy',
 					daysOfWeekDisabled: [0, 6],
 					beforeShowDay: function (date) {
 						var dmy = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-						var day = date.getDay();
-						//alert(fechaI);		
+						var day = date.getDay();		
 						if ($.inArray(dmy, feriados) === -1 && day !== 0 && day !== 6) {
 							return [true, ""];
 						} else {
