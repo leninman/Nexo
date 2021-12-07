@@ -1,6 +1,7 @@
 package com.beca.misdivisas.controller;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import com.beca.misdivisas.model.AgenciaDiaOperacionesModel;
 import com.beca.misdivisas.model.AgenciaFechaOperaciones;
 import com.beca.misdivisas.services.LogService;
 import com.beca.misdivisas.util.Constantes;
+import com.beca.misdivisas.util.Util;
 
 @Controller
 public class AgenciaDiaController {
@@ -87,8 +89,8 @@ public class AgenciaDiaController {
 			agenciaDias.add(ad);
 			
 		}
-		agenciaDiaRepository.saveAll(agenciaDias);
-			
+		agenciaDiaRepository.saveAll(agenciaDias);	
+		
 	return "redirect:agenciaDiasResult?success";		 
 	}
 	
