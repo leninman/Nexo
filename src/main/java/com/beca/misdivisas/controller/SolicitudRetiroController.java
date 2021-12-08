@@ -794,6 +794,11 @@ public class SolicitudRetiroController {
 		Timestamp ts = new Timestamp(time);
 		solicitudRetiroTraza.setFecha(ts);
 		solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
+		
+				String detalle = MessageFormat.format(Constantes.ACCION_SOLICITUD_RETIRO_EFECTIVO, Constantes.OP_ENTREGAR,
+				solicitudRetiro.getIdSolicitud(), usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGA, true,
+				Util.getRemoteIp(request), usuario);
 		return "modals/pruebaOTP";
 	}
 

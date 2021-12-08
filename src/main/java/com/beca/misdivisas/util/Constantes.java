@@ -83,7 +83,8 @@ public final class Constantes {
 	public static final String ACCION_LISTAR_PERFILES = "Se listaron los perfiles de la empresa {0}";
 	public static final String ACCION_SOLICITUD_RETIRO_EFECTIVO = "{0} Solicitud Retiro Efectivo : idSolicitud({1}); idUsuario({2}); nombreUsuario({3});";
 	public static final String ACCION_LOGIN="Se intenta ingresar con el nombre de usuario ({0}) desde la ip ({1})";
-	public static final String ACCION_AGENCIA_DIA="Consulta mapa disponibilidad agencia";
+	//public static final String ACCION_AGENCIA_DIA="Consulta mapa disponibilidad agencia";
+	public static final String ACCION_AGENCIA_DIA="{0} Programacion Agencia Dia : nombreUsuario({1});";
 	
 	public static final String OP_CONSULTA = "Consulta";
 	public static final String OP_EDICION = "Edicion";
@@ -170,6 +171,7 @@ public final class Constantes {
 	public static final String CANCELAR_SOLICITUD_RETIRO_EFECTIVO = "Cancelar solic ret efectivo";
 	public static final String PROCESAR_SOLICITUD_RETIRO_EFECTIVO = "Procesar solic ret efectivo";
 	public static final String ENTREGAR_SOLICITUD_RETIRO_EFECTIVO = "Entregar solic ret efectivo";
+	public static final String CREAR_PROG_AGENCIA_DIA = "Crear prog agencia dia";
 	public static final String OPCION_POSICION = "Posicion Consolidada";
 	public static final String OPCION_BNA = "Billetes No Aptos";
 	public static final String OPCION_TRACKING = "Tracking de Remesas";
