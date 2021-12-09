@@ -93,15 +93,8 @@ public class AgenciaDiaController {
 			
 		}
 		agenciaDiaRepository.saveAll(agenciaDias);	
-		String detalle = MessageFormat.format(Constantes.ACCION_AGENCIA_DIA, Constantes.OP_CREAR,
-				usuario.getNombreUsuario());
-				logServ.registrarLog(Constantes.CREAR_PROG_AGENCIA_DIA, detalle, Constantes.OP_CREAR, true,
+				logServ.registrarLog(Constantes.CREAR_PROG_AGENCIA_DIA, null, Constantes.OP_PROGRAMAR_AGENCIAS, true,
 				Util.getRemoteIp(request), usuario);
-				
-		/*		String detalle = MessageFormat.format(Constantes.ACCION_SOLICITUD_RETIRO_EFECTIVO, Constantes.OP_ENTREGAR,
-						solicitudRetiro.getIdSolicitud(), usuario.getIdUsuario(), usuario.getNombreUsuario());
-						logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGA, true,
-						Util.getRemoteIp(request), usuario);*/
 	return "redirect:agenciaDiasResult?success";		 
 	}
 	

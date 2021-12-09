@@ -741,11 +741,17 @@ public class SolicitudRetiroController {
 					solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(0, 1),
 					solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim().substring(1), nombre, telefono,
 					email, "retirar la solicitud", Util.getRemoteIp(request));
-		}
+		}		
 		validarOtpModel.setIdSolicitud(id);
 		model.addAttribute("validarOtpModel", validarOtpModel);
+		
+		String detalle = MessageFormat.format(Constantes.DETALLE_GENERAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO,
+				solicitudRetiro.getIdSolicitud(), solicitudRetiro.getAutorizado().getDocumentoIdentidad());
+		logServ.registrarLog(Constantes.GENERAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO, detalle,
+				Constantes.OP_ENTREGA, true, Util.getRemoteIp(request), usuario);
+		
 		return "modals/validarOtpModal";
-
+		
 	}
 
 	@PostMapping("/validarOtpEntregaSolicitudRetiro")
@@ -761,13 +767,18 @@ public class SolicitudRetiroController {
 		String resultado = microServicioService.solicitarValidarOTP(
 				solicitudRetiro.getAutorizado().getDocumentoIdentidad().trim(), validarOtpModel.getOtp(),
 				Util.getRemoteIp(request), "retirar la solicitud", Constantes.VALIDAR);
-
+		
+		String detalle = MessageFormat.format(Constantes.DETALLE_VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO,
+				solicitudRetiro.getIdSolicitud(), solicitudRetiro.getAutorizado().getDocumentoIdentidad());
+		
 		if (resultado.equals("902")) {
 			invalidOtp = true;
 			model.addAttribute("validarOtpModel", validarOtpModel);
 			model.addAttribute("error", true);
 			model.addAttribute("invalidOtp", invalidOtp);
 			// model.addAttribute("resultado", resultado);
+			logServ.registrarLog(Constantes.VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO, "OTP invalido: " + detalle, Constantes.OP_ENTREGA, false,
+					Util.getRemoteIp(request), usuario);
 			return "modals/validarOtpModal";
 		} else if (resultado.equals("904")) {
 			excessOtp = true;
@@ -775,6 +786,8 @@ public class SolicitudRetiroController {
 			model.addAttribute("error", true);
 			model.addAttribute("excessOtp", excessOtp);
 			// model.addAttribute("resultado", resultado);
+			logServ.registrarLog(Constantes.VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO, "Exceso de intentos OTP: " + detalle, Constantes.OP_ENTREGA, false,
+					Util.getRemoteIp(request), usuario);
 			return "modals/validarOtpModal";
 		} else if (resultado.equals("938")) {
 			expiredOtp = true;
@@ -782,9 +795,13 @@ public class SolicitudRetiroController {
 			model.addAttribute("error", true);
 			model.addAttribute("expiredOtp", expiredOtp);
 			// model.addAttribute("resultado", resultado);
+			logServ.registrarLog(Constantes.VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO, "OTP expirado: " + detalle, Constantes.OP_ENTREGA, false,
+					Util.getRemoteIp(request), usuario);
 			return "modals/validarOtpModal";
 		}
-
+		
+		logServ.registrarLog(Constantes.VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGA, true,
+				Util.getRemoteIp(request), usuario);
 		final SolicitudRetiroTraza solicitudRetiroTraza = new SolicitudRetiroTraza();
 		solicitudRetiroTraza.setCodigoUsuario(usuario.getNombreUsuario());
 		solicitudRetiroTraza.setIdSolicitud(solicitudRetiro.getIdSolicitud());
@@ -794,10 +811,10 @@ public class SolicitudRetiroController {
 		Timestamp ts = new Timestamp(time);
 		solicitudRetiroTraza.setFecha(ts);
 		solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
-		
-				String detalle = MessageFormat.format(Constantes.ACCION_SOLICITUD_RETIRO_EFECTIVO, Constantes.OP_ENTREGAR,
-				solicitudRetiro.getIdSolicitud(), usuario.getIdUsuario(), usuario.getNombreUsuario());
-		logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGA, true,
+	
+		String detalle1 = MessageFormat.format(Constantes.DETALLE_ENTREGA_SOLICITUD_RETIRO_EFECTIVO,
+				solicitudRetiro.getIdSolicitud());
+		logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle1, Constantes.OP_ENTREGA, true,
 				Util.getRemoteIp(request), usuario);
 		return "modals/pruebaOTP";
 	}
@@ -819,9 +836,9 @@ public class SolicitudRetiroController {
 			solicitudRetiroTraza.setFecha(ts);
 			solicitudRetiroTrazaRepo.save(solicitudRetiroTraza);
 
-			String detalle = MessageFormat.format(Constantes.ACCION_SOLICITUD_RETIRO_EFECTIVO, Constantes.OP_ENTREGAR,
-					solicitudRetiro.getIdSolicitud(), usuario.getIdUsuario(), usuario.getNombreUsuario());
-			logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGAR, true,
+			String detalle = MessageFormat.format(Constantes.DETALLE_ENTREGA_SOLICITUD_RETIRO_EFECTIVO,
+					solicitudRetiro.getIdSolicitud());
+			logServ.registrarLog(Constantes.ENTREGAR_SOLICITUD_RETIRO_EFECTIVO, detalle, Constantes.OP_ENTREGA, true,
 					Util.getRemoteIp(request), usuario);
 			return "redirect:solicitudesRetiroEntregar?success";
 		}

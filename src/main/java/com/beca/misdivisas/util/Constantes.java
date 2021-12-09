@@ -83,10 +83,14 @@ public final class Constantes {
 	public static final String ACCION_LISTAR_PERFILES = "Se listaron los perfiles de la empresa {0}";
 	public static final String ACCION_SOLICITUD_RETIRO_EFECTIVO = "{0} Solicitud Retiro Efectivo : idSolicitud({1}); idUsuario({2}); nombreUsuario({3});";
 	public static final String ACCION_LOGIN="Se intenta ingresar con el nombre de usuario ({0}) desde la ip ({1})";
-	//public static final String ACCION_AGENCIA_DIA="Consulta mapa disponibilidad agencia";
-	public static final String ACCION_AGENCIA_DIA="{0} Programacion Agencia Dia : nombreUsuario({1});";
+	public static final String ACCION_AGENCIA_DIA="Programacion Agencia Dia";
+	public static final String DETALLE_GENERAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO = "idSolicitud({0}); sharedKey({1})";
+	public static final String DETALLE_VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO = "idSolicitud({0}); sharedKey({1})";
+	public static final String DETALLE_ENTREGA_SOLICITUD_RETIRO_EFECTIVO = "idSolicitud({0})"; 
+	public static final String DETALLE_MAPA_AGENCIA_DIA="Se visualizo la disponibilidad de agencias en el mapa";
 	
 	public static final String OP_CONSULTA = "Consulta";
+	public static final String OP_CONSULTAR = "Consultar";
 	public static final String OP_EDICION = "Edicion";
 	public static final String OP_CREAR = "Creacion";
 	public static final String OP_ELIMINAR = "Eliminar";
@@ -97,6 +101,9 @@ public final class Constantes {
 	public static final String OP_PROCESAR = "Procesar";
 	public static final String OP_ENTREGAR = "Entregar";
 	public static final String OP_CANCELAR = "Cancelar";
+	public static final String OP_GENERAR_OTP = "Generar Otp";
+	public static final String OP_PROGRAMAR_AGENCIAS = "Programacion de agencias";
+	
 
 
 	public static final String OP_DESCARGA = "Descarga";
@@ -171,7 +178,9 @@ public final class Constantes {
 	public static final String CANCELAR_SOLICITUD_RETIRO_EFECTIVO = "Cancelar solic ret efectivo";
 	public static final String PROCESAR_SOLICITUD_RETIRO_EFECTIVO = "Procesar solic ret efectivo";
 	public static final String ENTREGAR_SOLICITUD_RETIRO_EFECTIVO = "Entregar solic ret efectivo";
-	public static final String CREAR_PROG_AGENCIA_DIA = "Crear prog agencia dia";
+	public static final String GENERAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO = "Generar OTP";
+	public static final String VALIDAR_OTP_ENTREGA_SOLICITUD_RETIRO_EFECTIVO = "Validar OTP";
+	public static final String CREAR_PROG_AGENCIA_DIA = "Programar disp de agencias";
 	public static final String OPCION_POSICION = "Posicion Consolidada";
 	public static final String OPCION_BNA = "Billetes No Aptos";
 	public static final String OPCION_TRACKING = "Tracking de Remesas";
@@ -205,6 +214,7 @@ public final class Constantes {
 	public static final String AUTORIZADO_PERSONA_JURIDICA = "Autorizado Persona Juridica";
 	public static final String SOLICTUD_RETIRO_ACCION_FROM = "accionFrom";
 	public static final String AGENCIA_DIA = "Agencia Dia";
+	public static final String DISPONIBILIDAD_AGENCIA_DIA = "Consulta disp agencias";
 	
 	public static final String TIPO_PERFIL_I = "I";
 	public static final String TIPO_PERFIL_E = "E";

@@ -202,8 +202,9 @@ public class MapController {
 		model.addAttribute(Constantes.MENUES, factory.getObject().getAttribute(Constantes.USUARIO_MENUES));
 		model.addAttribute(Constantes.TIPO_MAPA, "agencias");
 		model.addAttribute("fecha", fechaS);
-		String detalle = MessageFormat.format(Constantes.ACCION_AGENCIA_DIA, Constantes.OP_CONSULTA, usuario.getIdUsuario(), usuario.getNombreUsuario());
-		logServ.registrarLog(Constantes.OP_CONSULTA, detalle, Constantes.AGENCIA_DIA,
+		
+		//String detalle = MessageFormat.format(Constantes.ACCION_MAPA_AGENCIA_DIA, Constantes.OP_CONSULTA, usuario.getIdUsuario(), usuario.getNombreUsuario());
+		logServ.registrarLog(Constantes.OP_CONSULTAR, Constantes.DETALLE_MAPA_AGENCIA_DIA, Constantes.DISPONIBILIDAD_AGENCIA_DIA,
 				true, Util.getRemoteIp(request), usuario);
 
 		return Constantes.MAPA_AGENCIA_DIA;
