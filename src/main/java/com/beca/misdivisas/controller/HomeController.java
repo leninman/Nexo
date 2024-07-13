@@ -272,6 +272,11 @@ public class HomeController {
             
 			logServ.registrarLog(Constantes.MAIN, Constantes.MAIN, Constantes.OPCION_INICIO, true,
 					Util.getRemoteIp(request), usuario);
+            
+            
+			/*logServ.registrarLog(Constantes.MAIN,Constantes.INGRESO_USUARIO + usuario.getNombreUsuario(), Constantes.OPCION_INICIO, true,
+					Util.getRemoteIp(request), usuario);*/
+			
 			if (menues != null) {
 				model.addAttribute(Constantes.MENUES, menues);
 			}	

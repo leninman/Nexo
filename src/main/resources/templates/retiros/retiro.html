@@ -1,0 +1,321 @@
+<style>
+	/* Chrome, Safari, Edge, Opera */
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	/* Firefox */
+	input[type=number] {
+		-moz-appearance: textfield;
+	}
+</style>
+
+<!-- <script src="js/bootnavbar.js"></script>
+<script src="js/datatable.js"></script>
+<script src="js/jquery-ui.min.1.12.1.js"></script>
+<link href="css/jquery-ui.1.12.1.css" rel="stylesheet">
+<script src="vendor/select2/js/select2.min.js" th:src="@{/vendor/select2/js/select2.min.js}" defer></script>-->
+
+<!-- datatables -->
+<!-- <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="js/jquery-ui.min.1.12.1.js"></script>
+<script src="js/datatable.js"></script>
+
+<link rel="stylesheet" href="css/jquery.dataTables.min.1.10.20.css">
+<link rel="stylesheet" href="css/buttons.dataTables.min.1.6.1.css">
+<link rel="stylesheet" href="css/styles.css">
+<script src="js/buttons.html5.min.1.2.2.js"></script>
+
+<script src="js/dataTables.buttons.min.1.6.1.js"></script>
+<script src="js/buttons.colVis.min.1.6.1.js"></script>
+<script src="js/jszip.min.3.1.3.js"></script>
+<script src="js/pdfmake.min.0.1.53.js"></script>
+<script src="js/vfs_fonts.0.1.53.js"></script>
+<script src="js/date-eu.1.10.11.js"></script>
+<script src="js/jqExtension.js"></script>-->
+
+<link rel="stylesheet" href="css/styles.css">
+
+<div th:if="${crearRetiro}" class="row">
+	<div class="container my-5">
+		<div class="row">
+			<div class="form-group col-md-4">&nbsp;</div>
+			<div class="form-group col-md-4">
+				<h5><b>Nuevo retiro</b></h5>
+			</div>
+
+		</div>
+
+		<div class="card" style="width: 100%;">
+			<div class="card-body" style="text-align: left; width: 100%">
+				<div class="container">
+
+					<div class="col-md-20">
+						<form class="form-horizontal" role="form">
+							<br> <br>
+							<input type="hidden" th:value="${crear}" id="crear" name="crear" />
+							 <script>
+								$('form')
+									.on(
+										'submit',
+										function (e) {
+											e.preventDefault();
+											processPostForm(
+												"agregarRetiro",
+												this);
+										});
+							</script>
+							<div class="row">
+
+								<div class="col-md-1">
+									<label for="tipoMoneda" class="col-form-label">Moneda:
+									</label>
+								</div>
+								<div class="col-md-3">
+									<select id="tipoMoneda" class="form-control" name="tipoMoneda"
+										style="width: 230px;">
+										<option selected value="D">Dólar</option>
+										<option value="E">Euro</option>
+									</select>
+								</div>
+
+								<div class="form-group col-md-4">&nbsp;</div>
+
+
+								<div class="col-md-1">
+									<label for="agencia" class="col-form-label">Agencia:</label>
+								</div>
+
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="agencia" id="agencia"
+										style="border: 0;" value="010-Urdaneta">
+								</div>
+
+							</div>
+							<br> <br>
+							<br> <br>
+
+
+							<div class="row">
+
+								<div class="form-group col-md-4">&nbsp;</div>
+								<div class="form-group col-md-4">
+									<h5><b>Datos del Cliente</b></h5>
+								</div>
+
+
+								<div class="col-md-4">
+
+									Custodia<input type="radio" name="optcustodia" style="width: 30px;">
+
+									Otro<input type="radio" name="optotro" style="width: 30px;">
+
+								</div>
+
+							</div>
+
+
+
+				
+
+					<div class="row">
+						<div class="col-md-2">
+							<label for="tipoDocumento" class="col-form-label">Doc
+								identificación: </label>
+						</div>
+
+						<div class="col-md-1">
+							<select class="form-control" name="tipoDocumento" id="tipoDocumento" style="width: 60px;">
+								<option>V</option>
+								<option>E</option>
+								<option>P</option>
+							</select>
+						</div>
+						<div class="col-md-3">
+							<input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57'
+								maxlength="8" class="form-control" name="numeroDocumento" id="numeroDocumento">
+						</div>
+						<div class="col-md-2">
+							<label for="nombre" class="col-form-label" style="width: 150px; padding: 0px;">Destino de
+								los
+								fondos:</label>
+						</div>
+						<div class="col-md-4">
+							<input type="text" class="form-control" id="nombre"
+								style="width: 350px; margin-right: 0px;">
+						</div>
+					</div>
+					<br> <br>
+					<div class="row">
+						<div class="form-group col-md-8" style="text-align: center; margin: 0 auto;">
+							<input type="submit" class="btn btn-primary" th:value="#{bot.buscar}">
+						</div>
+					</div>
+					<br> <br>
+
+					<div class="row">
+						<div class="col-md-3">
+							<label for="cuentaReceptora"
+								style="width: 250px; margin-right: auto;margin-left: auto;">Cuenta
+								Exterior Divisas: </label>
+						</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="cuentaReceptora"
+								style="width: 250px; margin-right: auto;margin-left: auto;border:0px;" maxlength="20"
+								value="0115************2547">
+						</div>
+
+						<div class="col-md-3">
+							<label for="cuentaComision"
+								style="width: 250px; margin-right: auto;margin-left: auto;">Cuenta
+								cobro comisión: </label>
+						</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="cuentaComision"
+								style="width: 250px; margin-right: auto;margin-left: auto;" maxlength="20"
+								value="0115************6574">
+						</div>
+
+					</div>
+					<br> <br>
+
+					<h5><b>Piezas</b></h5>
+					<div class="row">
+
+						<div class="col-md-4" style="margin-left: auto;margin-right: auto;">
+							<h6>Euro</h6>
+						</div>
+
+						<div class="col-md-4" style="margin-left: auto;margin-right: auto;">
+							<h6>Dólar</h6>
+						</div>
+					</div>
+					<div class="row">
+
+						<div class="col-md-4" style="margin-left: auto;margin-right: auto;">
+
+							<table class="tablasdivisas">
+								<tr>
+									<th>Denominación</th>
+									<th>Cantidad</th>
+								</tr>
+								<tr>
+									<td>200</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>100</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>50</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>20</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>10</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+							</table>
+						</div>
+
+
+
+						<div class="col-md-4" style="margin-left: auto;margin-right: auto;">
+
+							<table class="tablasdivisas">
+								<tr>
+									<th>Denominación</th>
+									<th>Cantidad</th>
+								</tr>
+								<tr>
+									<td>100</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>50</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>20</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>10</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+								<tr>
+									<td>1</td>
+									<td><input type="text" value="0" class="inputcantidad">
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col" style="display: flex;">
+							<div class="form-group col-md-3">&nbsp;</div>
+							<div class="col-md-2">
+								<h5>Monto total:</h5>
+							</div>
+							<div class="form-group col-md-2">&nbsp;</div>
+							<div class="col-md-2">
+								<h5>0,00</h5>
+							</div>
+						</div>
+					</div>
+					<br> <br>
+					<div class="row">
+						<div class="col" style="display: flex; justify-content: center;">
+							<div class="form-group col-md-8" style="text-align: center;">
+								<button class="btn btn-secondary" th:text="#{bot.limpiar}"></button>
+								<input type="submit" class="btn btn-primary" th:value="#{bot.procesar}">
+								<button class="btn btn-secondary" th:text="#{bot.cancelar}"></button>
+							</div>
+						</div>
+					</div>
+
+
+					</form>
+
+				</div>
+
+
+
+			</div>
+
+		</div>
+	</div>
+</div>
+</div>

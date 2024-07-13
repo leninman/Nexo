@@ -1,0 +1,131 @@
+<th:block th:fragment="lista">
+	<div th:if="${param.success}">
+		<div class="alert alert-info">Operaci&oacute;n Realizada
+			Exitosamente</div>
+	</div>
+	<div th:if="${param.error}">
+		<div class="alert alert-danger" th:text="#{msj.operacion.fallida}"></div>
+	</div>
+
+	<div class="container my-5">
+		<h5 align="center">Listado de retiros</h5>
+		<div class="card">
+			<div class="card-body" align="center">
+				<div class="container my-5">
+					<div class="row" style="display: inline-block;">
+						<div>
+							<p class="my-5">
+								<a id="boton_agregar" style="cursor: hand;"
+									onclick="getFormulario('nuevoRetiro')"
+									class="btn btn-secondary btn-sm" th:title="#{msj.retiro.crear}"
+									tabindex="-1"> <i class="fas fa-plus-circle"></i></a>
+							</p>
+						</div>
+
+
+					</div>
+					<div class="row">
+						<div class="col-md-9"></div>
+						<div>
+							<input id="buscarRetiro"
+								type="text" class="form-control" />
+
+						</div>
+					</div>
+
+					<br>
+					<table class="table table-striped table-responsive-md table-hover"
+						id="tableListRetiros">
+						<thead>
+							<tr>
+								<th th:text="#{etq.fecha.retiro}"></th>
+								<th th:text="#{etq.codigo.usuario}"></th>
+								<th th:text="#{etq.referencia}"></th>
+								<th th:text="#{etq.cliente.retiro}"></th>
+								<th th:text="#{etq.moneda}"></th>
+								<th th:text="#{etq.monto}"></th>
+								<th th:text="#{etq.cliente.estatusActualRetiro}"></th>
+								<th th:text="#{etq.acciones}"></th>
+
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>05/11/2020 13:42:18</td>
+								<td>E12345</td>
+								<td>201105134218006</td>
+								<td>E1234567890</td>
+								<td>Euro</td>
+								<td>600,00</td>
+								<td>Procesado</td>
+								<td><a name="verRetiro" th:text="#{msj.retiro.ver}"
+									style="cursor: pointer;"> </a></td>
+							</tr>
+							<tr>
+								<td>05/11/2020 13:47:18</td>
+								<td>E12345</td>
+								<td>201105134218006</td>
+								<td>E1234567890</td>
+								<td>Euro</td>
+								<td>250,00</td>
+								<td>Reversado</td>
+								<td><a name="verRetiro" th:text="#{msj.retiro.ver}"
+									style="cursor: pointer;"> </a></td>
+							</tr>
+							<tr>
+								<td>05/11/2020 13:47:18</td>
+								<td>E12345</td>
+								<td>201105134218006</td>
+								<td>E1234567890</td>
+								<td>Euro</td>
+								<td>550,00</td>
+								<td>Procesado</td>
+								<td><a name="verRetiro" th:text="#{msj.retiro.ver}"
+									onclick="getFormulario('detalleRetiro')"
+									style="cursor: pointer;"> </a></td>
+							</tr>
+						</tbody>
+					</table>
+
+
+				</div>
+			</div>
+
+
+
+		</div>
+
+
+
+	</div>
+<script>
+document.querySelector("#buscarRetiro").onkeyup = function() {
+	$TableFilter("#tableListRetiros", this.value);
+}
+
+$TableFilter = function(id, value) {
+	var rows = document.querySelectorAll(id + ' tbody tr');
+
+	for (var i = 0; i < rows.length; i++) {
+		var showRow = false;
+
+		var row = rows[i];
+		row.style.display = 'none';
+
+		for (var x = 0; x < row.childElementCount; x++) {
+			if (row.children[x].textContent.toLowerCase().indexOf(value.toLowerCase().trim()) > -1) {
+				showRow = true;
+				break;
+			}
+		}
+
+		if (showRow) {
+			row.style.display = null;
+		}
+	}
+}
+</script>
+
+
+
+</th:block>
